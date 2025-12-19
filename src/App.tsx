@@ -24,6 +24,8 @@ export default function App() {
     import.meta.env.VITE_API_BASE || 'https://ghost-job-api.onrender.com';
 
   const [url, setUrl] = useState('');
+  const [pastedText, setPastedText] = useState('');
+
   const [openLegal, setOpenLegal] = useState<null | 'terms' | 'privacy'>(null);
 
   type AnalysisStatus = 'idle' | 'running' | 'complete';
@@ -83,7 +85,12 @@ export default function App() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ url }),
+        body: JSON.stringify(
+  pastedText.trim()
+    ? { pastedText }
+    : { url }
+),
+
       });
 
       if (!res.ok) {
@@ -91,6 +98,9 @@ export default function App() {
       }
 
       const data = await res.json();
+
+console.log('Signals:', data.signals);
+
 
       // Trigger signals one-by-one using backend timing
       const { stale, weak, inactivity } = data.signals;
@@ -149,18 +159,29 @@ export default function App() {
                   where to focus your time.
                 </p>
 
-                <div className="input-group">
-                  <input
-                    type="url"
-                    placeholder="Copy and paste job link here"
-                    value={url}
-                    onChange={(e) => setUrl(e.target.value)}
-                  />
-                  <button className="analyze-btn" onClick={handleAnalyze}>
-                    <span className="analyze-desktop">Analyze Job Link</span>
-                    <span className="analyze-mobile">Analyze</span>
-                  </button>
-                </div>
+<div className="input-group">
+  <input
+    type="url"
+    placeholder="Copy and paste job link here"
+    value={url}
+    onChange={(e) => setUrl(e.target.value)}
+  />
+
+  <textarea
+    placeholder="Or paste full job description here"
+    value={pastedText}
+    onChange={(e) => setPastedText(e.target.value)}
+    rows={6}
+  />
+
+  <button className="analyze-btn" onClick={handleAnalyze}>
+    <span className="analyze-desktop">Analyze Job Link</span>
+    <span className="analyze-mobile">Analyze</span>
+  </button>
+</div>
+
+
+
 
                 <p className="microcopy muted">
                   Works on any public job posting. No account required.
