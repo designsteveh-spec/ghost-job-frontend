@@ -168,12 +168,15 @@ export default function App() {
               </>
             ) : (
               <>
-                <h2>
-                  Results:{' '}
-                  {status === 'running'
-                    ? 'In Progress'
-                    : 'Likely Active Posting'}
-                </h2>
+               <h2>
+  Results:{' '}
+  {status === 'running' ? (
+    'In Progress'
+  ) : (
+    <span className="result-active">Likely Active Posting</span>
+  )}
+</h2>
+
 
                 <p>
                   Probability Score:{' '}
@@ -211,7 +214,8 @@ export default function App() {
                 </ul>
 
                 <button
-                  className="secondary-btn"
+                  className="secondary-btn primary-cta"
+
                   disabled={status === 'running'}
                   aria-disabled={status === 'running'}
                   onClick={() => {
