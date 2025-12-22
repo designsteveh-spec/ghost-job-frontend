@@ -101,6 +101,13 @@ body {
 
 /* ---------------- RESULTS ---------------- */
 
+/* Result status highlight */
+.result-active {
+  color: #806655;
+  font-weight: 600;
+}
+
+
 .results {
   padding: 64px 24px;
   background: #f8fafc;
@@ -150,6 +157,20 @@ body {
 /* Disabled state for result actions */
 .secondary-btn:disabled,
 .secondary-btn[aria-disabled='true'] {
+	
+	/* Primary result CTA */
+.primary-cta {
+  background-color: #FFCD2E;
+  border: 2px solid #4040FF;
+  color: #4040FF;
+  font-weight: 600;
+}
+
+.primary-cta:hover {
+  background-color: #ffd84d;
+}
+
+	
   opacity: 0.45;
   cursor: not-allowed;
   pointer-events: none;
