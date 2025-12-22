@@ -155,26 +155,26 @@ body {
 }
 
 /* Disabled state for result actions */
+/* Disabled state for result actions */
 .secondary-btn:disabled,
 .secondary-btn[aria-disabled='true'] {
-	
-	/* Primary result CTA */
+  opacity: 0.45;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* Primary result CTA */
 .primary-cta {
   background-color: #FFCD2E;
   border: 2px solid #4040FF;
   color: #4040FF;
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .primary-cta:hover {
   background-color: #ffd84d;
 }
 
-	
-  opacity: 0.45;
-  cursor: not-allowed;
-  pointer-events: none;
-}
 
 /* ---------------- HERO ---------------- */
 
@@ -242,11 +242,25 @@ button {
   padding: 14px 22px;
   border-radius: 999px;
   border: none;
-  background: #1e40ff;
-  color: #ffffff;
+  background: transparent;
+  color: inherit;
   font-weight: 600;
   cursor: pointer;
 }
+
+/* Primary analyze CTA */
+.analyze-btn {
+  background-color: #FFCD2E;
+  border: 2px solid #4040FF;
+  color: #4040FF;
+  font-weight: 700;
+}
+
+.analyze-btn:hover {
+  background-color: #ffd84d;
+}
+
+
 
 .microcopy {
   font-size: 13px;
