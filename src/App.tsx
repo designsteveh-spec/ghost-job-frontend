@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import './index.css';
 import Pricing from './components/Pricing';
 import MailerLiteForm from './components/MailerLiteForm';
+import lockIcon from './assets/lock.svg';
+
 
 import Navbar from './components/Navbar';
 import ghostStatic from './assets/ghost-static-gear.jpg';
@@ -28,11 +30,7 @@ export default function App() {
     import.meta.env.VITE_API_BASE || 'https://ghost-job-api.onrender.com';
 
   const [url, setUrl] = useState('');
-  // Check mode (tabs)
-const [checkMode, setCheckMode] = useState<'basic' | 'deep'>('basic');
 
-// User tier (temporary — will come from cookie / Stripe later)
-const [userTier] = useState<'free' | 'plus' | 'pro'>('free');
 
   const [openLegal, setOpenLegal] = useState<null | 'terms' | 'privacy'>(null);
 
@@ -166,11 +164,8 @@ const [checkMode, setCheckMode] = useState<CheckMode>('basic');
     >
       Deep Check
       {userTier === 'free' && (
-        <img
-          src="/assets/lock.svg"
-          alt=""
-          className="tab-lock-icon"
-        />
+        <img src={lockIcon} alt="" className="tab-lock-icon" />
+
       )}
     </button>
   </div>
