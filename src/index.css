@@ -187,11 +187,10 @@ body {
   margin: 0 auto;
   padding: 0 24px;
   display: grid;
-  grid-template-columns: auto 1fr;
-  gap: 24px; /* reduced spacing between image and text */
+  grid-template-columns: 0.5fr 1.1fr;
+  gap: 48px;
   align-items: center;
 }
-
 
 .hero-graphic {
   max-width: 320px;
