@@ -142,34 +142,36 @@ const [checkMode, setCheckMode] = useState<CheckMode>('basic');
       {/* HERO */}
       <section id="hero" className="hero">
 	  
-	  <div className="check-tabs-bar">
-  <div className="check-tabs">
-    {/* BASIC TAB */}
-    <button
-      className={`check-tab ${checkMode === 'basic' ? 'active' : ''}`}
-      onClick={() => setCheckMode('basic')}
-    >
-      Basic Check
-    </button>
+	 <div className="check-tabs-frame">
+  <div className="check-tabs-inner">
+    <div className="check-tabs">
+      {/* BASIC TAB */}
+      <button
+        className={`check-tab ${checkMode === 'basic' ? 'active' : ''}`}
+        onClick={() => setCheckMode('basic')}
+      >
+        Basic Check
+      </button>
 
-    {/* DEEP TAB */}
-    <button
-      className={`check-tab ${
-        checkMode === 'deep' ? 'active' : ''
-      } ${userTier === 'free' ? 'locked' : ''}`}
-      onClick={() => {
-        if (userTier === 'free') return;
-        setCheckMode('deep');
-      }}
-    >
-      Deep Check
-      {userTier === 'free' && (
-        <img src={lockIcon} alt="" className="tab-lock-icon" />
-
-      )}
-    </button>
+      {/* DEEP TAB */}
+      <button
+        className={`check-tab ${
+          checkMode === 'deep' ? 'active' : ''
+        } ${userTier === 'free' ? 'locked' : ''}`}
+        onClick={() => {
+          if (userTier === 'free') return;
+          setCheckMode('deep');
+        }}
+      >
+        Deep Check
+        {userTier === 'free' && (
+          <img src={lockIcon} alt="" className="tab-lock-icon" />
+        )}
+      </button>
+    </div>
   </div>
 </div>
+ 
 
 	  
         <div className="hero-inner">
