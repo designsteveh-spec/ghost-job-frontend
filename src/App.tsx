@@ -13,8 +13,8 @@ import educationImage from './assets/ghostPic-1.png';
 
 // Education icons
 import staleIcon from './assets/marker3-data.svg';
-import checkOn from './assets/checkmark-on.png';
-import checkOff from './assets/checkmark-off.png';
+import checkOn from './assets/checkmark-on.svg';
+import checkOff from './assets/checkmark-off.svg';
 import weakIcon from './assets/marker2-abs.svg';
 import signalIcon from './assets/marker1-suc.svg';
 
@@ -28,12 +28,24 @@ export default function App() {
     import.meta.env.VITE_API_BASE || 'https://ghost-job-api.onrender.com';
 
   const [url, setUrl] = useState('');
+  // Check mode (tabs)
+const [checkMode, setCheckMode] = useState<'basic' | 'deep'>('basic');
+
+// User tier (temporary — will come from cookie / Stripe later)
+const [userTier] = useState<'free' | 'plus' | 'pro'>('free');
+
   const [openLegal, setOpenLegal] = useState<null | 'terms' | 'privacy'>(null);
 
   type AnalysisStatus = 'idle' | 'running' | 'complete';
   type SignalStatus = 'pending' | 'complete';
 
   const [status, setStatus] = useState<AnalysisStatus>('idle');
+  // Tier + tab state (UI only for now)
+const userTier: 'free' | 'plus' | 'pro' = 'free';
+
+type CheckMode = 'basic' | 'deep';
+const [checkMode, setCheckMode] = useState<CheckMode>('basic');
+
   const [score, setScore] = useState<number | null>(null);
   const [signals, setSignals] = useState<{
     stale: SignalStatus;
@@ -131,6 +143,40 @@ export default function App() {
 
       {/* HERO */}
       <section id="hero" className="hero">
+	  
+	  <div className="check-tabs-bar">
+  <div className="check-tabs">
+    {/* BASIC TAB */}
+    <button
+      className={`check-tab ${checkMode === 'basic' ? 'active' : ''}`}
+      onClick={() => setCheckMode('basic')}
+    >
+      Basic Check
+    </button>
+
+    {/* DEEP TAB */}
+    <button
+      className={`check-tab ${
+        checkMode === 'deep' ? 'active' : ''
+      } ${userTier === 'free' ? 'locked' : ''}`}
+      onClick={() => {
+        if (userTier === 'free') return;
+        setCheckMode('deep');
+      }}
+    >
+      Deep Check
+      {userTier === 'free' && (
+        <img
+          src="/assets/lock.svg"
+          alt=""
+          className="tab-lock-icon"
+        />
+      )}
+    </button>
+  </div>
+</div>
+
+	  
         <div className="hero-inner">
           <div className="hero-graphic hero-visual">
   <img
