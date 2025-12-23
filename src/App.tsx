@@ -129,8 +129,13 @@ export default function App() {
       <section id="hero" className="hero">
         <div className="hero-inner">
           <div className="hero-graphic hero-visual">
-            <img src={heroGraphic} alt="Job posting analysis illustration" />
-          </div>
+  <img
+    src={status === 'running' ? ghostAnim : ghostStatic}
+    alt="Job posting analysis illustration"
+    className="hero-graphic-img"
+  />
+</div>
+
 
           <div className="hero-content">
             {status === 'idle' ? (
