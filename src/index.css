@@ -187,14 +187,19 @@ body {
   margin: 0 auto;
   padding: 0 24px;
   display: grid;
-  grid-template-columns: 0.5fr 1.1fr;
-  gap: 48px;
-  align-items: center;
+  grid-template-columns: 0.45fr 1.1fr;
+  gap: 32px;
+  align-items: start; /* 🔒 lock vertical position */
 }
+
 
 .hero-graphic {
   max-width: 320px;
+  height: 256px;           /* 🔒 fixed visual anchor */
+  display: flex;
+  align-items: center;
 }
+
 
 .hero-graphic-img {
   transition: opacity 180ms ease;
@@ -220,10 +225,12 @@ body {
   margin-bottom: 12px;
 }
 
-.hero-content h1 {
+.hero-content h1,
+.hero-content h2 {
   font-size: 36px;
   margin-bottom: 16px;
 }
+
 
 .accent {
   color: #1e40ff;
