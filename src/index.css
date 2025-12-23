@@ -133,26 +133,34 @@ body {
   color: #64748b;
 }
 
-.results-list li::before {
-  content: '●';
-  position: absolute;
-  left: 0;
-  top: 0;
-  font-size: 14px;
+.results-list li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-left: 0; /* remove old bullet spacing */
 }
 
-.results-list li.pending::before {
-  color: #cbd5e1;
+.result-icon {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
 }
+
+@media (max-width: 640px) {
+  .result-icon {
+    width: 18px;
+    height: 18px;
+  }
+}
+
+
 
 .results-list li.done {
   color: #0f172a;
   font-weight: 600;
 }
 
-.results-list li.done::before {
-  color: #1e40ff;
-}
+
 
 /* Disabled state for result actions */
 /* Disabled state for result actions */

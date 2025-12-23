@@ -13,6 +13,8 @@ import educationImage from './assets/ghostPic-1.png';
 
 // Education icons
 import staleIcon from './assets/marker3-data.svg';
+import checkOn from './assets/checkmark-on.png';
+import checkOff from './assets/checkmark-off.png';
 import weakIcon from './assets/marker2-abs.svg';
 import signalIcon from './assets/marker1-suc.svg';
 
@@ -201,25 +203,35 @@ export default function App() {
                 </p>
 
                 <ul className="results-list">
-                  <li
-                    className={
-                      signals.stale === 'complete' ? 'done' : 'pending'
-                    }
-                  >
-                    Detects stale or evergreen postings
-                  </li>
-                  <li
-                    className={signals.weak === 'complete' ? 'done' : 'pending'}
-                  >
-                    Flags weak or recycled job descriptions
-                  </li>
-                  <li
-                    className={
-                      signals.inactivity === 'complete' ? 'done' : 'pending'
-                    }
-                  >
-                    Highlights common inactivity signals
-                  </li>
+                  <ul className="results-list">
+  <li className={signals.stale === 'complete' ? 'done' : 'pending'}>
+    <img
+      src={signals.stale === 'complete' ? checkOn : checkOff}
+      alt=""
+      className="result-icon"
+    />
+    Detects stale or evergreen postings
+  </li>
+
+  <li className={signals.weak === 'complete' ? 'done' : 'pending'}>
+    <img
+      src={signals.weak === 'complete' ? checkOn : checkOff}
+      alt=""
+      className="result-icon"
+    />
+    Flags weak or recycled job descriptions
+  </li>
+
+  <li className={signals.inactivity === 'complete' ? 'done' : 'pending'}>
+    <img
+      src={signals.inactivity === 'complete' ? checkOn : checkOff}
+      alt=""
+      className="result-icon"
+    />
+    Highlights common inactivity signals
+  </li>
+</ul>
+
                 </ul>
 
                 <button
