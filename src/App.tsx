@@ -132,7 +132,7 @@ export default function App() {
         <div className="hero-inner">
           <div className="hero-graphic hero-visual">
   <img
-    src={status !== 'idle' ? ghostAnim : ghostStatic}
+    src={status !== 'running' ? ghostAnim : ghostStatic}
     alt="Job posting analysis illustration"
     className="hero-graphic-img"
   />
