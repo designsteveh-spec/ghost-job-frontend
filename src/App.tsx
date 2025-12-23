@@ -4,9 +4,11 @@ import Pricing from './components/Pricing';
 import MailerLiteForm from './components/MailerLiteForm';
 
 import Navbar from './components/Navbar';
+import ghostStatic from './assets/ghost-static-gear.jpg';
+import ghostAnim from './assets/ghost-anim-gear.gif';
+
 
 // Hero + education images
-import heroGraphic from './assets/graphic-ghost-1.svg';
 import educationImage from './assets/ghostPic-1.png';
 
 // Education icons
@@ -130,7 +132,7 @@ export default function App() {
         <div className="hero-inner">
           <div className="hero-graphic hero-visual">
   <img
-    src={status === 'running' ? ghostAnim : ghostStatic}
+    src={status !== 'idle' ? ghostAnim : ghostStatic}
     alt="Job posting analysis illustration"
     className="hero-graphic-img"
   />
