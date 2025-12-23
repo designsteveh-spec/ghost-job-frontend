@@ -132,10 +132,12 @@ export default function App() {
         <div className="hero-inner">
           <div className="hero-graphic hero-visual">
   <img
-    src={status !== 'idle' ? ghostAnim : ghostStatic}
-    alt="Job posting analysis illustration"
-    className="hero-graphic-img"
-  />
+  key={status} // 🔑 forces GIF to stop when status changes
+  src={status === 'running' ? ghostAnim : ghostStatic}
+  alt="Job posting analysis illustration"
+  className="hero-graphic-img"
+/>
+
 </div>
 
 

@@ -203,10 +203,12 @@ body {
 
 .hero-graphic img,
 .hero-graphic-img {
-  width: 100%;
-  max-width: 320px;
+  width: auto;
+  max-width: 256px; /* hard cap to native resolution */
   height: auto;
+  image-rendering: auto;
 }
+
 
 
 .eyebrow {
