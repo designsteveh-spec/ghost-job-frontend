@@ -195,11 +195,12 @@ body {
 
 
 .check-tabs-frame {
-  background: #f8fafc;
-  padding-top: 10px;
-  padding-bottom: 0; /* 🔒 tabs butt into white hero */
+  background: #ffffff;        /* 🔒 white gap */
+  padding-top: 20px;          /* 🔒 EXACT spacing you want */
+  padding-bottom: 0;
   border-bottom: 0;
 }
+
 
 
 
@@ -270,8 +271,9 @@ body {
 
 
 .hero {
-  padding: 0 0 72px;
+  padding: 20px 0 72px; /* 🔒 creates 20px white space above eyebrow */
 }
+
 
 
 
@@ -315,8 +317,11 @@ body {
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: #1e40ff;
+  margin-top: 20px;      /* 🔒 THIS fixes the arrow issue */
   margin-bottom: 12px;
 }
+
+
 
 .hero-content h1,
 .hero-content h2 {
