@@ -194,9 +194,10 @@ body {
 
 .check-tabs-frame {
   background: #f8fafc;
-  border-bottom: 1px solid #e5e7eb;
-  padding-top: 24px;
+  padding-top: 0;
+  border-bottom: 0;
 }
+
 
 .check-tabs-inner {
   max-width: 1100px;
@@ -212,39 +213,50 @@ body {
 
 
 .check-tab {
-  position: relative;
-  padding: 8px 16px;
-  border-radius: 999px;
-  font-size: 13px;
-  font-weight: 600;
-  background: transparent;
-  color: #475569;
-  border: none;
+  height: 47px;                 /* Figma */
+  padding: 9px 16px;            /* Figma */
+  border-radius: 15px 15px 0 0; /* tab corners */
+  border: 2px solid #4040FF;    /* stroke */
+  border-bottom: 0;             /* tab look */
+  background: #DBDBDB;          /* inactive fill */
+  color: #4040FF;
+  font-size: 20px;
+  font-weight: 500;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
   cursor: pointer;
 }
 
 .check-tab.active {
-  background: #ffffff;
-  color: #1e40ff;
-  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.12);
+  background: #FFFFFF; /* active fill */
+  box-shadow: none;    /* remove pill look */
 }
 
+
 .check-tab.locked {
-  opacity: 0.6;
+  opacity: 0.7;
   cursor: not-allowed;
 }
 
+
 .tab-lock-icon {
-  width: 12px;
-  height: 12px;
-  margin-left: 6px;
+  width: 22px;
+  height: 22px;
+  margin-left: 0;
   vertical-align: middle;
 }
 
 
+
+
 .hero {
-  padding: 56px 0 72px;
+  padding: 0 0 72px;
 }
+
+
 
 .hero-inner {
   max-width: 1100px;
@@ -349,6 +361,30 @@ button {
   margin-top: 12px;
   color: #64748b;
 }
+
+.deep-desc {
+  margin-top: 18px;
+}
+
+.deep-label {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  color: #0f172a;
+  margin-bottom: 8px;
+}
+
+.deep-textarea {
+  width: 100%;
+  padding: 14px 16px;
+  border-radius: 10px;
+  border: 1px solid #cbd5e1;
+  font-size: 15px;
+  font-family: inherit;
+  resize: vertical;
+  min-height: 220px;
+}
+
 
 /* ---------------- EDUCATION ---------------- */
 

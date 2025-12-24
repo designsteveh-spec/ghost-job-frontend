@@ -41,6 +41,11 @@ export default function App() {
   // Tier + tab state (UI only for now)
 const userTier: 'free' | 'plus' | 'pro' = 'free';
 
+// DEV ONLY: unlock Deep Check while building/testing UI
+const DEV_UNLOCK_DEEP = true;
+const canUseDeep = userTier !== 'free' || DEV_UNLOCK_DEEP;
+
+
 type CheckMode = 'basic' | 'deep';
 const [checkMode, setCheckMode] = useState<CheckMode>('basic');
 
@@ -155,19 +160,18 @@ const [checkMode, setCheckMode] = useState<CheckMode>('basic');
 
       {/* DEEP TAB */}
       <button
-        className={`check-tab ${
-          checkMode === 'deep' ? 'active' : ''
-        } ${userTier === 'free' ? 'locked' : ''}`}
-        onClick={() => {
-          if (userTier === 'free') return;
-          setCheckMode('deep');
-        }}
-      >
-        Deep Check
-        {userTier === 'free' && (
-          <img src={lockIcon} alt="" className="tab-lock-icon" />
-        )}
-      </button>
+  className={`check-tab ${checkMode === 'deep' ? 'active' : ''} ${
+    !canUseDeep ? 'locked' : ''
+  }`}
+  onClick={() => {
+    if (!canUseDeep) return;
+    setCheckMode('deep');
+  }}
+>
+  Deep Check
+  {!canUseDeep && <img src={lockIcon} alt="" className="tab-lock-icon" />}
+</button>
+
     </div>
   </div>
 </div>
@@ -215,6 +219,18 @@ const [checkMode, setCheckMode] = useState<CheckMode>('basic');
                     <span className="analyze-mobile">Analyze</span>
                   </button>
                 </div>
+
+{checkMode === 'deep' && (
+  <div className="deep-desc">
+    <label className="deep-label">Job Description (Deep Check)</label>
+    <textarea
+      className="deep-textarea"
+      placeholder="Copy and paste job description here"
+      rows={10}
+    />
+  </div>
+)}
+
 
                 <p className="microcopy muted">
                   Works on any public job posting. No account required.
