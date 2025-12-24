@@ -224,7 +224,7 @@ body {
 
 .check-tab {
    height: 40px;
-   padding: 9px 16px;
+   padding: 6px 16px; /* ↓ reduce vertical padding */
    border-radius: 15px 15px 0 0;
    border: 2px solid #4040FF;
    border-bottom: 0;
@@ -239,6 +239,8 @@ body {
    gap: 12px;
    cursor: pointer;
 }
+
+
 
 
 
