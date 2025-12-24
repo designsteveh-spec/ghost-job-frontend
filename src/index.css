@@ -197,9 +197,10 @@ body {
 .check-tabs-frame {
   background: #f8fafc;
   padding-top: 10px;
-  padding-bottom: 15px; /* ↑ adds space above eyebrow text */
+  padding-bottom: 0; /* 🔒 tabs butt into white hero */
   border-bottom: 0;
 }
+
 
 
 
@@ -213,7 +214,9 @@ body {
 .check-tabs {
   display: flex;
   gap: 10px;
+  align-items: flex-end; /* 🔒 tabs sit flush to bottom */
 }
+
 
 .check-tabs {
   align-items: flex-end;
