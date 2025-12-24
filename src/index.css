@@ -197,8 +197,10 @@ body {
 .check-tabs-frame {
   background: #f8fafc;
   padding-top: 10px;
+  padding-bottom: 15px; /* ↑ adds space above eyebrow text */
   border-bottom: 0;
 }
+
 
 
 
@@ -212,6 +214,11 @@ body {
   display: flex;
   gap: 10px;
 }
+
+.check-tabs {
+  align-items: flex-end;
+}
+
 
 
 
