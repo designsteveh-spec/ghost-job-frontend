@@ -20,11 +20,9 @@ body {
 
 .site-header {
   width: 100%;
-  background: #f8fafc;
+  background: #ffffff;
   border-bottom: 1px solid #e5e7eb;
 }
-
-
 
 .nav-inner {
   max-width: 1100px;
@@ -195,15 +193,10 @@ body {
 
 
 .check-tabs-frame {
-  background: #ffffff;        /* 🔒 white gap */
-  padding-top: 20px;          /* 🔒 EXACT spacing you want */
-  padding-bottom: 0;
+  background: #f8fafc;
+  padding-top: 0;
   border-bottom: 0;
 }
-
-
-
-
 
 
 .check-tabs-inner {
@@ -215,38 +208,27 @@ body {
 .check-tabs {
   display: flex;
   gap: 10px;
-  align-items: flex-end; /* 🔒 tabs sit flush to bottom */
 }
-
-
-.check-tabs {
-  align-items: flex-end;
-}
-
 
 
 
 .check-tab {
-   height: 40px;
-   padding: 6px 16px; /* ↓ reduce vertical padding */
-   border-radius: 15px 15px 0 0;
-   border: 2px solid #4040FF;
-   border-bottom: 0;
-   background: #DBDBDB;
-   color: #4040FF;
-   font-size: 16px;
-   font-weight: 500;
-   line-height: 1;
-   display: inline-flex;
-   align-items: center;
-   justify-content: center;
-   gap: 12px;
-   cursor: pointer;
+  height: 47px;                 /* Figma */
+  padding: 9px 16px;            /* Figma */
+  border-radius: 15px 15px 0 0; /* tab corners */
+  border: 2px solid #4040FF;    /* stroke */
+  border-bottom: 0;             /* tab look */
+  background: #DBDBDB;          /* inactive fill */
+  color: #4040FF;
+  font-size: 20px;
+  font-weight: 500;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  cursor: pointer;
 }
-
-
-
-
 
 .check-tab.active {
   background: #FFFFFF; /* active fill */
@@ -271,9 +253,8 @@ body {
 
 
 .hero {
-  padding: 20px 0 72px; /* 🔒 creates 20px white space above eyebrow */
+  padding: 0 0 72px;
 }
-
 
 
 
@@ -317,11 +298,8 @@ body {
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: #1e40ff;
-  margin-top: 20px;      /* 🔒 THIS fixes the arrow issue */
   margin-bottom: 12px;
 }
-
-
 
 .hero-content h1,
 .hero-content h2 {
