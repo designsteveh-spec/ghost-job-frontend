@@ -296,7 +296,8 @@ onClick={() => {
                   />
                  <button
   className="analyze-btn"
-  onClick={handleAnalyze}
+  onClick={() => handleAnalyze()}
+
   disabled={!canAnalyzeLinkNow || (isDeep && hasDesc)}
   aria-disabled={!canAnalyzeLinkNow || (isDeep && hasDesc)}
 >
