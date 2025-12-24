@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
+
 import './index.css';
 import Pricing from './components/Pricing';
 import MailerLiteForm from './components/MailerLiteForm';
@@ -57,11 +58,15 @@ const [checkMode, setCheckMode] = useState<CheckMode>('basic');
   const hasUrl = !!url.trim();
   const hasDesc = !!jobDescription.trim();
 
-  // Basic requires URL. Deep allows URL OR Description.
-  const canAnalyzeNow = isDeep ? (hasUrl || hasDesc) : hasUrl;
+  // Analyze rules:
+  // - Basic: link only
+  // - Deep: link OR description (separate buttons to prevent mismatches)
+  const canAnalyzeLinkNow = hasUrl;
+  const canAnalyzeDescNow = isDeep && hasDesc;
 
-  // If both are present, show a mismatch warning (allowed, just warn)
-  const showMismatchNote = isDeep && hasUrl && hasDesc;
+  // If both are present, show a mismatch warning (should be rare due to auto-clearing)
+
+
 
 
   const [score, setScore] = useState<number | null>(null);
@@ -74,6 +79,14 @@ const [checkMode, setCheckMode] = useState<CheckMode>('basic');
     weak: 'pending',
     inactivity: 'pending',
   });
+
+  const timeoutsRef = useRef<number[]>([]);
+
+  const clearAllTimeouts = () => {
+    timeoutsRef.current.forEach((t) => window.clearTimeout(t));
+    timeoutsRef.current = [];
+  };
+
 
   /* -------------------------------------------
      Auto-expand legal sections via anchor links
@@ -90,6 +103,7 @@ const [checkMode, setCheckMode] = useState<CheckMode>('basic');
   };
 
    const resetAnalysis = () => {
+	clearAllTimeouts();
     setStatus('idle');
     setScore(null);
     setFormError(null);
@@ -101,14 +115,17 @@ const [checkMode, setCheckMode] = useState<CheckMode>('basic');
   };
 
 
-  const handleAnalyze = async () => {
+  const handleAnalyze = async (override?: { url?: string; jobDescription?: string }) => {
     setFormError(null);
 
-    const urlValue = url.trim();
-    const descValue = jobDescription.trim();
+    const urlValue = (override?.url ?? url).trim();
+    const descValue = (override?.jobDescription ?? jobDescription).trim();
 
     // Basic requires URL
-    if (checkMode === 'basic' && !urlValue) return;
+    if (checkMode === 'basic' && !urlValue) {
+      setFormError('Paste a job link to run Basic Check.');
+      return;
+    }
 
     // Deep requires URL OR Description
     if (checkMode === 'deep' && !urlValue && !descValue) {
@@ -116,9 +133,8 @@ const [checkMode, setCheckMode] = useState<CheckMode>('basic');
       return;
     }
 
-    // Deep: description-only (UI is ready; backend wiring comes next)
-   
-
+    // Kill any prior timers so tab switching/reset can't be overwritten
+    clearAllTimeouts();
 
     // Reset state
     setStatus('running');
@@ -132,61 +148,59 @@ const [checkMode, setCheckMode] = useState<CheckMode>('basic');
     try {
       const res = await fetch(`${API_BASE}/api/analyze`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-  mode: checkMode,
-  url: urlValue,
-  jobDescription: descValue,
-}),
-
-
-
+          mode: checkMode,
+          url: urlValue,
+          jobDescription: descValue,
+        }),
       });
 
-if (!res.ok) {
-  let msg = 'Analyze failed';
-  try {
-    const errData = await res.json();
-    if (errData?.error) msg = errData.error;
-  } catch {}
-  setFormError(msg);
-  setStatus('idle');
-  return;
-}
-
+      if (!res.ok) {
+        let msg = 'Analyze failed';
+        try {
+          const errData = await res.json();
+          if (errData?.error) msg = errData.error;
+        } catch {}
+        setFormError(msg);
+        setStatus('idle');
+        return;
+      }
 
       const data = await res.json();
 
-      // Trigger signals one-by-one using backend timing
       const { stale, weak, inactivity } = data.signals;
 
-      setTimeout(() => {
+      const t1 = window.setTimeout(() => {
         setSignals((s) => ({ ...s, stale: 'complete' }));
       }, stale.delay);
+      timeoutsRef.current.push(t1);
 
-      setTimeout(() => {
+      const t2 = window.setTimeout(() => {
         setSignals((s) => ({ ...s, weak: 'complete' }));
       }, weak.delay);
+      timeoutsRef.current.push(t2);
 
-      setTimeout(() => {
+      const t3 = window.setTimeout(() => {
         setSignals((s) => ({ ...s, inactivity: 'complete' }));
       }, inactivity.delay);
+      timeoutsRef.current.push(t3);
 
-      // Mark analysis complete after last signal
       const maxDelay = Math.max(stale.delay, weak.delay, inactivity.delay);
 
-      setTimeout(() => {
+      const t4 = window.setTimeout(() => {
         setScore(data.score);
         setStatus('complete');
       }, maxDelay + 300);
+      timeoutsRef.current.push(t4);
     } catch (err) {
       console.error(err);
-      setStatus('complete');
+      setFormError('Network error. Please try again.');
+      setStatus('idle');
       setScore(null);
     }
   };
+
 
   return (
     <>
@@ -280,12 +294,13 @@ onClick={() => {
 
 
                   />
-                  <button
+                 <button
   className="analyze-btn"
   onClick={handleAnalyze}
-  disabled={!canAnalyzeNow}
-  aria-disabled={!canAnalyzeNow}
+  disabled={!canAnalyzeLinkNow || (isDeep && hasDesc)}
+  aria-disabled={!canAnalyzeLinkNow || (isDeep && hasDesc)}
 >
+
 
                     <span className="analyze-desktop">Analyze Job Link</span>
                     <span className="analyze-mobile">Analyze</span>
@@ -320,6 +335,21 @@ onClick={() => {
 }}
 
       />
+	  
+	  <div className="input-group">
+  <button
+    className="analyze-btn"
+    onClick={() => handleAnalyze({ jobDescription, url: '' })}
+    disabled={!canAnalyzeDescNow || hasUrl}
+    aria-disabled={!canAnalyzeDescNow || hasUrl}
+  >
+    <span className="analyze-desktop">Analyze Description</span>
+    <span className="analyze-mobile">Analyze</span>
+  </button>
+</div>
+
+	  
+	  
     </div>
 
     
