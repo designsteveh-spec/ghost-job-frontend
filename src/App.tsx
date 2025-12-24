@@ -137,16 +137,25 @@ const [checkMode, setCheckMode] = useState<CheckMode>('basic');
         },
         body: JSON.stringify({
   mode: checkMode,
-  url: urlValue || null,
-  jobDescription: descValue || null,
+  url: urlValue,
+  jobDescription: descValue,
 }),
+
 
 
       });
 
-      if (!res.ok) {
-        throw new Error('Analyze failed');
-      }
+if (!res.ok) {
+  let msg = 'Analyze failed';
+  try {
+    const errData = await res.json();
+    if (errData?.error) msg = errData.error;
+  } catch {}
+  setFormError(msg);
+  setStatus('idle');
+  return;
+}
+
 
       const data = await res.json();
 

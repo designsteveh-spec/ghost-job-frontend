@@ -398,6 +398,12 @@ button {
   background-color: #ffd84d;
 }
 
+.analyze-btn:disabled,
+.analyze-btn[aria-disabled='true'] {
+  opacity: 0.45;
+  cursor: not-allowed;
+  pointer-events: none;
+}
 
 
 .microcopy {
