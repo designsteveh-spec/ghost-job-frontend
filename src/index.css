@@ -194,9 +194,10 @@ body {
 
 .check-tabs-frame {
   background: #f8fafc;
-  padding-top: 0;
+  padding-top: 16px; /* more space below navbar */
   border-bottom: 0;
 }
+
 
 
 .check-tabs-inner {
@@ -213,20 +214,20 @@ body {
 
 
 .check-tab {
-  height: 47px;                 /* Figma */
-  padding: 9px 16px;            /* Figma */
+  height: 44px;                 /* Figma */
+  padding: 10px 16px;            /* Figma */
   border-radius: 15px 15px 0 0; /* tab corners */
   border: 2px solid #4040FF;    /* stroke */
   border-bottom: 0;             /* tab look */
   background: #DBDBDB;          /* inactive fill */
   color: #4040FF;
-  font-size: 20px;
-  font-weight: 500;
+  font-size: 16px;
+  font-weight: 600;
   line-height: 1;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 12px;
+  gap: 10px;
   cursor: pointer;
 }
 
