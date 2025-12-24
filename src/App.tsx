@@ -31,6 +31,10 @@ export default function App() {
 
   const [url, setUrl] = useState('');
 
+  const [jobDescription, setJobDescription] = useState('');
+  const [formError, setFormError] = useState<string | null>(null);
+
+
 
   const [openLegal, setOpenLegal] = useState<null | 'terms' | 'privacy'>(null);
 
@@ -48,6 +52,17 @@ const canUseDeep = userTier !== 'free' || DEV_UNLOCK_DEEP;
 
 type CheckMode = 'basic' | 'deep';
 const [checkMode, setCheckMode] = useState<CheckMode>('basic');
+
+  const isDeep = checkMode === 'deep';
+  const hasUrl = !!url.trim();
+  const hasDesc = !!jobDescription.trim();
+
+  // Basic requires URL. Deep allows URL OR Description.
+  const canAnalyzeNow = isDeep ? (hasUrl || hasDesc) : hasUrl;
+
+  // If both are present, show a mismatch warning (allowed, just warn)
+  const showMismatchNote = isDeep && hasUrl && hasDesc;
+
 
   const [score, setScore] = useState<number | null>(null);
   const [signals, setSignals] = useState<{
@@ -74,9 +89,10 @@ const [checkMode, setCheckMode] = useState<CheckMode>('basic');
     setOpenLegal((prev) => (prev === section ? null : section));
   };
 
-  const resetAnalysis = () => {
+   const resetAnalysis = () => {
     setStatus('idle');
     setScore(null);
+    setFormError(null);
     setSignals({
       stale: 'pending',
       weak: 'pending',
@@ -84,8 +100,25 @@ const [checkMode, setCheckMode] = useState<CheckMode>('basic');
     });
   };
 
+
   const handleAnalyze = async () => {
-    if (!url.trim()) return;
+    setFormError(null);
+
+    const urlValue = url.trim();
+    const descValue = jobDescription.trim();
+
+    // Basic requires URL
+    if (checkMode === 'basic' && !urlValue) return;
+
+    // Deep requires URL OR Description
+    if (checkMode === 'deep' && !urlValue && !descValue) {
+      setFormError('Add a job link or paste a job description to run Deep Check.');
+      return;
+    }
+
+    // Deep: description-only (UI is ready; backend wiring comes next)
+   
+
 
     // Reset state
     setStatus('running');
@@ -102,7 +135,13 @@ const [checkMode, setCheckMode] = useState<CheckMode>('basic');
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ url }),
+        body: JSON.stringify({
+  mode: checkMode,
+  url: urlValue || null,
+  jobDescription: descValue || null,
+}),
+
+
       });
 
       if (!res.ok) {
@@ -153,7 +192,11 @@ const [checkMode, setCheckMode] = useState<CheckMode>('basic');
       {/* BASIC TAB */}
       <button
         className={`check-tab ${checkMode === 'basic' ? 'active' : ''}`}
-        onClick={() => setCheckMode('basic')}
+        onClick={() => {
+  setCheckMode('basic');
+  if (status !== 'idle') resetAnalysis();
+}}
+
       >
         Basic Check
       </button>
@@ -163,10 +206,12 @@ const [checkMode, setCheckMode] = useState<CheckMode>('basic');
   className={`check-tab ${checkMode === 'deep' ? 'active' : ''} ${
     !canUseDeep ? 'locked' : ''
   }`}
-  onClick={() => {
-    if (!canUseDeep) return;
-    setCheckMode('deep');
-  }}
+onClick={() => {
+  if (!canUseDeep) return;
+  setCheckMode('deep');
+  if (status !== 'idle') resetAnalysis();
+}}
+
 >
   Deep Check
   {!canUseDeep && <img src={lockIcon} alt="" className="tab-lock-icon" />}
@@ -210,26 +255,70 @@ const [checkMode, setCheckMode] = useState<CheckMode>('basic');
                 <div className="input-group">
                   <input
                     type="url"
-                    placeholder="Copy and paste job link here"
+                    placeholder={isDeep ? "Paste job link (or use description below)" : "Copy and paste job link here"}
+
                     value={url}
-                    onChange={(e) => setUrl(e.target.value)}
+                    onChange={(e) => {
+  const next = e.target.value;
+  setUrl(next);
+  if (formError) setFormError(null);
+
+  // Deep rule: if user starts using link, clear description
+  if (isDeep && next.trim() && jobDescription.trim()) {
+    setJobDescription('');
+  }
+}}
+
+
                   />
-                  <button className="analyze-btn" onClick={handleAnalyze}>
+                  <button
+  className="analyze-btn"
+  onClick={handleAnalyze}
+  disabled={!canAnalyzeNow}
+  aria-disabled={!canAnalyzeNow}
+>
+
                     <span className="analyze-desktop">Analyze Job Link</span>
                     <span className="analyze-mobile">Analyze</span>
                   </button>
                 </div>
+				
+				{formError && <p className="form-error">{formError}</p>}
 
-{checkMode === 'deep' && (
-  <div className="deep-desc">
-    <label className="deep-label">Job Description (Deep Check)</label>
-    <textarea
-      className="deep-textarea"
-      placeholder="Copy and paste job description here"
-      rows={10}
-    />
-  </div>
+
+{isDeep && (
+  <>
+    <div className="deep-block">
+      <div className="deep-label-row">
+        <div className="deep-label">Job Description (Deep Check)</div>
+        <div className="deep-hint">Paste a job description instead of a link.</div>
+
+      </div>
+
+      <textarea
+        className="job-desc"
+        placeholder="Copy and paste job description here"
+        value={jobDescription}
+       onChange={(e) => {
+  const next = e.target.value;
+  setJobDescription(next);
+  if (formError) setFormError(null);
+
+  // Deep rule: if user starts using description, clear link
+  if (next.trim() && url.trim()) {
+    setUrl('');
+  }
+}}
+
+      />
+    </div>
+
+    
+
+    
+  </>
 )}
+
 
 
                 <p className="microcopy muted">
@@ -300,8 +389,10 @@ const [checkMode, setCheckMode] = useState<CheckMode>('basic');
                   aria-disabled={status === 'running'}
                   onClick={() => {
                     if (status === 'running') return;
-                    resetAnalysis();
-                    setUrl('');
+resetAnalysis();
+setUrl('');
+setJobDescription('');
+
                   }}
                 >
                   Check Another Link
