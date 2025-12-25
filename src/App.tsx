@@ -7,8 +7,8 @@ import lockIcon from './assets/lock.svg';
 
 
 import Navbar from './components/Navbar';
-import ghostStatic from './assets/ghost-static-gear.jpg';
-import ghostAnim from './assets/ghost-anim-gear.gif';
+import ActivityGauge from './components/ActivityGauge';
+
 
 
 // Hero + education images
@@ -70,6 +70,12 @@ const [checkMode, setCheckMode] = useState<CheckMode>('basic');
 
 
   const [score, setScore] = useState<number | null>(null);
+
+// Gauge UI (front-end only)
+const [gaugeTarget, setGaugeTarget] = useState<number>(0);
+const [gaugeDurationMs, setGaugeDurationMs] = useState<number>(1400);
+const [gaugeRunId, setGaugeRunId] = useState<number>(0);
+
   const [signals, setSignals] = useState<{
     stale: SignalStatus;
     weak: SignalStatus;
@@ -105,13 +111,19 @@ const [checkMode, setCheckMode] = useState<CheckMode>('basic');
    const resetAnalysis = () => {
 	clearAllTimeouts();
     setStatus('idle');
-    setScore(null);
-    setFormError(null);
-    setSignals({
-      stale: 'pending',
-      weak: 'pending',
-      inactivity: 'pending',
-    });
+setScore(null);
+setFormError(null);
+setSignals({
+  stale: 'pending',
+  weak: 'pending',
+  inactivity: 'pending',
+});
+
+// Reset gauge to start state
+setGaugeTarget(0);
+setGaugeDurationMs(1400);
+setGaugeRunId((n) => n + 1);
+
   };
 
 
@@ -137,13 +149,19 @@ const [checkMode, setCheckMode] = useState<CheckMode>('basic');
     clearAllTimeouts();
 
     // Reset state
-    setStatus('running');
-    setScore(null);
-    setSignals({
-      stale: 'pending',
-      weak: 'pending',
-      inactivity: 'pending',
-    });
+setStatus('running');
+setScore(null);
+setSignals({
+  stale: 'pending',
+  weak: 'pending',
+  inactivity: 'pending',
+});
+
+// Start a fresh gauge run at 0% while we process
+setGaugeTarget(0);
+setGaugeDurationMs(1400);
+setGaugeRunId((n) => n + 1);
+
 
     try {
       const res = await fetch(`${API_BASE}/api/analyze`, {
@@ -187,6 +205,11 @@ const [checkMode, setCheckMode] = useState<CheckMode>('basic');
       timeoutsRef.current.push(t3);
 
       const maxDelay = Math.max(stale.delay, weak.delay, inactivity.delay);
+
+// Drive gauge animation to the final score across the staged signal duration
+setGaugeTarget(data.score);
+setGaugeDurationMs(maxDelay + 300);
+
 
       const t4 = window.setTimeout(() => {
         setScore(data.score);
@@ -247,15 +270,15 @@ onClick={() => {
 
 	  
         <div className="hero-inner">
-          <div className="hero-graphic hero-visual">
-  <img
-  key={status} // 🔑 forces GIF to stop when status changes
-  src={status === 'running' ? ghostAnim : ghostStatic}
-  alt="Job posting analysis illustration"
-  className="hero-graphic-img"
-/>
-
+        <div className="hero-graphic hero-visual">
+  <ActivityGauge
+    status={status}
+    targetPercent={gaugeTarget}
+    durationMs={gaugeDurationMs}
+    runId={gaugeRunId}
+  />
 </div>
+
 
 
           <div className="hero-content">
