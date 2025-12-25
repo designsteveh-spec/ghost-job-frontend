@@ -64,15 +64,17 @@ export default function Pricing() {
                 focus your effort wisely.
               </p>
 
-              <ul className="pricing-features">
-                <li>10 checks per day</li>
-                <li>Detailed signal breakdown</li>
-                <li>Stronger explanations</li>
-                <li>
-                  Priority analysis queue{' '}
-                  <span className="muted">(copy only)</span>
-                </li>
-              </ul>
+             <ul className="pricing-features">
+  <li>10 checks per day</li>
+  <li>Detailed signal breakdown</li>
+  <li>Stronger explanations</li>
+  <li>
+    Priority analysis queue{' '}
+    <span className="muted">(copy only)</span>
+  </li>
+  <li>Deep Check access</li>
+</ul>
+
 
               <div className="pricing-price">
                 $1.99 <span>/ month</span>
@@ -99,12 +101,14 @@ export default function Pricing() {
                 evaluation.
               </p>
 
-              <ul className="pricing-features">
-                <li>30 checks per day</li>
-                <li>Full signal history (last 30 days)</li>
-                <li>Stronger pattern explanations</li>
-                <li>Priority support</li>
-              </ul>
+<ul className="pricing-features">
+  <li>30 checks per day</li>
+  <li>Full signal history (last 30 days)</li>
+  <li>Stronger pattern explanations</li>
+  <li>Priority support</li>
+  <li>Deep Check access</li>
+</ul>
+
 
               <div className="pricing-price">
                 $4.99 <span>/ month</span>
