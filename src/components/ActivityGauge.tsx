@@ -102,7 +102,8 @@ export default function ActivityGauge({
   const needleOuter = polarToCartesian(cx, cy, r - 18, needleAngle);
 
   // Tick labels
-  const ticks = useMemo(() => [0, 20, 50, 75, 100], []);
+  const ticks = useMemo(() => [0, 25, 50, 75, 100], []);
+
 
   useEffect(() => {
     // Stop any prior animation
@@ -193,10 +194,11 @@ export default function ActivityGauge({
 
         {/* Ticks + labels */}
         {ticks.map((t) => {
-          const a = arcStart + ((arcEnd - arcStart) * t) / 100;
+          const a = arcEnd + ((arcStart - arcEnd) * t) / 100;
           const p = polarToCartesian(cx, cy, r - 2, a);
-          const p2 = polarToCartesian(cx, cy, r - 18, a);
-          const lbl = polarToCartesian(cx, cy, r - 34, a);
+          const p2 = polarToCartesian(cx, cy, r - 24, a);
+          const lbl = polarToCartesian(cx, cy, r - 42, a);
+
 
           return (
             <g key={t}>
