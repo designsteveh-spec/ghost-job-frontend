@@ -67,7 +67,7 @@ export default function ActivityGauge({
 
   // Gauge geometry (256x256)
   const cx = 128;
- const cy = 379; // lower center so arc sits comfortably inside 256x256
+ const cy = 240; // lower center so arc sits comfortably inside 256x256
   const r = 92;
 
 
