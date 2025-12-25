@@ -67,8 +67,9 @@ export default function ActivityGauge({
 
   // Gauge geometry (256x256)
   const cx = 128;
-  const cy = 136; // slightly lower so bottom number fits nicely
-  const r = 96;
+  const cy = 156; // lower center so arc sits comfortably inside 256x256
+  const r = 92;
+
 
   // Arc sweep similar to your mock: 270° (from 225° down-left to -45° down-right)
   const arcStart = 225;
