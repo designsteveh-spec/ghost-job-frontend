@@ -67,15 +67,20 @@ export default function ActivityGauge({
 
   // Gauge geometry (256x256)
   const cx = 128;
- const cy = 280; // lower center so arc sits comfortably inside 256x256
+  const cy = 156; // center Y (tweak 150–170 to taste)
   const r = 92;
 
 
   // Arc sweep similar to your mock: 270° (from 225° down-left to -45° down-right)
-  const arcStart = 225;
-  const arcEnd = -45;
+const arcStart = 135;  // lower-left
+const arcEnd = 405;    // lower-right (45 + 360) so the sweep goes over the top
 
-  const arcPath = useMemo(() => describeArc(cx, cy, r, arcStart, arcEnd), []);
+
+  const arcPath = useMemo(
+  () => describeArc(cx, cy, r, arcStart, arcEnd),
+  [cx, cy, r, arcStart, arcEnd]
+);
+
 
   // Convert percent -> needle angle
   const needleAngleBase = useMemo(() => {
@@ -103,6 +108,7 @@ export default function ActivityGauge({
 
   // Tick labels
   const ticks = useMemo(() => [0, 25, 50, 75, 100], []);
+
 
 
   useEffect(() => {
@@ -194,7 +200,7 @@ export default function ActivityGauge({
 
         {/* Ticks + labels */}
         {ticks.map((t) => {
-          const a = arcEnd + ((arcStart - arcEnd) * t) / 100;
+          const a = arcStart + ((arcEnd - arcStart) * t) / 100;
           const p = polarToCartesian(cx, cy, r - 2, a);
           const p2 = polarToCartesian(cx, cy, r - 24, a);
           const lbl = polarToCartesian(cx, cy, r - 42, a);
