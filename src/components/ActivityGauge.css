@@ -45,10 +45,11 @@
   position: absolute;
   left: 0;
   right: 0;
-  bottom: 18px;
+  bottom: 8px; /* move down */
   text-align: center;
-  font-size: 40px;
+  font-size: 34px; /* slightly smaller */
   font-weight: 800;
   color: #1e40ff;
   letter-spacing: -0.02em;
 }
+

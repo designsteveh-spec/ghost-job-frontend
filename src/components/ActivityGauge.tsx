@@ -188,23 +188,12 @@ const arcEnd = 405;    // lower-right (45 + 360) so the sweep goes over the top
           </filter>
         </defs>
 
-        {/* Arc */}
-        <path
-          d={arcPath}
-          fill="none"
-          stroke="url(#gArc)"
-          strokeWidth="18"
-          strokeLinecap="round"
-          filter="url(#gShadow)"
-        />
-
-        {/* Ticks + labels */}
+                {/* Ticks + labels */}
         {ticks.map((t) => {
           const a = arcStart + ((arcEnd - arcStart) * t) / 100;
           const p = polarToCartesian(cx, cy, r - 2, a);
           const p2 = polarToCartesian(cx, cy, r - 24, a);
           const lbl = polarToCartesian(cx, cy, r - 42, a);
-
 
           return (
             <g key={t}>
@@ -227,6 +216,17 @@ const arcEnd = 405;    // lower-right (45 + 360) so the sweep goes over the top
             </g>
           );
         })}
+
+        {/* Arc */}
+        <path
+          d={arcPath}
+          fill="none"
+          stroke="url(#gArc)"
+          strokeWidth="18"
+          strokeLinecap="round"
+          filter="url(#gShadow)"
+        />
+
 
         {/* Needle */}
         <line
