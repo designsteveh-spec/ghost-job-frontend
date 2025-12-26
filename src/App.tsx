@@ -396,7 +396,7 @@ onClick={() => {
           <div className="hero-content">
             {status === 'idle' ? (
               <>
-                <span className="eyebrow">Ghost Job Link Checker</span>
+                <span className="eyebrow">Ghost Job Link Checker — DEPLOY TEST</span>
 
                 <h1>
                   Use probability indicators to assess{' '}
