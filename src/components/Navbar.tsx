@@ -61,12 +61,12 @@ export default function Navbar() {
         <div className="nav-actions nav-actions-desktop">
           <a href="#newsletter" className="cta cta-secondary">
             <span className="cta-desktop">Subscribe to Newsletter</span>
-            <span className="cta-mobile">Newsletter</span>
+            <span className="cta-mobile">Subscribe</span>
           </a>
 
           <a href="#pricing" className="cta cta-primary">
             <span className="cta-desktop">Get More Link Checks</span>
-            <span className="cta-mobile">Pricing</span>
+            <span className="cta-mobile">Upgrade</span>
           </a>
         </div>
 

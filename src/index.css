@@ -63,7 +63,9 @@ body {
   font-size: 14px;
   font-weight: 700;
   cursor: pointer;
+  white-space: nowrap; /* ✅ never break into 2 lines */
 }
+
 
 .cta:hover {
   background: #1e3ae8;
@@ -914,7 +916,7 @@ button {
   display: none;
 }
 
-@media (max-width: 640px) {
+@media (max-width: 768px) {
   .cta-desktop {
     display: none;
   }
@@ -923,6 +925,7 @@ button {
     display: inline;
   }
 }
+
 
 /* ---------------- ANALYZE BUTTON RESPONSIVE LABEL ---------------- */
 
