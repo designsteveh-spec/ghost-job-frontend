@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import logoLeft from '../assets/ghostchecker-logoLeft.svg';
 import logoRight from '../assets/ghostchecker-logoRight.svg';
+import burgerIcon from '../assets/burger-menu.svg';
+
 
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -71,19 +73,16 @@ export default function Navbar() {
         {/* Mobile hamburger */}
         <div className="nav-actions-mobile" ref={menuWrapRef}>
           <button
-            type="button"
-            className="nav-menu-btn"
-            aria-label={menuOpen ? 'Close menu' : 'Open menu'}
-            aria-expanded={menuOpen}
-            aria-controls="nav-menu-panel"
-            onClick={() => setMenuOpen((v) => !v)}
-          >
-            <span className="nav-menu-icon" aria-hidden="true">
-              <span />
-              <span />
-              <span />
-            </span>
-          </button>
+  type="button"
+  className="nav-menu-btn"
+  aria-label={menuOpen ? 'Close menu' : 'Open menu'}
+  aria-expanded={menuOpen}
+  aria-controls="nav-menu-panel"
+  onClick={() => setMenuOpen((v) => !v)}
+>
+  <img src={burgerIcon} alt="" aria-hidden="true" className="nav-menu-svg" />
+</button>
+
 
           {menuOpen && (
             <div id="nav-menu-panel" className="nav-menu-panel" role="menu">

@@ -82,7 +82,7 @@ body {
     padding-left: 16px;
     padding-right: 16px;
     max-width: 100%;
-    overflow: hidden;
+    overflow: visible;
   }
 
   .nav-actions {
@@ -765,9 +765,8 @@ button {
   width: 44px;
   height: 44px;
   border-radius: 12px;
-  border: 2px solid #1e40ff;
-  background: #ffffff;
-  color: #1e40ff;
+  border: none;
+  background: transparent;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -777,6 +776,18 @@ button {
 .nav-menu-btn:hover {
   background: rgba(30, 64, 255, 0.06);
 }
+
+.nav-menu-svg {
+  width: 22px;
+  height: 22px;
+  display: block;
+}
+
+.site-header {
+  position: relative;
+  z-index: 60;
+}
+
 
 .nav-menu-icon {
   width: 18px;
