@@ -105,11 +105,36 @@ body {
 
 /* ---------------- RESULTS ---------------- */
 
-/* Result status highlight */
-.result-active {
-  color: #806655;
-  font-weight: 600;
+/* Result status highlight (4-tier) */
+.result-very-active,
+.result-likely-active,
+.result-borderline,
+.result-inactive {
+  font-weight: 700;
 }
+
+.result-very-active {
+  color: #0f766e;
+}
+
+.result-likely-active {
+  color: #1e40ff;
+}
+
+.result-borderline {
+  color: #b45309;
+}
+
+.result-inactive {
+  color: #b91c1c;
+}
+
+/* Back-compat (in case any old markup still uses it) */
+.result-active {
+  color: #1e40ff;
+  font-weight: 700;
+}
+
 
 
 .results {

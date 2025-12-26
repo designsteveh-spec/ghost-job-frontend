@@ -206,6 +206,27 @@ setGaugeRunId((n) => n + 1);
 
   };
 
+  const getResultBucket = (pct: number) => {
+    const s = Math.max(5, Math.min(95, Math.round(pct)));
+
+    // 75–95
+    if (s >= 75) {
+      return { label: 'Very Likely Active Posting', className: 'result-very-active' };
+    }
+
+    // 55–74
+    if (s >= 55) {
+      return { label: 'Likely Active Posting', className: 'result-likely-active' };
+    }
+
+    // 40–54  ✅ Use your preferred label
+    if (s >= 40) {
+      return { label: 'Borderline Freshness', className: 'result-borderline' };
+    }
+
+    // 5–39
+    return { label: 'Likely Inactive / Ghost Posting', className: 'result-inactive' };
+  };
 
 
   const handleAnalyze = async (override?: { url?: string; jobDescription?: string }) => {
@@ -524,10 +545,15 @@ onClick={() => {
   Results:{' '}
   {status === 'running' ? (
     'In Progress'
+  ) : score === null ? (
+    '—'
   ) : (
-    <span className="result-active">Likely Active Posting</span>
+    <span className={getResultBucket(score).className}>
+      {getResultBucket(score).label}
+    </span>
   )}
 </h2>
+
 
 
                 <p>
