@@ -1348,3 +1348,31 @@ button {
   border-radius: 16px !important;
   box-shadow: 0 12px 32px rgba(15, 23, 42, 0.08);
 }
+
+
+/* ---------------- TINY SCREEN PADDING CONSISTENCY (<= 360px) ---------------- */
+@media (max-width: 360px) {
+  .nav-inner,
+  .check-tabs-inner,
+  .hero-inner,
+  .education-inner,
+  .pricing-inner,
+  .analysis,
+  .legal,
+  .newsletter,
+  .site-footer {
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+  }
+
+  /* prevent long words/URLs from forcing weird layout */
+  .hero-content h1,
+  .hero-content h2,
+  .subtitle,
+  .education-text,
+  .analysis-card-title,
+  .analysis-tag-title,
+  .analysis-tag-value {
+    overflow-wrap: anywhere;
+  }
+}
