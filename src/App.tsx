@@ -396,7 +396,7 @@ onClick={() => {
           <div className="hero-content">
             {status === 'idle' ? (
               <>
-                <span className="eyebrow">Ghost Job Link Checker — DEPLOY TEST</span>
+                <span className="eyebrow">Ghost Job Link Checker</span>
 
                 <h1>
                   Use probability indicators to assess{' '}
@@ -579,7 +579,8 @@ setJobDescription('');
       </section>
 
             {/* ANALYSIS (accordion like Legal) */}
-      {status !== 'idle' && (
+      {(status !== 'idle' || import.meta.env.DEV) && (
+
         <section id="analysis" className="analysis">
           <div className="analysis-section">
             <button
