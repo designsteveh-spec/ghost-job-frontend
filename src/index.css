@@ -5,7 +5,9 @@
 
 html {
   scroll-behavior: smooth;
+  overflow-x: hidden; /* ✅ prevent tiny-width sideways scroll */
 }
+
 
 body {
   margin: 0;
@@ -211,6 +213,17 @@ body {
   gap: 10px;
 }
 
+@media (max-width: 420px) {
+  .check-tabs {
+    flex-wrap: wrap; /* ✅ prevents right overflow */
+  }
+
+  .check-tab {
+    flex: 1 1 140px; /* ✅ wraps cleanly */
+  }
+}
+
+
 
 
 .check-tab {
@@ -324,6 +337,18 @@ body {
   gap: 12px;
   margin-top: 24px;
 }
+
+@media (max-width: 420px) {
+  .input-group {
+    flex-direction: column; /* ✅ input then button */
+    align-items: stretch;
+  }
+
+  .input-group .analyze-btn {
+    width: 100%;
+  }
+}
+
 
 input[type='url'] {
   flex: 1;
@@ -764,8 +789,10 @@ button {
 .nav-menu-btn {
   width: 44px;
   height: 44px;
+  padding: 0;              /* ✅ overrides global button padding */
   border-radius: 12px;
   border: none;
+  outline: none;           /* ✅ removes default blue outline */
   background: transparent;
   display: inline-flex;
   align-items: center;
@@ -773,15 +800,25 @@ button {
   cursor: pointer;
 }
 
+.nav-menu-btn:focus,
+.nav-menu-btn:focus-visible {
+  outline: none;           /* ✅ keep it borderless on click */
+}
+
+
 .nav-menu-btn:hover {
   background: rgba(30, 64, 255, 0.06);
 }
 
 .nav-menu-svg {
-  width: 22px;
-  height: 22px;
+  width: 26px;
+  height: 26px;
+  max-width: 100%;
+  max-height: 100%;
   display: block;
+  pointer-events: none;
 }
+
 
 .site-header {
   position: relative;

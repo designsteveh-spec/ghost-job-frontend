@@ -8,32 +8,32 @@ export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const menuWrapRef = useRef<HTMLDivElement | null>(null);
 
-  useEffect(() => {
+    useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') setMenuOpen(false);
     };
 
-    const onPointerDown = (e: MouseEvent | TouchEvent) => {
+    const onDocClick = (e: MouseEvent) => {
+      if (!menuOpen) return;
       if (!menuWrapRef.current) return;
+
       const target = e.target as Node | null;
       if (!target) return;
 
-      // If click is outside the menu wrapper, close
       if (!menuWrapRef.current.contains(target)) {
         setMenuOpen(false);
       }
     };
 
     document.addEventListener('keydown', onKeyDown);
-    document.addEventListener('mousedown', onPointerDown);
-    document.addEventListener('touchstart', onPointerDown, { passive: true });
+    document.addEventListener('click', onDocClick);
 
     return () => {
       document.removeEventListener('keydown', onKeyDown);
-      document.removeEventListener('mousedown', onPointerDown);
-      document.removeEventListener('touchstart', onPointerDown);
+      document.removeEventListener('click', onDocClick);
     };
-  }, []);
+  }, [menuOpen]);
+
 
   return (
     <header className="site-header">
