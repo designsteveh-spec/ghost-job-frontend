@@ -896,7 +896,191 @@ button {
   background: transparent !important;
 }
 
+/* ---------------- ANALYSIS ACCORDION + CARDS (v1.0.t) ---------------- */
+
+.analysis {
+  background: #ffffff;
+  padding: 24px 24px 0;
+}
+
+.analysis-section {
+  max-width: 1100px;
+  margin: 0 auto 24px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.analysis-header {
+  width: 100%;
+  background: none;
+  border: none;
+  padding: 22px 0;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  cursor: pointer;
+  text-align: left;
+}
+
+.analysis-header h3 {
+  font-size: 20px;
+  font-weight: 700;
+  margin: 0;
+  color: #0f172a;
+}
+
+.analysis-toggle {
+  font-size: 26px;
+  font-weight: 400;
+  line-height: 1;
+  width: 28px;
+  text-align: center;
+  color: #0f172a;
+  flex-shrink: 0;
+}
+
+.analysis-header:hover h3 {
+  color: #1e40ff;
+}
+
+.analysis-content {
+  padding: 0 0 28px 42px;
+}
+
+.analysis-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 18px;
+  max-width: 100%;
+}
+
+.analysis-card {
+  border: 2px solid #4040FF;
+  border-radius: 18px;
+  background: #ffffff;
+  padding: 14px 14px 12px;
+  box-shadow: 0 10px 28px rgba(15, 23, 42, 0.06);
+}
+
+.analysis-card-title {
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  color: #1e40ff;
+  margin-bottom: 12px;
+}
+
+@keyframes analysisTagPop {
+  from { opacity: 0; transform: translateY(6px) scale(0.985); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.analysis-tag {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  border: 2px solid #4040FF;
+  border-radius: 14px;
+  padding: 10px 10px;
+  margin-bottom: 10px;
+  background: #ffffff;
+  position: relative;
+  animation: analysisTagPop 220ms ease-out both;
+}
+
+.analysis-tag:last-child {
+  margin-bottom: 0;
+}
+
+.analysis-tag-icon {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  margin-top: 1px; /* aligns with first text row height */
+}
+
+.analysis-tag-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.analysis-tag-title {
+  font-size: 13px;
+  font-weight: 800;
+  color: #1e40ff;
+  line-height: 1.15;
+}
+
+.analysis-tag-value {
+  font-size: 12px;
+  font-weight: 500;
+  color: #475569;
+  line-height: 1.2;
+}
+
+.analysis-tag-link {
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.analysis-tag-link:hover {
+  background: rgba(30, 64, 255, 0.04);
+}
+
+.analysis-tag-value-link {
+  text-decoration: underline;
+}
+
+.analysis-tag-highlight {
+  background: #FFCD2E;
+}
+
+/* simple CSS tooltip */
+.analysis-tag[data-tip]::after {
+  content: attr(data-tip);
+  position: absolute;
+  left: 10px;
+  top: calc(100% + 10px);
+  max-width: 260px;
+  padding: 10px 10px;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  background: #0f172a;
+  color: #ffffff;
+  font-size: 12px;
+  line-height: 1.35;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-4px);
+  transition: opacity 140ms ease, transform 140ms ease;
+  z-index: 10;
+}
+
+.analysis-tag[data-tip]:hover::after {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Responsive */
+@media (max-width: 1000px) {
+  .analysis-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .analysis-content {
+    padding-left: 36px;
+  }
+
+  .analysis-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 /* ---------------- LEGAL ACCORDION (v1.0.s) ---------------- */
+
 
 .legal {
   background: #ffffff;

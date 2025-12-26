@@ -18,6 +18,7 @@ import educationImage from './assets/ghostPic-1.png';
 import staleIcon from './assets/marker3-data.svg';
 import checkOn from './assets/checkmark-on.svg';
 import checkOff from './assets/checkmark-off.svg';
+import checkComplete from './assets/check-complete.svg';
 import weakIcon from './assets/marker2-abs.svg';
 import signalIcon from './assets/marker1-suc.svg';
 
@@ -76,7 +77,7 @@ const [gaugeTarget, setGaugeTarget] = useState<number>(0);
 const [gaugeDurationMs, setGaugeDurationMs] = useState<number>(1400);
 const [gaugeRunId, setGaugeRunId] = useState<number>(0);
 
-  const [signals, setSignals] = useState<{
+    const [signals, setSignals] = useState<{
     stale: SignalStatus;
     weak: SignalStatus;
     inactivity: SignalStatus;
@@ -85,6 +86,81 @@ const [gaugeRunId, setGaugeRunId] = useState<number>(0);
     weak: 'pending',
     inactivity: 'pending',
   });
+
+  /* ---------------- ANALYSIS (accordion + cards) ---------------- */
+
+  const [openAnalysis, setOpenAnalysis] = useState<boolean>(true);
+
+  type StepStatus = 'pending' | 'complete';
+  type AnalysisStepKey =
+    | 'pageLoads'
+    | 'postingAgeDetected'
+    | 'contentStructureParsed'
+    | 'freshnessPatterns'
+    | 'recycledLanguageChecks'
+    | 'activityIndicatorsScan'
+    | 'detectedPostingAge'
+    | 'detectedEmployerSource'
+    | 'detectedCanonicalJobId'
+    | 'detectedActivityScan'
+    | 'detectedLastUpdated'
+    | 'detectedApplyLinkBehavior'
+    | 'confidenceDataQuality'
+    | 'scorePostingAge'
+    | 'scoreFreshness1'
+    | 'scoreContentUniqueness'
+    | 'scoreActivityIndicators'
+    | 'scoreFreshness2'
+    | 'scoreSiteReliability';
+
+  const makeInitialAnalysisSteps = (): Record<AnalysisStepKey, StepStatus> => ({
+    pageLoads: 'pending',
+    postingAgeDetected: 'pending',
+    contentStructureParsed: 'pending',
+    freshnessPatterns: 'pending',
+    recycledLanguageChecks: 'pending',
+    activityIndicatorsScan: 'pending',
+
+    detectedPostingAge: 'pending',
+    detectedEmployerSource: 'pending',
+    detectedCanonicalJobId: 'pending',
+    detectedActivityScan: 'pending',
+    detectedLastUpdated: 'pending',
+    detectedApplyLinkBehavior: 'pending',
+
+    confidenceDataQuality: 'pending',
+
+    scorePostingAge: 'pending',
+    scoreFreshness1: 'pending',
+    scoreContentUniqueness: 'pending',
+    scoreActivityIndicators: 'pending',
+    scoreFreshness2: 'pending',
+    scoreSiteReliability: 'pending',
+  });
+
+  const [analysisSteps, setAnalysisSteps] = useState<Record<AnalysisStepKey, StepStatus>>(
+    makeInitialAnalysisSteps()
+  );
+
+  const completeAllAnalysisSteps = () => {
+    setAnalysisSteps((prev) => {
+      const next = { ...prev };
+      (Object.keys(next) as AnalysisStepKey[]).forEach((k) => (next[k] = 'complete'));
+      return next;
+    });
+  };
+
+  const resetAnalysisSteps = () => {
+    setAnalysisSteps(makeInitialAnalysisSteps());
+  };
+
+  const scheduleStep = (key: AnalysisStepKey, delayMs: number) => {
+    const t = window.setTimeout(() => {
+      setAnalysisSteps((s) => ({ ...s, [key]: 'complete' }));
+    }, delayMs);
+    timeoutsRef.current.push(t);
+  };
+
 
   const timeoutsRef = useRef<number[]>([]);
 
@@ -108,7 +184,7 @@ const [gaugeRunId, setGaugeRunId] = useState<number>(0);
     setOpenLegal((prev) => (prev === section ? null : section));
   };
 
-   const resetAnalysis = () => {
+      const resetAnalysis = () => {
 	clearAllTimeouts();
     setStatus('idle');
 setScore(null);
@@ -119,12 +195,17 @@ setSignals({
   inactivity: 'pending',
 });
 
+// Reset analysis UI
+setOpenAnalysis(true);
+resetAnalysisSteps();
+
 // Reset gauge to start state
 setGaugeTarget(0);
 setGaugeDurationMs(1400);
 setGaugeRunId((n) => n + 1);
 
   };
+
 
 
   const handleAnalyze = async (override?: { url?: string; jobDescription?: string }) => {
@@ -161,6 +242,35 @@ setSignals({
 setGaugeTarget(0);
 setGaugeDurationMs(1400);
 setGaugeRunId((n) => n + 1);
+
+// Analysis accordion: show + reset + progressive tag reveal
+setOpenAnalysis(true);
+resetAnalysisSteps();
+
+// Progressive tag reveal timing (subtle “pop on”)
+scheduleStep('pageLoads', 220);
+scheduleStep('postingAgeDetected', 520);
+scheduleStep('contentStructureParsed', 860);
+scheduleStep('freshnessPatterns', 1220);
+scheduleStep('recycledLanguageChecks', 1600);
+scheduleStep('activityIndicatorsScan', 2000);
+
+scheduleStep('detectedPostingAge', 560);
+scheduleStep('detectedEmployerSource', 900);
+scheduleStep('detectedCanonicalJobId', 1240);
+scheduleStep('detectedActivityScan', 1680);
+scheduleStep('detectedLastUpdated', 2080);
+scheduleStep('detectedApplyLinkBehavior', 2400);
+
+scheduleStep('confidenceDataQuality', 1480);
+
+scheduleStep('scorePostingAge', 1000);
+scheduleStep('scoreFreshness1', 1320);
+scheduleStep('scoreContentUniqueness', 1640);
+scheduleStep('scoreActivityIndicators', 1960);
+scheduleStep('scoreFreshness2', 2280);
+scheduleStep('scoreSiteReliability', 2600);
+
 
 
     try {
@@ -211,11 +321,13 @@ setGaugeTarget(data.score);
 setGaugeDurationMs(maxDelay + 300);
 
 
-      const t4 = window.setTimeout(() => {
+            const t4 = window.setTimeout(() => {
         setScore(data.score);
+        completeAllAnalysisSteps();
         setStatus('complete');
       }, maxDelay + 300);
       timeoutsRef.current.push(t4);
+
     } catch (err) {
       console.error(err);
       setFormError('Network error. Please try again.');
@@ -466,7 +578,256 @@ setJobDescription('');
         </div>
       </section>
 
+            {/* ANALYSIS (accordion like Legal) */}
+      {status !== 'idle' && (
+        <section id="analysis" className="analysis">
+          <div className="analysis-section">
+            <button
+              className="analysis-header"
+              aria-expanded={openAnalysis}
+              onClick={() => setOpenAnalysis((v) => !v)}
+            >
+              <span className="analysis-toggle">{openAnalysis ? '−' : '+'}</span>
+              <h3>Analysis</h3>
+            </button>
+
+            {openAnalysis && (
+              <div className="analysis-content">
+                <div className="analysis-grid">
+                  {/* 1) VISIBLE SIGNALS PIPELINE */}
+                  <div className="analysis-card">
+                    <div className="analysis-card-title">VISIBLE SIGNALS PIPELINE</div>
+
+                    {analysisSteps.pageLoads === 'complete' && (
+                      <div className="analysis-tag" data-tip="Basic page load + reachable response.">
+                        <img src={checkComplete} alt="" className="analysis-tag-icon" />
+                        <div className="analysis-tag-text">
+                          <div className="analysis-tag-title">Page Loads</div>
+                          <div className="analysis-tag-value">Complete</div>
+                        </div>
+                      </div>
+                    )}
+
+                    {analysisSteps.postingAgeDetected === 'complete' && (
+                      <div className="analysis-tag" data-tip="Checks for visible age / posting recency signals.">
+                        <img src={checkComplete} alt="" className="analysis-tag-icon" />
+                        <div className="analysis-tag-text">
+                          <div className="analysis-tag-title">Posting Age Detected</div>
+                          <div className="analysis-tag-value">Complete</div>
+                        </div>
+                      </div>
+                    )}
+
+                    {analysisSteps.contentStructureParsed === 'complete' && (
+                      <div className="analysis-tag" data-tip="Parses content blocks to confirm page structure.">
+                        <img src={checkComplete} alt="" className="analysis-tag-icon" />
+                        <div className="analysis-tag-text">
+                          <div className="analysis-tag-title">Content Structure Parsed</div>
+                          <div className="analysis-tag-value">Complete</div>
+                        </div>
+                      </div>
+                    )}
+
+                    {analysisSteps.freshnessPatterns === 'complete' && (
+                      <div className="analysis-tag" data-tip="Looks for freshness cues (updates, timestamps, etc.).">
+                        <img src={checkComplete} alt="" className="analysis-tag-icon" />
+                        <div className="analysis-tag-text">
+                          <div className="analysis-tag-title">Freshness Patterns</div>
+                          <div className="analysis-tag-value">Complete</div>
+                        </div>
+                      </div>
+                    )}
+
+                    {analysisSteps.recycledLanguageChecks === 'complete' && (
+                      <div className="analysis-tag" data-tip="Checks for common recycled / evergreen phrasing.">
+                        <img src={checkComplete} alt="" className="analysis-tag-icon" />
+                        <div className="analysis-tag-text">
+                          <div className="analysis-tag-title">Recycled Language Checks</div>
+                          <div className="analysis-tag-value">Complete</div>
+                        </div>
+                      </div>
+                    )}
+
+                    {analysisSteps.activityIndicatorsScan === 'complete' && (
+                      <div className="analysis-tag" data-tip="Scans for activity indicators (apply signals, structure cues).">
+                        <img src={checkComplete} alt="" className="analysis-tag-icon" />
+                        <div className="analysis-tag-text">
+                          <div className="analysis-tag-title">Activity Indicators Scan</div>
+                          <div className="analysis-tag-value">Complete</div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* 2) WHAT WE DETECTED */}
+                  <div className="analysis-card">
+                    <div className="analysis-card-title">WHAT WE DETECTED</div>
+
+                    {analysisSteps.detectedPostingAge === 'complete' && (
+                      <div className="analysis-tag" data-tip="If available, detects posting age / recency cues.">
+                        <img src={checkComplete} alt="" className="analysis-tag-icon" />
+                        <div className="analysis-tag-text">
+                          <div className="analysis-tag-title">Posting Age</div>
+                          <div className="analysis-tag-value">Detected</div>
+                        </div>
+                      </div>
+                    )}
+
+                    {analysisSteps.detectedEmployerSource === 'complete' && (
+                      <div className="analysis-tag" data-tip="Identifies the site/employer source where possible.">
+                        <img src={checkComplete} alt="" className="analysis-tag-icon" />
+                        <div className="analysis-tag-text">
+                          <div className="analysis-tag-title">Employer / Source</div>
+                          <div className="analysis-tag-value">Detected</div>
+                        </div>
+                      </div>
+                    )}
+
+                    {analysisSteps.detectedCanonicalJobId === 'complete' && (
+                      <div className="analysis-tag" data-tip="Extracts a stable identifier when present (e.g., jk, ID).">
+                        <img src={checkComplete} alt="" className="analysis-tag-icon" />
+                        <div className="analysis-tag-text">
+                          <div className="analysis-tag-title">Canonical Job ID</div>
+                          <div className="analysis-tag-value">Detected</div>
+                        </div>
+                      </div>
+                    )}
+
+                    {analysisSteps.detectedActivityScan === 'complete' && (
+                      <div className="analysis-tag" data-tip="Runs activity indicator scan across the page content.">
+                        <img src={checkComplete} alt="" className="analysis-tag-icon" />
+                        <div className="analysis-tag-text">
+                          <div className="analysis-tag-title">Activity Indicators Scan</div>
+                          <div className="analysis-tag-value">Complete</div>
+                        </div>
+                      </div>
+                    )}
+
+                    {analysisSteps.detectedLastUpdated === 'complete' && (
+                      <div className="analysis-tag" data-tip="Shows when this analysis result was generated.">
+                        <img src={checkComplete} alt="" className="analysis-tag-icon" />
+                        <div className="analysis-tag-text">
+                          <div className="analysis-tag-title">Last updated</div>
+                          <div className="analysis-tag-value">{new Date().toLocaleString()}</div>
+                        </div>
+                      </div>
+                    )}
+
+                    {analysisSteps.detectedApplyLinkBehavior === 'complete' && (
+                      hasUrl ? (
+                        <a
+                          className="analysis-tag analysis-tag-link"
+                          href={url}
+                          target="_blank"
+                          rel="noreferrer"
+                          data-tip="Opens the provided job link in a new tab."
+                        >
+                          <img src={checkComplete} alt="" className="analysis-tag-icon" />
+                          <div className="analysis-tag-text">
+                            <div className="analysis-tag-title">Apply Link Behavior</div>
+                            <div className="analysis-tag-value analysis-tag-value-link">Click Here</div>
+                          </div>
+                        </a>
+                      ) : (
+                        <div className="analysis-tag" data-tip="Link behavior available when analyzing a URL.">
+                          <img src={checkComplete} alt="" className="analysis-tag-icon" />
+                          <div className="analysis-tag-text">
+                            <div className="analysis-tag-title">Apply Link Behavior</div>
+                            <div className="analysis-tag-value">—</div>
+                          </div>
+                        </div>
+                      )
+                    )}
+                  </div>
+
+                  {/* 3) CONFIDENCE */}
+                  <div className="analysis-card">
+                    <div className="analysis-card-title">CONFIDENCE</div>
+
+                    {analysisSteps.confidenceDataQuality === 'complete' && (
+                      <div className="analysis-tag analysis-tag-highlight" data-tip="Confidence reflects input quality and page accessibility.">
+                        <img src={checkComplete} alt="" className="analysis-tag-icon" />
+                        <div className="analysis-tag-text">
+                          <div className="analysis-tag-title">Data Quality</div>
+                          <div className="analysis-tag-value">Medium</div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* 4) SCORE SUMMARY */}
+                  <div className="analysis-card">
+                    <div className="analysis-card-title">SCORE SUMMARY</div>
+
+                    {analysisSteps.scorePostingAge === 'complete' && (
+                      <div className="analysis-tag" data-tip="Posting age / recency signals contribution.">
+                        <img src={checkComplete} alt="" className="analysis-tag-icon" />
+                        <div className="analysis-tag-text">
+                          <div className="analysis-tag-title">Posting Age</div>
+                          <div className="analysis-tag-value">−25</div>
+                        </div>
+                      </div>
+                    )}
+
+                    {analysisSteps.scoreFreshness1 === 'complete' && (
+                      <div className="analysis-tag" data-tip="Freshness-related cues (timestamps / updates).">
+                        <img src={checkComplete} alt="" className="analysis-tag-icon" />
+                        <div className="analysis-tag-text">
+                          <div className="analysis-tag-title">Freshness Indicators</div>
+                          <div className="analysis-tag-value">−10</div>
+                        </div>
+                      </div>
+                    )}
+
+                    {analysisSteps.scoreContentUniqueness === 'complete' && (
+                      <div className="analysis-tag" data-tip="Content uniqueness (non-recycled language cues).">
+                        <img src={checkComplete} alt="" className="analysis-tag-icon" />
+                        <div className="analysis-tag-text">
+                          <div className="analysis-tag-title">Content Uniqueness</div>
+                          <div className="analysis-tag-value">+5</div>
+                        </div>
+                      </div>
+                    )}
+
+                    {analysisSteps.scoreActivityIndicators === 'complete' && (
+                      <div className="analysis-tag" data-tip="Activity cues (apply / structure / signals).">
+                        <img src={checkComplete} alt="" className="analysis-tag-icon" />
+                        <div className="analysis-tag-text">
+                          <div className="analysis-tag-title">Activity Indicators</div>
+                          <div className="analysis-tag-value">+10</div>
+                        </div>
+                      </div>
+                    )}
+
+                    {analysisSteps.scoreFreshness2 === 'complete' && (
+                      <div className="analysis-tag" data-tip="Additional freshness cues (secondary pass).">
+                        <img src={checkComplete} alt="" className="analysis-tag-icon" />
+                        <div className="analysis-tag-text">
+                          <div className="analysis-tag-title">Freshness Indicators</div>
+                          <div className="analysis-tag-value">−10</div>
+                        </div>
+                      </div>
+                    )}
+
+                    {analysisSteps.scoreSiteReliability === 'complete' && (
+                      <div className="analysis-tag" data-tip="Site reliability cues (major platforms vs unknown).">
+                        <img src={checkComplete} alt="" className="analysis-tag-icon" />
+                        <div className="analysis-tag-text">
+                          <div className="analysis-tag-title">Site Reliability Indicators</div>
+                          <div className="analysis-tag-value">+5</div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </section>
+      )}
+
       {/* EDUCATION */}
+
       <section className="education">
         <div className="education-inner">
           <div className="education-content">
