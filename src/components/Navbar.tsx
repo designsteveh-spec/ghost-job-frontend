@@ -1,12 +1,47 @@
+import { useEffect, useRef, useState } from 'react';
 import logoLeft from '../assets/ghostchecker-logoLeft.svg';
 import logoRight from '../assets/ghostchecker-logoRight.svg';
 
 export default function Navbar() {
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuWrapRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setMenuOpen(false);
+    };
+
+    const onPointerDown = (e: MouseEvent | TouchEvent) => {
+      if (!menuWrapRef.current) return;
+      const target = e.target as Node | null;
+      if (!target) return;
+
+      // If click is outside the menu wrapper, close
+      if (!menuWrapRef.current.contains(target)) {
+        setMenuOpen(false);
+      }
+    };
+
+    document.addEventListener('keydown', onKeyDown);
+    document.addEventListener('mousedown', onPointerDown);
+    document.addEventListener('touchstart', onPointerDown, { passive: true });
+
+    return () => {
+      document.removeEventListener('keydown', onKeyDown);
+      document.removeEventListener('mousedown', onPointerDown);
+      document.removeEventListener('touchstart', onPointerDown);
+    };
+  }, []);
+
   return (
     <header className="site-header">
       <div className="nav-inner">
         {/* Brand / Logo */}
-        <a href="#pricing" className="brand">
+        <a
+          href="#pricing"
+          className="brand"
+          onClick={() => setMenuOpen(false)}
+        >
           <img
             src={logoLeft}
             alt="Ghost Job Checker"
@@ -20,8 +55,8 @@ export default function Navbar() {
           />
         </a>
 
-        {/* Actions */}
-        <div className="nav-actions">
+        {/* Desktop actions */}
+        <div className="nav-actions nav-actions-desktop">
           <a href="#newsletter" className="cta cta-secondary">
             <span className="cta-desktop">Subscribe to Newsletter</span>
             <span className="cta-mobile">Newsletter</span>
@@ -31,6 +66,45 @@ export default function Navbar() {
             <span className="cta-desktop">Get More Link Checks</span>
             <span className="cta-mobile">Pricing</span>
           </a>
+        </div>
+
+        {/* Mobile hamburger */}
+        <div className="nav-actions-mobile" ref={menuWrapRef}>
+          <button
+            type="button"
+            className="nav-menu-btn"
+            aria-label={menuOpen ? 'Close menu' : 'Open menu'}
+            aria-expanded={menuOpen}
+            aria-controls="nav-menu-panel"
+            onClick={() => setMenuOpen((v) => !v)}
+          >
+            <span className="nav-menu-icon" aria-hidden="true">
+              <span />
+              <span />
+              <span />
+            </span>
+          </button>
+
+          {menuOpen && (
+            <div id="nav-menu-panel" className="nav-menu-panel" role="menu">
+              <a
+                role="menuitem"
+                href="#pricing"
+                className="nav-menu-item"
+                onClick={() => setMenuOpen(false)}
+              >
+                Pricing
+              </a>
+              <a
+                role="menuitem"
+                href="#newsletter"
+                className="nav-menu-item"
+                onClick={() => setMenuOpen(false)}
+              >
+                Newsletter
+              </a>
+            </div>
+          )}
         </div>
       </div>
     </header>

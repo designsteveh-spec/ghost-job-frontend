@@ -749,6 +749,92 @@ button {
   }
 }
 
+/* ---------------- NAVBAR MOBILE MENU (v1.0.u) ---------------- */
+
+.nav-actions-desktop {
+  display: flex;
+  gap: 12px;
+}
+
+.nav-actions-mobile {
+  display: none;
+  position: relative;
+}
+
+.nav-menu-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  border: 2px solid #1e40ff;
+  background: #ffffff;
+  color: #1e40ff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.nav-menu-btn:hover {
+  background: rgba(30, 64, 255, 0.06);
+}
+
+.nav-menu-icon {
+  width: 18px;
+  height: 14px;
+  display: inline-flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.nav-menu-icon span {
+  display: block;
+  height: 2px;
+  width: 100%;
+  background: #1e40ff;
+  border-radius: 999px;
+}
+
+.nav-menu-panel {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 10px);
+  width: 220px;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.12);
+  padding: 10px;
+  z-index: 50;
+}
+
+.nav-menu-item {
+  display: block;
+  padding: 12px 12px;
+  border-radius: 12px;
+  text-decoration: none;
+  color: #0f172a;
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.nav-menu-item:hover {
+  background: rgba(30, 64, 255, 0.06);
+  color: #1e40ff;
+}
+
+/* Switch: hide desktop CTAs, show burger */
+@media (max-width: 640px) {
+  .nav-actions-desktop {
+    display: none;
+  }
+
+  .nav-actions-mobile {
+    display: inline-flex;
+    align-items: center;
+  }
+}
+
+
 /* NAVBAR ENHANCEMENTS (v1.0.m) */
 
 .site-header {

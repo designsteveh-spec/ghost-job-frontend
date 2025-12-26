@@ -352,7 +352,12 @@ setGaugeDurationMs(maxDelay + 300);
         className={`check-tab ${checkMode === 'basic' ? 'active' : ''}`}
         onClick={() => {
   setCheckMode('basic');
-  if (status !== 'idle') resetAnalysis();
+  if (status !== 'idle') {
+  resetAnalysis();
+  setUrl('');
+  setJobDescription('');
+}
+
   setUrl('');
   setJobDescription('');
   setFormError(null);
@@ -371,7 +376,12 @@ setGaugeDurationMs(maxDelay + 300);
 onClick={() => {
   if (!canUseDeep) return;
   setCheckMode('deep');
-  if (status !== 'idle') resetAnalysis();
+  if (status !== 'idle') {
+  resetAnalysis();
+  setUrl('');
+  setJobDescription('');
+}
+
   setUrl('');
   setJobDescription('');
   setFormError(null);
