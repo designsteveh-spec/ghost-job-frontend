@@ -45,7 +45,7 @@
   position: absolute;
   left: 0;
   right: 0;
-  bottom: 8px; /* move down */
+  bottom: 2px; /* move down */
   text-align: center;
   font-size: 34px; /* slightly smaller */
   font-weight: 800;
