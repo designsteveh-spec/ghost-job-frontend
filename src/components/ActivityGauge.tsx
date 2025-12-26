@@ -188,7 +188,17 @@ const arcEnd = 405;    // lower-right (45 + 360) so the sweep goes over the top
           </filter>
         </defs>
 
-                {/* Ticks + labels */}
+                    {/* Arc (behind everything) */}
+        <path
+          d={arcPath}
+          fill="none"
+          stroke="url(#gArc)"
+          strokeWidth="18"
+          strokeLinecap="round"
+          filter="url(#gShadow)"
+        />
+
+        {/* Ticks + labels (above arc, below needle) */}
         {ticks.map((t) => {
           const a = arcStart + ((arcEnd - arcStart) * t) / 100;
           const p = polarToCartesian(cx, cy, r - 2, a);
@@ -217,18 +227,7 @@ const arcEnd = 405;    // lower-right (45 + 360) so the sweep goes over the top
           );
         })}
 
-        {/* Arc */}
-        <path
-          d={arcPath}
-          fill="none"
-          stroke="url(#gArc)"
-          strokeWidth="18"
-          strokeLinecap="round"
-          filter="url(#gShadow)"
-        />
-
-
-        {/* Needle */}
+        {/* Needle (on top of numbers) */}
         <line
           x1={needleInner.x}
           y1={needleInner.y}
@@ -237,6 +236,7 @@ const arcEnd = 405;    // lower-right (45 + 360) so the sweep goes over the top
           className="activity-gauge-needle"
         />
         <circle cx={cx} cy={cy} r="12" className="activity-gauge-hub" />
+
       </svg>
 
       <div className="activity-gauge-percent">{labelPct}%</div>
