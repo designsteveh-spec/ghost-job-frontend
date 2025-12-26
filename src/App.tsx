@@ -353,7 +353,11 @@ setGaugeDurationMs(maxDelay + 300);
         onClick={() => {
   setCheckMode('basic');
   if (status !== 'idle') resetAnalysis();
+  setUrl('');
+  setJobDescription('');
+  setFormError(null);
 }}
+
 
       >
         Basic Check
@@ -368,7 +372,11 @@ onClick={() => {
   if (!canUseDeep) return;
   setCheckMode('deep');
   if (status !== 'idle') resetAnalysis();
+  setUrl('');
+  setJobDescription('');
+  setFormError(null);
 }}
+
 
 >
   Deep Check
