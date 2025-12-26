@@ -188,35 +188,7 @@ const arcEnd = 405;    // lower-right (45 + 360) so the sweep goes over the top
           </filter>
         </defs>
 
-                     {/* Tick marks (LINES) — behind arc */}
-        {ticks.map((t) => {
-          const a = arcStart + ((arcEnd - arcStart) * t) / 100;
-          const p = polarToCartesian(cx, cy, r - 2, a);
-          const p2 = polarToCartesian(cx, cy, r - 24, a);
-
-          return (
-            <line
-              key={`tick-line-${t}`}
-              x1={p.x}
-              y1={p.y}
-              x2={p2.x}
-              y2={p2.y}
-              className="activity-gauge-tick"
-            />
-          );
-        })}
-
-        {/* Arc — on top of tick lines */}
-        <path
-          d={arcPath}
-          fill="none"
-          stroke="url(#gArc)"
-          strokeWidth="18"
-          strokeLinecap="round"
-          filter="url(#gShadow)"
-        />
-
-        {/* Tick numbers (TEXT) — above arc */}
+                             {/* Tick numbers (TEXT) — bottom layer */}
         {ticks.map((t) => {
           const a = arcStart + ((arcEnd - arcStart) * t) / 100;
           const lbl = polarToCartesian(cx, cy, r - 42, a);
@@ -235,7 +207,35 @@ const arcEnd = 405;    // lower-right (45 + 360) so the sweep goes over the top
           );
         })}
 
-        {/* Needle + hub — top layer */}
+        {/* Tick marks (LINES) — middle layer */}
+        {ticks.map((t) => {
+          const a = arcStart + ((arcEnd - arcStart) * t) / 100;
+          const p = polarToCartesian(cx, cy, r - 2, a);
+          const p2 = polarToCartesian(cx, cy, r - 24, a);
+
+          return (
+            <line
+              key={`tick-line-${t}`}
+              x1={p.x}
+              y1={p.y}
+              x2={p2.x}
+              y2={p2.y}
+              className="activity-gauge-tick"
+            />
+          );
+        })}
+
+        {/* Arc — top layer (covers tick lines where they overlap) */}
+        <path
+          d={arcPath}
+          fill="none"
+          stroke="url(#gArc)"
+          strokeWidth="18"
+          strokeLinecap="round"
+          filter="url(#gShadow)"
+        />
+
+        {/* Needle + hub — top-most layer */}
         <line
           x1={needleInner.x}
           y1={needleInner.y}
@@ -244,7 +244,10 @@ const arcEnd = 405;    // lower-right (45 + 360) so the sweep goes over the top
           className="activity-gauge-needle"
         />
         <circle cx={cx} cy={cy} r="12" className="activity-gauge-hub" />
+      </svg>
 
+      <div className="activity-gauge-percent">{labelPct}%</div>
     </div>
   );
 }
+
