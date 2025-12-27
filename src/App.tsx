@@ -70,7 +70,13 @@ const [checkMode, setCheckMode] = useState<CheckMode>('basic');
 
 
 
-  const [score, setScore] = useState<number | null>(null);
+    const [score, setScore] = useState<number | null>(null);
+
+  // "What we detected" values (UI only)
+  const [detectedPostingAgeValue, setDetectedPostingAgeValue] = useState<string | null>(null);
+  const [detectedEmployerSourceValue, setDetectedEmployerSourceValue] = useState<string | null>(null);
+  const [detectedCanonicalJobIdValue, setDetectedCanonicalJobIdValue] = useState<string | null>(null);
+
 
 // Gauge UI (front-end only)
 const [gaugeTarget, setGaugeTarget] = useState<number>(0);
@@ -189,6 +195,12 @@ const [gaugeRunId, setGaugeRunId] = useState<number>(0);
     setStatus('idle');
 setScore(null);
 setFormError(null);
+
+// Reset "What we detected" values
+setDetectedPostingAgeValue(null);
+setDetectedEmployerSourceValue(null);
+setDetectedCanonicalJobIdValue(null);
+
 setSignals({
   stale: 'pending',
   weak: 'pending',
@@ -253,11 +265,18 @@ setGaugeRunId((n) => n + 1);
     // Reset state
 setStatus('running');
 setScore(null);
+
+// Reset "What we detected" values (new run)
+setDetectedPostingAgeValue(null);
+setDetectedEmployerSourceValue(null);
+setDetectedCanonicalJobIdValue(null);
+
 setSignals({
   stale: 'pending',
   weak: 'pending',
   inactivity: 'pending',
 });
+
 
 // Start a fresh gauge run at 0% while we process
 setGaugeTarget(0);
@@ -316,9 +335,39 @@ scheduleStep('scoreSiteReliability', 2600);
         return;
       }
 
-      const data = await res.json();
+            const data = await res.json();
+
+      // Fill "What we detected" values:
+      // - Prefer API-provided detected fields if present
+      // - Otherwise fallback to URL-derived values for Employer/Source + Canonical Job ID
+      let fallbackHost: string | null = null;
+      let fallbackJobId: string | null = null;
+
+      try {
+        if (urlValue) {
+          const u = new URL(urlValue);
+          fallbackHost = u.hostname || null;
+
+          // Canonical Job ID heuristics (URL-derived)
+          const qp = u.searchParams;
+          fallbackJobId =
+            (qp.get('jk') || qp.get('jobId') || qp.get('job_id') || qp.get('job') || '').trim() || null;
+
+          if (!fallbackJobId) {
+            const path = u.pathname || '';
+            // last path segment if it looks like an id (number/uuid-ish)
+            const last = path.split('/').filter(Boolean).pop() || '';
+            if (/^[a-z0-9-]{8,}$/i.test(last)) fallbackJobId = last;
+          }
+        }
+      } catch {}
+
+      setDetectedPostingAgeValue(data?.detected?.postingAge ?? null);
+      setDetectedEmployerSourceValue(data?.detected?.employerSource ?? fallbackHost ?? null);
+      setDetectedCanonicalJobIdValue(data?.detected?.canonicalJobId ?? fallbackJobId ?? null);
 
       const { stale, weak, inactivity } = data.signals;
+
 
       const t1 = window.setTimeout(() => {
         setSignals((s) => ({ ...s, stale: 'complete' }));
@@ -712,8 +761,9 @@ setJobDescription('');
                       <div className="analysis-tag" data-tip="If available, detects posting age / recency cues.">
                         <img src={checkComplete} alt="" className="analysis-tag-icon" />
                         <div className="analysis-tag-text">
-                          <div className="analysis-tag-title">Posting Age</div>
-                          <div className="analysis-tag-value">Detected</div>
+                                                    <div className="analysis-tag-title">Posting Age</div>
+                          <div className="analysis-tag-value">{detectedPostingAgeValue ?? '—'}</div>
+
                         </div>
                       </div>
                     )}
@@ -723,7 +773,7 @@ setJobDescription('');
                         <img src={checkComplete} alt="" className="analysis-tag-icon" />
                         <div className="analysis-tag-text">
                           <div className="analysis-tag-title">Employer / Source</div>
-                          <div className="analysis-tag-value">Detected</div>
+                          <div className="analysis-tag-value">{detectedEmployerSourceValue ?? '—'}</div>
                         </div>
                       </div>
                     )}
@@ -733,7 +783,7 @@ setJobDescription('');
                         <img src={checkComplete} alt="" className="analysis-tag-icon" />
                         <div className="analysis-tag-text">
                           <div className="analysis-tag-title">Canonical Job ID</div>
-                          <div className="analysis-tag-value">Detected</div>
+                          <div className="analysis-tag-value">{detectedCanonicalJobIdValue ?? '—'}</div>
                         </div>
                       </div>
                     )}
