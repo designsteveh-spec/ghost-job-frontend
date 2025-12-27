@@ -71,10 +71,6 @@ const [checkMode, setCheckMode] = useState<CheckMode>('basic');
 
 
   const [score, setScore] = useState<number | null>(null);
-  
-  type RepostingPattern = 'no_signal' | 'some' | 'strong';
-const [repostingPattern, setRepostingPattern] = useState<RepostingPattern | null>(null);
-
 
 // Gauge UI (front-end only)
 const [gaugeTarget, setGaugeTarget] = useState<number>(0);
@@ -96,7 +92,7 @@ const [gaugeRunId, setGaugeRunId] = useState<number>(0);
   const [openAnalysis, setOpenAnalysis] = useState<boolean>(true);
 
   type StepStatus = 'pending' | 'complete';
-    type AnalysisStepKey =
+  type AnalysisStepKey =
     | 'pageLoads'
     | 'postingAgeDetected'
     | 'contentStructureParsed'
@@ -115,11 +111,7 @@ const [gaugeRunId, setGaugeRunId] = useState<number>(0);
     | 'scoreContentUniqueness'
     | 'scoreActivityIndicators'
     | 'scoreFreshness2'
-    | 'detectedRepostingPattern'
     | 'scoreSiteReliability';
-
-
-
 
   const makeInitialAnalysisSteps = (): Record<AnalysisStepKey, StepStatus> => ({
     pageLoads: 'pending',
@@ -128,17 +120,13 @@ const [gaugeRunId, setGaugeRunId] = useState<number>(0);
     freshnessPatterns: 'pending',
     recycledLanguageChecks: 'pending',
     activityIndicatorsScan: 'pending',
-	
 
     detectedPostingAge: 'pending',
     detectedEmployerSource: 'pending',
-	detectedRepostingPattern: 'pending',
     detectedCanonicalJobId: 'pending',
     detectedActivityScan: 'pending',
     detectedLastUpdated: 'pending',
     detectedApplyLinkBehavior: 'pending',
-
-
 
     confidenceDataQuality: 'pending',
 
@@ -200,8 +188,6 @@ const [gaugeRunId, setGaugeRunId] = useState<number>(0);
 	clearAllTimeouts();
     setStatus('idle');
 setScore(null);
-setRepostingPattern(null);
-
 setFormError(null);
 setSignals({
   stale: 'pending',
@@ -220,15 +206,7 @@ setGaugeRunId((n) => n + 1);
 
   };
 
-    const getRepostingPatternLabel = (p: RepostingPattern | null) => {
-    if (!p) return 'No Information';
-    if (p === 'strong') return 'Repeat Posting Signal';
-    if (p === 'some') return 'Mixed Signals';
-    return 'No Information';
-  };
-
   const getResultBucket = (pct: number) => {
-
     const s = Math.max(5, Math.min(95, Math.round(pct)));
 
     // 75–95
@@ -303,9 +281,7 @@ scheduleStep('detectedEmployerSource', 900);
 scheduleStep('detectedCanonicalJobId', 1240);
 scheduleStep('detectedActivityScan', 1680);
 scheduleStep('detectedLastUpdated', 2080);
-scheduleStep('detectedRepostingPattern', 2240);
 scheduleStep('detectedApplyLinkBehavior', 2400);
-
 
 scheduleStep('confidenceDataQuality', 1480);
 
@@ -335,19 +311,14 @@ scheduleStep('scoreSiteReliability', 2600);
           const errData = await res.json();
           if (errData?.error) msg = errData.error;
         } catch {}
-                setRepostingPattern(null);
         setFormError(msg);
         setStatus('idle');
         return;
-
       }
 
-            const data = await res.json();
-
-      setRepostingPattern((data?.repostingPattern as RepostingPattern) ?? null);
+      const data = await res.json();
 
       const { stale, weak, inactivity } = data.signals;
-
 
       const t1 = window.setTimeout(() => {
         setSignals((s) => ({ ...s, stale: 'complete' }));
@@ -380,11 +351,9 @@ setGaugeDurationMs(maxDelay + 300);
 
     } catch (err) {
       console.error(err);
-            setFormError('Network error. Please try again.');
+      setFormError('Network error. Please try again.');
       setStatus('idle');
       setScore(null);
-      setRepostingPattern(null);
-
     }
   };
 
@@ -749,7 +718,7 @@ setJobDescription('');
                       </div>
                     )}
 
-                                        {analysisSteps.detectedEmployerSource === 'complete' && (
+                    {analysisSteps.detectedEmployerSource === 'complete' && (
                       <div className="analysis-tag" data-tip="Identifies the site/employer source where possible.">
                         <img src={checkComplete} alt="" className="analysis-tag-icon" />
                         <div className="analysis-tag-text">
@@ -758,20 +727,6 @@ setJobDescription('');
                         </div>
                       </div>
                     )}
-
-                    {analysisSteps.detectedRepostingPattern === 'complete' && (
-                      <div
-                        className="analysis-tag"
-                        data-tip="Looks for reposted / duplicated signals that are visible on the job page (when available). This is an indicator, not a claim."
-                      >
-                        <img src={checkComplete} alt="" className="analysis-tag-icon" />
-                        <div className="analysis-tag-text">
-                          <div className="analysis-tag-title">Reposting / Duplicate Signal</div>
-                          <div className="analysis-tag-value">{getRepostingPatternLabel(repostingPattern)}</div>
-                        </div>
-                      </div>
-                    )}
-
 
                     {analysisSteps.detectedCanonicalJobId === 'complete' && (
                       <div className="analysis-tag" data-tip="Extracts a stable identifier when present (e.g., jk, ID).">
