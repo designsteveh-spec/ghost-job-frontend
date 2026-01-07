@@ -78,6 +78,13 @@ const [checkMode, setCheckMode] = useState<CheckMode>('basic');
   const [detectedEmployerSourceValue, setDetectedEmployerSourceValue] = useState<string | null>(null);
   const [detectedCanonicalJobIdValue, setDetectedCanonicalJobIdValue] = useState<string | null>(null);
 
+  // Google snippet “What we detected”
+  const [detectedGoogleIndexedValue, setDetectedGoogleIndexedValue] = useState<string | null>(null);
+  const [detectedGoogleTopResultValue, setDetectedGoogleTopResultValue] = useState<string | null>(null);
+  const [detectedGoogleSnippetValue, setDetectedGoogleSnippetValue] = useState<string | null>(null);
+  const [detectedGoogleTopLinkValue, setDetectedGoogleTopLinkValue] = useState<string | null>(null);
+
+
   // Deep Check CTA focus target
   const jobDescRef = useRef<HTMLTextAreaElement | null>(null);
 
@@ -121,7 +128,12 @@ const [gaugeRunId, setGaugeRunId] = useState<number>(0);
     | 'scoreContentUniqueness'
     | 'scoreActivityIndicators'
     | 'scoreFreshness2'
-    | 'scoreSiteReliability';
+    | 'scoreSiteReliability'
+    | 'detectedGoogleIndexed'
+    | 'detectedGoogleTopResult'
+    | 'detectedGoogleSnippet';
+
+
 
   const makeInitialAnalysisSteps = (): Record<AnalysisStepKey, StepStatus> => ({
     pageLoads: 'pending',
@@ -146,6 +158,12 @@ const [gaugeRunId, setGaugeRunId] = useState<number>(0);
     scoreActivityIndicators: 'pending',
     scoreFreshness2: 'pending',
     scoreSiteReliability: 'pending',
+
+    detectedGoogleIndexed: 'pending',
+    detectedGoogleTopResult: 'pending',
+    detectedGoogleSnippet: 'pending',
+
+
   });
 
   const [analysisSteps, setAnalysisSteps] = useState<Record<AnalysisStepKey, StepStatus>>(
@@ -259,6 +277,12 @@ setDetectedPostingAgeStatusValue(null);
 setDetectedEmployerSourceValue(null);
 setDetectedCanonicalJobIdValue(null);
 
+setDetectedGoogleIndexedValue(null);
+setDetectedGoogleTopResultValue(null);
+setDetectedGoogleSnippetValue(null);
+setDetectedGoogleTopLinkValue(null);
+
+
 setSignals({
   stale: 'pending',
   weak: 'pending',
@@ -330,6 +354,11 @@ setDetectedPostingAgeValue(null);
 setDetectedPostingAgeStatusValue(null);
 setDetectedEmployerSourceValue(null);
 setDetectedCanonicalJobIdValue(null);
+setDetectedGoogleIndexedValue(null);
+setDetectedGoogleTopResultValue(null);
+setDetectedGoogleSnippetValue(null);
+setDetectedGoogleTopLinkValue(null);
+
 
 setSignals({
   stale: 'pending',
@@ -373,6 +402,11 @@ scheduleStep('scoreContentUniqueness', 1640);
 scheduleStep('scoreActivityIndicators', 1960);
 scheduleStep('scoreFreshness2', 2280);
 scheduleStep('scoreSiteReliability', 2600);
+
+scheduleStep('detectedGoogleIndexed', 1100);
+scheduleStep('detectedGoogleTopResult', 1500);
+scheduleStep('detectedGoogleSnippet', 1900);
+
 
 
 
@@ -433,6 +467,23 @@ scheduleStep('scoreSiteReliability', 2600);
       setDetectedPostingAgeStatusValue(data?.detected?.postingAgeStatus ?? null);
       setDetectedEmployerSourceValue(data?.detected?.employerSource ?? fallbackHost ?? null);
       setDetectedCanonicalJobIdValue(data?.detected?.canonicalJobId ?? fallbackJobId ?? null);
+
+
+            // Google snippet values (from API if available)
+      const g = data?.google;
+
+      if (!g || g.enabled === false) {
+        setDetectedGoogleIndexedValue('Not enabled');
+        setDetectedGoogleTopResultValue('—');
+        setDetectedGoogleSnippetValue('—');
+        setDetectedGoogleTopLinkValue(null);
+      } else {
+        setDetectedGoogleIndexedValue(g.indexed ? 'Indexed' : 'Not found');
+        setDetectedGoogleTopResultValue(g.topTitle ?? '—');
+        setDetectedGoogleSnippetValue(g.topSnippet ?? '—');
+        setDetectedGoogleTopLinkValue(g.topLink ?? null);
+      }
+
 
       const { stale, weak, inactivity } = data.signals;
 
@@ -890,6 +941,55 @@ setJobDescription('');
                         </div>
                       </div>
                     )}
+
+                                        {analysisSteps.detectedGoogleIndexed === 'complete' && (
+                      <div className="analysis-tag" data-tip="Checks whether Google currently returns results for this job/source.">
+                        <img src={checkComplete} alt="" className="analysis-tag-icon" />
+                        <div className="analysis-tag-text">
+                          <div className="analysis-tag-title">Google Index</div>
+                          <div className="analysis-tag-value">{detectedGoogleIndexedValue ?? '—'}</div>
+                        </div>
+                      </div>
+                    )}
+
+                    {analysisSteps.detectedGoogleTopResult === 'complete' && (
+                      detectedGoogleTopLinkValue ? (
+                        <a
+                          className="analysis-tag analysis-tag-link"
+                          href={detectedGoogleTopLinkValue}
+                          target="_blank"
+                          rel="noreferrer"
+                          data-tip="Opens the top Google result in a new tab."
+                        >
+                          <img src={checkComplete} alt="" className="analysis-tag-icon" />
+                          <div className="analysis-tag-text">
+                            <div className="analysis-tag-title">Google Top Result</div>
+                            <div className="analysis-tag-value analysis-tag-value-link">
+                              {detectedGoogleTopResultValue ?? '—'}
+                            </div>
+                          </div>
+                        </a>
+                      ) : (
+                        <div className="analysis-tag" data-tip="Top Google result (if found).">
+                          <img src={checkComplete} alt="" className="analysis-tag-icon" />
+                          <div className="analysis-tag-text">
+                            <div className="analysis-tag-title">Google Top Result</div>
+                            <div className="analysis-tag-value">{detectedGoogleTopResultValue ?? '—'}</div>
+                          </div>
+                        </div>
+                      )
+                    )}
+
+                    {analysisSteps.detectedGoogleSnippet === 'complete' && (
+                      <div className="analysis-tag" data-tip="Snippet text Google shows for this result (may include age cues).">
+                        <img src={checkComplete} alt="" className="analysis-tag-icon" />
+                        <div className="analysis-tag-text">
+                          <div className="analysis-tag-title">Google Snippet</div>
+                          <div className="analysis-tag-value">{detectedGoogleSnippetValue ?? '—'}</div>
+                        </div>
+                      </div>
+                    )}
+
 
                     {analysisSteps.detectedActivityScan === 'complete' && (
                       <div className="analysis-tag" data-tip="Runs activity indicator scan across the page content.">
