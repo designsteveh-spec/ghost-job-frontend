@@ -1201,7 +1201,7 @@ button {
 .postingage-cta-head {
   background: #4040FF;
   padding: 12px 14px;
-  text-align: center;
+  text-align: left; /* ✅ left aligned like mock */
 }
 
 .postingage-cta-title {
@@ -1213,7 +1213,7 @@ button {
 
 .postingage-cta-sub {
   color: #ffffff;
-  font-weight: 600;
+  font-weight: 500; /* ✅ not bold */
   font-size: 12px;
   line-height: 1.2;
   margin-top: 2px;
@@ -1222,18 +1222,19 @@ button {
 
 .postingage-cta-body {
   padding: 12px 14px 14px;
-  text-align: center;
+  text-align: left;   /* ✅ left aligned */
   color: #4040FF;
   font-size: 12px;
-  font-weight: 600;
+  font-weight: 500;   /* ✅ calmer, matches rest of UI */
   line-height: 1.35;
 }
 
 .postingage-cta-btn {
-  display: inline-block;   /* button sized to text like mock */
-  margin: 10px auto 0;
+  display: block;          /* ✅ makes margin auto center actually work */
+  width: 220px;            /* ✅ consistent centered button like mock */
+  max-width: calc(100% - 24px);
+  margin: 12px auto 16px;  /* ✅ centered + space below button */
   padding: 10px 16px;
-  width: auto;             /* NOT full width */
   font-size: 14px;
 }
 
