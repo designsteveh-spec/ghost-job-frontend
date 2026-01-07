@@ -74,8 +74,12 @@ const [checkMode, setCheckMode] = useState<CheckMode>('basic');
 
   // "What we detected" values (UI only)
   const [detectedPostingAgeValue, setDetectedPostingAgeValue] = useState<string | null>(null);
+  const [detectedPostingAgeStatusValue, setDetectedPostingAgeStatusValue] = useState<string | null>(null);
   const [detectedEmployerSourceValue, setDetectedEmployerSourceValue] = useState<string | null>(null);
   const [detectedCanonicalJobIdValue, setDetectedCanonicalJobIdValue] = useState<string | null>(null);
+
+  // Deep Check CTA focus target
+  const jobDescRef = useRef<HTMLTextAreaElement | null>(null);
 
 
 // Gauge UI (front-end only)
@@ -216,6 +220,25 @@ const [gaugeRunId, setGaugeRunId] = useState<number>(0);
     setOpenLegal((prev) => (prev === section ? null : section));
   };
 
+    const jumpToDeepCheck = () => {
+    if (!canUseDeep) {
+      window.location.hash = '#pricing';
+      return;
+    }
+
+    setCheckMode('deep');
+
+    // Wait for React to render the Deep UI, then scroll + focus
+    window.setTimeout(() => {
+      const el = jobDescRef.current;
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        el.focus();
+      }
+    }, 80);
+  };
+
+
       const resetAnalysis = () => {
     clearAllTimeouts();
     stopGaugeFlutter();
@@ -225,6 +248,7 @@ setFormError(null);
 
 // Reset "What we detected" values
 setDetectedPostingAgeValue(null);
+setDetectedPostingAgeStatusValue(null);
 setDetectedEmployerSourceValue(null);
 setDetectedCanonicalJobIdValue(null);
 
@@ -296,6 +320,7 @@ setScore(null);
 
 // Reset "What we detected" values (new run)
 setDetectedPostingAgeValue(null);
+setDetectedPostingAgeStatusValue(null);
 setDetectedEmployerSourceValue(null);
 setDetectedCanonicalJobIdValue(null);
 
@@ -398,6 +423,7 @@ scheduleStep('scoreSiteReliability', 2600);
       } catch {}
 
       setDetectedPostingAgeValue(data?.detected?.postingAge ?? null);
+      setDetectedPostingAgeStatusValue(data?.detected?.postingAgeStatus ?? null);
       setDetectedEmployerSourceValue(data?.detected?.employerSource ?? fallbackHost ?? null);
       setDetectedCanonicalJobIdValue(data?.detected?.canonicalJobId ?? fallbackJobId ?? null);
 
@@ -584,6 +610,7 @@ onClick={() => {
       </div>
 
       <textarea
+        ref={jobDescRef}
         className="job-desc"
         placeholder="Copy and paste job description here"
         value={jobDescription}
@@ -803,6 +830,22 @@ setJobDescription('');
                         <div className="analysis-tag-text">
                                                     <div className="analysis-tag-title">Posting Age</div>
                           <div className="analysis-tag-value">{detectedPostingAgeValue ?? '—'}</div>
+
+                          {(detectedPostingAgeStatusValue === 'blocked' ||
+                            detectedPostingAgeStatusValue === 'js_required') && (
+                            <div className="microcopy muted" style={{ marginTop: 8 }}>
+                              Posting age couldn’t be read from this page. Some job sites block automated checks.
+                              <div style={{ marginTop: 8 }}>
+                                <button
+                                  type="button"
+                                  className="secondary-btn"
+                                  onClick={jumpToDeepCheck}
+                                >
+                                  Run Deep Check with Job Description
+                                </button>
+                              </div>
+                            </div>
+                          )}
 
                         </div>
                       </div>
