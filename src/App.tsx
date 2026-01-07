@@ -188,17 +188,17 @@ const [gaugeRunId, setGaugeRunId] = useState<number>(0);
     stopGaugeFlutter();
 
     // Keep animation snappy while "waiting"
-    setGaugeDurationMs(220);
+    setGaugeDurationMs(380);
 
     // Start low, then flutter between 1% and 34%
     setGaugeTarget(1);
 
     flutterIntervalRef.current = window.setInterval(() => {
       // Random integer in [1, 34]
-      const next = 1 + Math.floor(Math.random() * 34);
+      const next = 1 + Math.floor(Math.random() * 11);
       setGaugeTarget(next);
       setGaugeRunId((n) => n + 1);
-    }, 260);
+    }, 650);
   };
 
 
