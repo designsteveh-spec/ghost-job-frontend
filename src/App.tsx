@@ -221,22 +221,23 @@ const [gaugeRunId, setGaugeRunId] = useState<number>(0);
   };
 
     const jumpToDeepCheck = () => {
-    if (!canUseDeep) {
-      window.location.hash = '#pricing';
-      return;
+  // Force Deep UI on (this CTA should always take the user there)
+  setCheckMode('deep');
+  setFormError(null);
+
+  // Wait for Deep UI to render, then scroll + focus the textarea
+  window.setTimeout(() => {
+    const el = jobDescRef.current;
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      el.focus();
+    } else {
+      // Fallback: at least keep them at the hero section
+      window.location.hash = '#hero';
     }
+  }, 120);
+};
 
-    setCheckMode('deep');
-
-    // Wait for React to render the Deep UI, then scroll + focus
-    window.setTimeout(() => {
-      const el = jobDescRef.current;
-      if (el) {
-        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        el.focus();
-      }
-    }, 80);
-  };
 
 
       const resetAnalysis = () => {
