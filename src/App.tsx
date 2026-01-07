@@ -169,10 +169,36 @@ const [gaugeRunId, setGaugeRunId] = useState<number>(0);
 
 
   const timeoutsRef = useRef<number[]>([]);
+  const flutterIntervalRef = useRef<number | null>(null);
+  const gaugeDurationRef = useRef<number>(1400);
 
   const clearAllTimeouts = () => {
     timeoutsRef.current.forEach((t) => window.clearTimeout(t));
     timeoutsRef.current = [];
+  };
+
+  const stopGaugeFlutter = () => {
+    if (flutterIntervalRef.current !== null) {
+      window.clearInterval(flutterIntervalRef.current);
+      flutterIntervalRef.current = null;
+    }
+  };
+
+  const startGaugeFlutter = () => {
+    stopGaugeFlutter();
+
+    // Keep animation snappy while "waiting"
+    setGaugeDurationMs(220);
+
+    // Start low, then flutter between 1% and 34%
+    setGaugeTarget(1);
+
+    flutterIntervalRef.current = window.setInterval(() => {
+      // Random integer in [1, 34]
+      const next = 1 + Math.floor(Math.random() * 34);
+      setGaugeTarget(next);
+      setGaugeRunId((n) => n + 1);
+    }, 260);
   };
 
 
@@ -191,7 +217,8 @@ const [gaugeRunId, setGaugeRunId] = useState<number>(0);
   };
 
       const resetAnalysis = () => {
-	clearAllTimeouts();
+    clearAllTimeouts();
+    stopGaugeFlutter();
     setStatus('idle');
 setScore(null);
 setFormError(null);
@@ -214,6 +241,7 @@ resetAnalysisSteps();
 // Reset gauge to start state
 setGaugeTarget(0);
 setGaugeDurationMs(1400);
+gaugeDurationRef.current = 1400;
 setGaugeRunId((n) => n + 1);
 
   };
@@ -278,10 +306,13 @@ setSignals({
 });
 
 
-// Start a fresh gauge run at 0% while we process
+// Start a fresh gauge run + flutter while we wait (1%–34%)
 setGaugeTarget(0);
 setGaugeDurationMs(1400);
+gaugeDurationRef.current = 1400;
 setGaugeRunId((n) => n + 1);
+
+startGaugeFlutter();
 
 // Analysis accordion: show + reset + progressive tag reveal
 setOpenAnalysis(true);
@@ -323,6 +354,10 @@ scheduleStep('scoreSiteReliability', 2600);
           jobDescription: descValue,
         }),
       });
+
+      // ✅ Stop flutter as soon as we have a response
+      stopGaugeFlutter();
+      setGaugeDurationMs(gaugeDurationRef.current);
 
       if (!res.ok) {
         let msg = 'Analyze failed';
@@ -400,6 +435,11 @@ setGaugeDurationMs(maxDelay + 300);
 
     } catch (err) {
       console.error(err);
+
+      // ✅ Stop flutter if the request fails
+      stopGaugeFlutter();
+      setGaugeDurationMs(gaugeDurationRef.current);
+
       setFormError('Network error. Please try again.');
       setStatus('idle');
       setScore(null);
