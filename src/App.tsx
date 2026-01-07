@@ -191,18 +191,18 @@ const [gaugeRunId, setGaugeRunId] = useState<number>(0);
   const startGaugeFlutter = () => {
     stopGaugeFlutter();
 
-    // Keep animation snappy while "waiting"
-    setGaugeDurationMs(380);
+    // Slow the animation while "waiting" so it doesn't feel like flicker
+    setGaugeDurationMs(900);
 
-    // Start low, then flutter between 1% and 34%
+    // Start low, then flutter between 1% and 33%
     setGaugeTarget(1);
 
     flutterIntervalRef.current = window.setInterval(() => {
-      // Random integer in [1, 34]
-      const next = 1 + Math.floor(Math.random() * 11);
+      // Random integer in [1, 33]
+      const next = 1 + Math.floor(Math.random() * 33);
       setGaugeTarget(next);
       setGaugeRunId((n) => n + 1);
-    }, 650);
+    }, 1100);
   };
 
 
@@ -833,17 +833,23 @@ setJobDescription('');
 
                           {(detectedPostingAgeStatusValue === 'blocked' ||
                             detectedPostingAgeStatusValue === 'js_required') && (
-                            <div className="microcopy muted" style={{ marginTop: 8 }}>
-                              Posting age couldn’t be read from this page. Some job sites block automated checks.
-                              <div style={{ marginTop: 8 }}>
-                                <button
-                                  type="button"
-                                  className="secondary-btn"
-                                  onClick={jumpToDeepCheck}
-                                >
-                                  Run Deep Check with Job Description
-                                </button>
+                            <div className="postingage-cta">
+                              <div className="postingage-cta-head">
+                                <div className="postingage-cta-title">Posting Age</div>
+                                <div className="postingage-cta-sub">Unavailable (blocked)</div>
                               </div>
+
+                              <div className="postingage-cta-body">
+                                Posting age couldn’t be read from this page. Paste Job Description into Deep Check.
+                              </div>
+
+                              <button
+                                type="button"
+                                className="analyze-btn postingage-cta-btn"
+                                onClick={jumpToDeepCheck}
+                              >
+                                Run Deep Check
+                              </button>
                             </div>
                           )}
 

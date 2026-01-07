@@ -1187,6 +1187,50 @@ button {
   line-height: 1.2;
 }
 
+/* Posting Age blocked CTA (mockup match) */
+.postingage-cta {
+  margin-top: 10px;
+  border: 2px solid #4040FF;
+  border-radius: 14px;
+  overflow: hidden;
+  background: #ffffff;
+}
+
+.postingage-cta-head {
+  background: #4040FF;
+  padding: 10px 12px;
+}
+
+.postingage-cta-title {
+  color: #ffffff;
+  font-weight: 800;
+  font-size: 13px;
+  line-height: 1.1;
+}
+
+.postingage-cta-sub {
+  color: #ffffff;
+  font-weight: 600;
+  font-size: 12px;
+  opacity: 0.95;
+  margin-top: 2px;
+}
+
+.postingage-cta-body {
+  padding: 12px;
+  color: #1e40ff;
+  font-size: 12px;
+  line-height: 1.35;
+  font-weight: 500;
+}
+
+.postingage-cta-btn {
+  margin: 0 12px 12px;
+  width: calc(100% - 24px);
+  padding: 12px 18px;
+}
+
+
 .analysis-tag-link {
   text-decoration: none;
   cursor: pointer;
