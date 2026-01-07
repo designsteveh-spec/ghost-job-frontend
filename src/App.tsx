@@ -191,15 +191,15 @@ const [gaugeRunId, setGaugeRunId] = useState<number>(0);
   const startGaugeFlutter = () => {
     stopGaugeFlutter();
 
-    // Slow the animation while "waiting" so it doesn't feel like flicker
-    setGaugeDurationMs(900);
+    // Slower, calmer flutter while "waiting"
+    setGaugeDurationMs(520);
 
-    // Start low, then flutter between 1% and 33%
+    // Start low, then flutter between 1% and 11%
     setGaugeTarget(1);
 
     flutterIntervalRef.current = window.setInterval(() => {
-      // Random integer in [1, 33]
-      const next = 1 + Math.floor(Math.random() * 33);
+      // Random integer in [1, 11]
+      const next = 1 + Math.floor(Math.random() * 11);
       setGaugeTarget(next);
       setGaugeRunId((n) => n + 1);
     }, 1100);
@@ -825,37 +825,44 @@ setJobDescription('');
                     <div className="analysis-card-title">WHAT WE DETECTED</div>
 
                     {analysisSteps.detectedPostingAge === 'complete' && (
-                      <div className="analysis-tag" data-tip="If available, detects posting age / recency cues.">
-                        <img src={checkComplete} alt="" className="analysis-tag-icon" />
-                        <div className="analysis-tag-text">
-                                                    <div className="analysis-tag-title">Posting Age</div>
-                          <div className="analysis-tag-value">{detectedPostingAgeValue ?? '—'}</div>
+  (detectedPostingAgeStatusValue === 'blocked' ||
+   detectedPostingAgeStatusValue === 'js_required') ? (
 
-                          {(detectedPostingAgeStatusValue === 'blocked' ||
-                            detectedPostingAgeStatusValue === 'js_required') && (
-                            <div className="postingage-cta">
-                              <div className="postingage-cta-head">
-                                <div className="postingage-cta-title">Posting Age</div>
-                                <div className="postingage-cta-sub">Unavailable (blocked)</div>
-                              </div>
+    <div
+      className="analysis-tag postingage-cta"
+      data-tip="If available, detects posting age / recency cues."
+    >
+      <div className="postingage-cta-head">
+        <div className="postingage-cta-title">Posting Age</div>
+        <div className="postingage-cta-sub">Unavailable (blocked)</div>
+      </div>
 
-                              <div className="postingage-cta-body">
-                                Posting age couldn’t be read from this page. Paste Job Description into Deep Check.
-                              </div>
+      <div className="postingage-cta-body">
+        Posting age couldn’t be read from this page. Paste Job Description into Deep Check.
+      </div>
 
-                              <button
-                                type="button"
-                                className="analyze-btn postingage-cta-btn"
-                                onClick={jumpToDeepCheck}
-                              >
-                                Run Deep Check
-                              </button>
-                            </div>
-                          )}
+      <button
+        type="button"
+        className="analyze-btn postingage-cta-btn"
+        onClick={jumpToDeepCheck}
+      >
+        Run Deep Check
+      </button>
+    </div>
 
-                        </div>
-                      </div>
-                    )}
+  ) : (
+
+    <div className="analysis-tag" data-tip="If available, detects posting age / recency cues.">
+      <img src={checkComplete} alt="" className="analysis-tag-icon" />
+      <div className="analysis-tag-text">
+        <div className="analysis-tag-title">Posting Age</div>
+        <div className="analysis-tag-value">{detectedPostingAgeValue ?? '—'}</div>
+      </div>
+    </div>
+
+  )
+)}
+
 
                     {analysisSteps.detectedEmployerSource === 'complete' && (
                       <div className="analysis-tag" data-tip="Identifies the site/employer source where possible.">

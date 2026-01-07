@@ -1187,9 +1187,11 @@ button {
   line-height: 1.2;
 }
 
-/* Posting Age blocked CTA (mockup match) */
+/* Posting Age blocked CTA (RIGHT mock) */
+/* This REPLACES the normal analysis-tag layout (no icon, no left title/value rows) */
 .postingage-cta {
-  margin-top: 10px;
+  display: block;          /* overrides .analysis-tag flex */
+  padding: 0;              /* head/body handle spacing */
   border: 2px solid #4040FF;
   border-radius: 14px;
   overflow: hidden;
@@ -1198,36 +1200,41 @@ button {
 
 .postingage-cta-head {
   background: #4040FF;
-  padding: 10px 12px;
+  padding: 12px 14px;
+  text-align: center;
 }
 
 .postingage-cta-title {
   color: #ffffff;
   font-weight: 800;
   font-size: 13px;
-  line-height: 1.1;
+  line-height: 1.15;
 }
 
 .postingage-cta-sub {
   color: #ffffff;
   font-weight: 600;
   font-size: 12px;
-  opacity: 0.95;
+  line-height: 1.2;
   margin-top: 2px;
+  opacity: 0.98;
 }
 
 .postingage-cta-body {
-  padding: 12px;
-  color: #1e40ff;
+  padding: 12px 14px 14px;
+  text-align: center;
+  color: #4040FF;
   font-size: 12px;
+  font-weight: 600;
   line-height: 1.35;
-  font-weight: 500;
 }
 
 .postingage-cta-btn {
-  margin: 0 12px 12px;
-  width: calc(100% - 24px);
-  padding: 12px 18px;
+  display: inline-block;   /* button sized to text like mock */
+  margin: 10px auto 0;
+  padding: 10px 16px;
+  width: auto;             /* NOT full width */
+  font-size: 14px;
 }
 
 
