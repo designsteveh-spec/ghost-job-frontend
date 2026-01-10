@@ -1293,7 +1293,7 @@ button {
 }
 
 .postingage-cta.postingage-cta-pulse {
-  animation: postingAgeBoxPulse 750ms ease-in-out 2;
+  animation: postingAgeBoxPulse 750ms ease-in-out 1;
 }
 
 @keyframes postingAgeInputPulse {
@@ -1304,7 +1304,7 @@ button {
 }
 
 .postingage-cta-input.postingage-cta-input-pulse {
-  animation: postingAgeInputPulse 750ms ease-in-out 2;
+  animation: postingAgeInputPulse 750ms ease-in-out 1;
 }
 
 
