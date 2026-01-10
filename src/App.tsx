@@ -34,6 +34,10 @@ export default function App() {
   const [url, setUrl] = useState('');
 
   const [jobDescription, setJobDescription] = useState('');
+
+// Posting Date override (Analyze Again workflow)
+const [postingDateOverride, setPostingDateOverride] = useState('');
+const [lastAnalyzedUrl, setLastAnalyzedUrl] = useState('');
   const [formError, setFormError] = useState<string | null>(null);
 
 
@@ -281,6 +285,9 @@ setDetectedGoogleIndexedValue(null);
 setDetectedGoogleTopResultValue(null);
 setDetectedGoogleSnippetValue(null);
 setDetectedGoogleTopLinkValue(null);
+setPostingDateOverride('');
+setLastAnalyzedUrl('');
+
 
 
 setSignals({
@@ -324,11 +331,19 @@ setGaugeRunId((n) => n + 1);
   };
 
 
-  const handleAnalyze = async (override?: { url?: string; jobDescription?: string }) => {
+  const handleAnalyze = async (override?: { url?: string; jobDescription?: string; postingDate?: string }) => {
     setFormError(null);
 
     const urlValue = (override?.url ?? url).trim();
-    const descValue = (override?.jobDescription ?? jobDescription).trim();
+const descValue = (override?.jobDescription ?? jobDescription).trim();
+const postingDateValue = (override?.postingDate ?? '').trim();
+
+// Remember the last URL we analyzed (so "Analyze Again" can rerun even if user edits fields)
+if (urlValue) setLastAnalyzedUrl(urlValue);
+
+// If this is a normal run (not Analyze Again), clear any old manual date
+if (!override?.postingDate) setPostingDateOverride('');
+
 
     // Basic requires URL
     if (checkMode === 'basic' && !urlValue) {
@@ -415,10 +430,12 @@ scheduleStep('detectedGoogleSnippet', 1900);
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          mode: checkMode,
-          url: urlValue,
-          jobDescription: descValue,
-        }),
+  mode: checkMode,
+  url: urlValue,
+  jobDescription: descValue,
+  postingDate: postingDateValue,
+}),
+
       });
 
       // ✅ Stop flutter as soon as we have a response
@@ -892,20 +909,52 @@ setJobDescription('');
     >
       <div className="postingage-cta-head">
         <div className="postingage-cta-title">Posting Age</div>
-        <div className="postingage-cta-sub">Unavailable (blocked)</div>
+        <div className="postingage-cta-sub">
+  {detectedPostingAgeStatusValue === 'js_required'
+    ? 'Unavailable (requires JS render)'
+    : 'Unavailable (blocked)'}
+</div>
       </div>
 
       <div className="postingage-cta-body">
-        Posting age couldn’t be read from this page. Paste Job Description into Deep Check.
-      </div>
+  Posting age couldn’t be read from this page. If the listing shows an “Opening Date” or “Posted” date,
+  enter it below and rerun.
+</div>
 
-      <button
-        type="button"
-        className="analyze-btn postingage-cta-btn"
-        onClick={jumpToDeepCheck}
-      >
-        Run Deep Check
-      </button>
+<div className="postingage-cta-field">
+  <div className="postingage-cta-label">Provide Posting Date</div>
+  <input
+    type="text"
+    className="postingage-cta-input"
+    placeholder="i.e. 01/09/2026"
+    value={postingDateOverride}
+    onChange={(e) => setPostingDateOverride(e.target.value)}
+  />
+</div>
+
+<button
+  type="button"
+  className="analyze-btn postingage-cta-btn"
+  disabled={
+    status === 'running' ||
+    !postingDateOverride.trim() ||
+    !(lastAnalyzedUrl || url).trim()
+  }
+  aria-disabled={
+    status === 'running' ||
+    !postingDateOverride.trim() ||
+    !(lastAnalyzedUrl || url).trim()
+  }
+  onClick={() => {
+    const rerunUrl = (lastAnalyzedUrl || url).trim();
+    const pd = postingDateOverride.trim();
+    if (!rerunUrl || !pd || status === 'running') return;
+    handleAnalyze({ url: rerunUrl, jobDescription: '', postingDate: pd });
+  }}
+>
+  Analyze Again
+</button>
+
     </div>
 
   ) : (

@@ -1229,6 +1229,27 @@ button {
   line-height: 1.35;
 }
 
+.postingage-cta-field {
+  padding: 0 14px;
+  margin-top: 6px;
+}
+
+.postingage-cta-label {
+  font-size: 12px;
+  font-weight: 800;
+  color: #4040FF;
+  margin-bottom: 8px;
+}
+
+.postingage-cta-input {
+  width: 100%;
+  padding: 12px 12px;
+  border-radius: 10px;
+  border: 1px solid #cbd5e1;
+  font-size: 14px;
+}
+
+
 .postingage-cta-btn {
   display: block;          /* ✅ makes margin auto center actually work */
   width: 220px;            /* ✅ consistent centered button like mock */
