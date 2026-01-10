@@ -40,6 +40,9 @@ const [postingDateOverride, setPostingDateOverride] = useState('');
 const [lastAnalyzedUrl, setLastAnalyzedUrl] = useState('');
   const [formError, setFormError] = useState<string | null>(null);
 
+  // Subtle pulse to draw attention to Posting Date input when Posting Age is blocked
+  const [pulsePostingDate, setPulsePostingDate] = useState<boolean>(false);
+
 
 
   const [openLegal, setOpenLegal] = useState<null | 'terms' | 'privacy'>(null);
@@ -264,6 +267,13 @@ const [gaugeRunId, setGaugeRunId] = useState<number>(0);
         behavior: 'smooth',
         block: 'start',
       });
+
+      // trigger subtle pulse on the input
+      setPulsePostingDate(false);
+      window.setTimeout(() => setPulsePostingDate(true), 50);
+
+      // stop pulse after it runs
+      window.setTimeout(() => setPulsePostingDate(false), 1400);
     }, 120);
   }, [detectedPostingAgeStatusValue, status]);
 
@@ -691,7 +701,7 @@ onClick={() => {
   <div className="postingage-cta-label">Posting Date (optional)</div>
   <input
     type="text"
-    className="postingage-cta-input"
+    className={`postingage-cta-input ${pulsePostingDate ? 'postingage-cta-pulse' : ''}`}
     placeholder="e.g. 1/9/2026, 1-9-26, or 2026-01-09"
     value={postingDateOverride}
     onChange={(e) => setPostingDateOverride(e.target.value)}
