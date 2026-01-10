@@ -317,13 +317,13 @@ setGaugeRunId((n) => n + 1);
 
     const urlValue = (override?.url ?? url).trim();
 const descValue = (override?.jobDescription ?? jobDescription).trim();
-const postingDateValue = (override?.postingDate ?? '').trim();
+const postingDateValue = (override?.postingDate ?? postingDateOverride ?? '').trim();
 
 // Remember the last URL we analyzed (so "Analyze Again" can rerun even if user edits fields)
 if (urlValue) setLastAnalyzedUrl(urlValue);
 
-// If this is a normal run (not Analyze Again), clear any old manual date
-if (!override?.postingDate) setPostingDateOverride('');
+// Keep manual posting date unless this call explicitly overrides it (Analyze Again sets it)
+if (override?.postingDate !== undefined) setPostingDateOverride(override.postingDate);
 
 
     // Basic requires URL
@@ -654,6 +654,20 @@ onClick={() => {
                 </div>
 				
 				{formError && <p className="form-error">{formError}</p>}
+
+<div className="postingdate-inline">
+  <div className="postingage-cta-label">Posting Date (optional)</div>
+  <input
+    type="text"
+    className="postingage-cta-input"
+    placeholder="e.g. 1/9/2026, 1-9-26, or 2026-01-09"
+    value={postingDateOverride}
+    onChange={(e) => setPostingDateOverride(e.target.value)}
+  />
+  <div className="postingdate-inline-hint">
+    If the listing shows an “Opening Date” or “Posted” date, add it to improve accuracy.
+  </div>
+</div>
 
 
 {isDeep && (
