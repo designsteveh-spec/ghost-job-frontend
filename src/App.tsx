@@ -92,6 +92,12 @@ const [checkMode, setCheckMode] = useState<CheckMode>('basic');
   // Deep Check CTA focus target
   const jobDescRef = useRef<HTMLTextAreaElement | null>(null);
 
+  // Auto-scroll target: "WHAT WE DETECTED" card
+  const whatWeDetectedRef = useRef<HTMLDivElement | null>(null);
+
+  // Prevent repeated scroll during one run
+  const didAutoScrollRef = useRef<boolean>(false);
+
 
 // Gauge UI (front-end only)
 const [gaugeTarget, setGaugeTarget] = useState<number>(0);
@@ -238,6 +244,30 @@ const [gaugeRunId, setGaugeRunId] = useState<number>(0);
     }
   }, []);
 
+    // Auto-scroll to "WHAT WE DETECTED" when Posting Age is unavailable (blocked/js)
+  useEffect(() => {
+    const needsManualDate =
+      detectedPostingAgeStatusValue === 'blocked' ||
+      detectedPostingAgeStatusValue === 'js_required';
+
+    if (!needsManualDate) return;
+    if (status === 'idle') return;
+    if (didAutoScrollRef.current) return;
+
+    didAutoScrollRef.current = true;
+
+    // Ensure Analysis is open, then scroll to the card
+    setOpenAnalysis(true);
+
+    window.setTimeout(() => {
+      whatWeDetectedRef.current?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start',
+      });
+    }, 120);
+  }, [detectedPostingAgeStatusValue, status]);
+
+
   const toggleLegal = (section: 'terms' | 'privacy') => {
     setOpenLegal((prev) => (prev === section ? null : section));
   };
@@ -266,6 +296,7 @@ setDetectedGoogleSnippetValue(null);
 setDetectedGoogleTopLinkValue(null);
 setPostingDateOverride('');
 setLastAnalyzedUrl('');
+didAutoScrollRef.current = false;
 
 
 
@@ -340,6 +371,7 @@ if (override?.postingDate !== undefined) setPostingDateOverride(override.posting
 
     // Kill any prior timers so tab switching/reset can't be overwritten
     clearAllTimeouts();
+    didAutoScrollRef.current = false;
 
     // Reset state
 setStatus('running');
@@ -891,7 +923,7 @@ setJobDescription('');
                   </div>
 
                   {/* 2) WHAT WE DETECTED */}
-                  <div className="analysis-card">
+                  <div className="analysis-card" ref={whatWeDetectedRef}>
                     <div className="analysis-card-title">WHAT WE DETECTED</div>
 
                     {analysisSteps.detectedPostingAge === 'complete' && (
