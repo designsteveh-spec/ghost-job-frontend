@@ -1305,13 +1305,13 @@ setJobDescription('');
             </p>
 
             <div className="footer-socials">
-              <a href="https://www.facebook.com" target="_blank">
+              <a href="https://www.facebook.com" target="_blank" rel="noreferrer">
                 <img src={facebookIcon} alt="Facebook" />
               </a>
-              <a href="https://www.x.com" target="_blank">
+              <a href="https://www.x.com" target="_blank" rel="noreferrer">
                 <img src={twitterIcon} alt="Twitter" />
               </a>
-              <a href="https://www.tiktok.com/en/" target="_blank">
+              <a href="https://www.tiktok.com/en/" target="_blank" rel="noreferrer">
                 <img src={tiktokIcon} alt="TikTok" />
               </a>
             </div>
