@@ -1158,11 +1158,16 @@ button {
   background: #ffffff;
   position: relative;
   z-index: 0; /* ✅ allow hovered tag to rise above siblings */
-  animation: analysisTagPop 220ms ease-out both;
+  
 }
 
 .analysis-tag:hover {
   z-index: 50; /* ✅ brings tooltip above the tags below */
+}
+
+/* Only animate tag "pop in" for normal tags (NOT the Posting Age CTA) */
+.analysis-tag:not(.postingage-cta) {
+  animation: analysisTagPop 220ms ease-out both;
 }
 
 
