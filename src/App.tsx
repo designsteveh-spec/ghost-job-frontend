@@ -310,12 +310,55 @@ setGaugeRunId((n) => n + 1);
   };
 
 
+  const normalizePostingDate = (raw: string): string | null => {
+  const s = raw.trim();
+  if (!s) return '';
+
+  // 1) ISO: YYYY-MM-DD
+  const iso = s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
+  if (iso) {
+    const y = Number(iso[1]);
+    const m = Number(iso[2]);
+    const d = Number(iso[3]);
+    const dt = new Date(y, m - 1, d);
+    if (dt.getFullYear() === y && dt.getMonth() === m - 1 && dt.getDate() === d) {
+      return `${String(y).padStart(4, '0')}-${String(m).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+    }
+    return null;
+  }
+
+  // 2) US: M/D/YY(YY) or M-D-YY(YY)
+  const us = s.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2}|\d{4})$/);
+  if (us) {
+    const m = Number(us[1]);
+    const d = Number(us[2]);
+    let y = Number(us[3]);
+
+    // Assume 20xx for 2-digit years (good enough for job posting dates)
+    if (us[3].length === 2) y = 2000 + y;
+
+    const dt = new Date(y, m - 1, d);
+    if (dt.getFullYear() === y && dt.getMonth() === m - 1 && dt.getDate() === d) {
+      return `${String(y).padStart(4, '0')}-${String(m).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+    }
+    return null;
+  }
+
+  return null;
+};
+
+
   const handleAnalyze = async (override?: { url?: string; jobDescription?: string; postingDate?: string }) => {
     setFormError(null);
 
     const urlValue = (override?.url ?? url).trim();
 const descValue = (override?.jobDescription ?? jobDescription).trim();
-const postingDateValue = (override?.postingDate ?? '').trim();
+const postingDateValueRaw = (override?.postingDate ?? '').trim();
+const postingDateValue = postingDateValueRaw ? normalizePostingDate(postingDateValueRaw) : '';
+if (postingDateValueRaw && !postingDateValue) {
+  setFormError('Posting date not recognized. Try 1/9/2026, 1-9-26, or 2026-01-09.');
+  return;
+}
 
 // Remember the last URL we analyzed (so "Analyze Again" can rerun even if user edits fields)
 if (urlValue) setLastAnalyzedUrl(urlValue);
@@ -905,7 +948,7 @@ setJobDescription('');
   <input
     type="text"
     className="postingage-cta-input"
-    placeholder="i.e. 01/09/2026"
+    placeholder="e.g. 1/9/2026, 1-9-26, or 2026-01-09"
     value={postingDateOverride}
     onChange={(e) => setPostingDateOverride(e.target.value)}
   />
