@@ -1284,6 +1284,30 @@ button {
   font-size: 14px;
 }
 
+/* Posting Age attention pulse (box + input) */
+@keyframes postingAgeBoxPulse {
+  0%   { box-shadow: 0 0 0 0 rgba(64,64,255,0); transform: translateY(0); }
+  35%  { box-shadow: 0 0 0 6px rgba(255,205,46,0.55); }
+  65%  { box-shadow: 0 0 0 10px rgba(64,64,255,0.24); }
+  100% { box-shadow: 0 0 0 0 rgba(64,64,255,0); transform: translateY(0); }
+}
+
+.postingage-cta.postingage-cta-pulse {
+  animation: postingAgeBoxPulse 750ms ease-in-out 3;
+}
+
+@keyframes postingAgeInputPulse {
+  0%   { box-shadow: 0 0 0 0 rgba(255,205,46,0); border-color: #cbd5e1; background: #ffffff; }
+  35%  { box-shadow: 0 0 0 5px rgba(255,205,46,0.50); border-color: #4040FF; background: rgba(255,205,46,0.12); }
+  65%  { box-shadow: 0 0 0 9px rgba(64,64,255,0.18); border-color: #4040FF; background: rgba(255,205,46,0.08); }
+  100% { box-shadow: 0 0 0 0 rgba(255,205,46,0); border-color: #cbd5e1; background: #ffffff; }
+}
+
+.postingage-cta-input.postingage-cta-input-pulse {
+  animation: postingAgeInputPulse 750ms ease-in-out 3;
+}
+
+
 
 .analysis-tag-link {
   text-decoration: none;

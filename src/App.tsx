@@ -95,6 +95,10 @@ const [checkMode, setCheckMode] = useState<CheckMode>('basic');
   // Deep Check CTA focus target
   const jobDescRef = useRef<HTMLTextAreaElement | null>(null);
 
+  // Posting Age CTA scroll + pulse
+  const postingAgeCtaRef = useRef<HTMLDivElement | null>(null);
+  const [postingAgePulseOn, setPostingAgePulseOn] = useState(false);
+
   // Auto-scroll target: "WHAT WE DETECTED" card
   const whatWeDetectedRef = useRef<HTMLDivElement | null>(null);
 
@@ -240,12 +244,59 @@ const [gaugeRunId, setGaugeRunId] = useState<number>(0);
   /* -------------------------------------------
      Auto-expand legal sections via anchor links
   -------------------------------------------- */
+
+
+
+
   useEffect(() => {
     const hash = window.location.hash.replace('#', '');
     if (hash === 'terms' || hash === 'privacy') {
       setOpenLegal(hash);
     }
   }, []);
+
+
+    // Auto-scroll + pulse when Posting Age is unavailable (blocked/js_required)
+  useEffect(() => {
+    const needsManualDate =
+      detectedPostingAgeStatusValue === 'blocked' ||
+      detectedPostingAgeStatusValue === 'js_required';
+
+    // CTA isn't mounted until this step flips to complete
+    if (!needsManualDate || analysisSteps.detectedPostingAge !== 'complete') return;
+
+    // Ensure Analysis is open so the CTA exists in DOM
+    if (!openAnalysis) setOpenAnalysis(true);
+
+    // Scroll to the Posting Age CTA (inside "What we detected")
+    window.setTimeout(() => {
+      postingAgeCtaRef.current?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start',
+      });
+    }, 60);
+
+    // Force-retrigger pulse (turn off -> next frame -> on)
+    setPostingAgePulseOn(false);
+
+    const t1 = window.setTimeout(() => {
+      requestAnimationFrame(() => setPostingAgePulseOn(true));
+    }, 380);
+
+    // Turn it back off after 3 pulses finish
+    const t2 = window.setTimeout(() => {
+      setPostingAgePulseOn(false);
+    }, 2700);
+
+    // track timers so your reset clears them
+    timeoutsRef.current.push(t1);
+    timeoutsRef.current.push(t2);
+  }, [
+    detectedPostingAgeStatusValue,
+    analysisSteps.detectedPostingAge,
+    openAnalysis,
+  ]);
+
 
     // Auto-scroll to "WHAT WE DETECTED" when Posting Age is unavailable (blocked/js)
   useEffect(() => {
@@ -941,7 +992,8 @@ setJobDescription('');
    detectedPostingAgeStatusValue === 'js_required') ? (
 
     <div
-      className="analysis-tag postingage-cta"
+      ref={postingAgeCtaRef}
+      className={`analysis-tag postingage-cta ${postingAgePulseOn ? 'postingage-cta-pulse' : ''}`}
       data-tip="If available, detects posting age / recency cues."
     >
       <div className="postingage-cta-head">
@@ -962,7 +1014,7 @@ setJobDescription('');
   <div className="postingage-cta-label">Provide Posting Date</div>
   <input
     type="text"
-    className="postingage-cta-input"
+    className={`postingage-cta-input ${postingAgePulseOn ? 'postingage-cta-input-pulse' : ''}`}
     placeholder="e.g. 1/9/2026, 1-9-26, or 2026-01-09"
     value={postingDateOverride}
     onChange={(e) => setPostingDateOverride(e.target.value)}
