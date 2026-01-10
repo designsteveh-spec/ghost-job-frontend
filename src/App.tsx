@@ -272,8 +272,8 @@ const [gaugeRunId, setGaugeRunId] = useState<number>(0);
       setPulsePostingDate(false);
       window.setTimeout(() => setPulsePostingDate(true), 50);
 
-      // stop pulse after it runs
-      window.setTimeout(() => setPulsePostingDate(false), 1400);
+      // stop pulse after it runs (3 pulses x 650ms ≈ 1950ms, add buffer)
+      window.setTimeout(() => setPulsePostingDate(false), 2300);
     }, 120);
   }, [detectedPostingAgeStatusValue, status]);
 

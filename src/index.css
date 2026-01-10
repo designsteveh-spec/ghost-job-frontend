@@ -1268,9 +1268,10 @@ button {
 }
 
 .postingage-cta-input.postingage-cta-pulse {
-  animation: postingAgePulse 900ms ease-out 1;
+  animation: postingAgePulse 650ms ease-out 3;
   border-color: #4040FF;
 }
+
 
 
 
