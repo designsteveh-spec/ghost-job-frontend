@@ -242,28 +242,7 @@ const [gaugeRunId, setGaugeRunId] = useState<number>(0);
     setOpenLegal((prev) => (prev === section ? null : section));
   };
 
-    const jumpToDeepCheck = () => {
-  // We must return to the "idle" UI, because the Deep inputs only render there.
-  resetAnalysis();
-
-  // Guide user into the “paste description” path
-  setCheckMode('deep');
-  setFormError(null);
-  setUrl('');
-  setJobDescription('');
-
-  // Bring user back to the hero area where the tabs + inputs live
-  window.location.hash = '#hero';
-
-  // Wait for React to render the Deep UI, then scroll + focus
-  window.setTimeout(() => {
-    const el = jobDescRef.current;
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      el.focus();
-    }
-  }, 150);
-};
+    
 
 
 
