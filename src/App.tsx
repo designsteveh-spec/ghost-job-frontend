@@ -259,77 +259,53 @@ const [gaugeRunId, setGaugeRunId] = useState<number>(0);
   }, []);
 
 
-    // Auto-scroll + pulse when Posting Age is unavailable (blocked/js_required)
+  // Auto-scroll to Analysis summary AFTER results are complete (prevents early jump/flash)
   useEffect(() => {
+    if (status !== 'complete') return;
+    if (didAutoScrollRef.current) return;
+
+    didAutoScrollRef.current = true;
+
     const needsManualDate =
       detectedPostingAgeStatusValue === 'blocked' ||
       detectedPostingAgeStatusValue === 'js_required';
 
-    // CTA isn't mounted until this step flips to complete
-    if (!needsManualDate || analysisSteps.detectedPostingAge !== 'complete') return;
-
-    // Ensure Analysis is open so the CTA exists in DOM
+    // Ensure Analysis is open so the summary exists in DOM
     if (!openAnalysis) setOpenAnalysis(true);
 
-    // Scroll to the Posting Age CTA (inside "What we detected")
-    window.setTimeout(() => {
+    const t0 = window.setTimeout(() => {
       analysisSummaryRef.current?.scrollIntoView({
         behavior: 'smooth',
         block: 'start',
       });
-    }, 60);
 
-    // Force-retrigger pulse (turn off -> next frame -> on)
-    setPostingAgePulseOn(false);
+      // If Posting Age is blocked/js_required, pulse the CTA in Analysis after we land
+      if (needsManualDate) {
+        setPostingAgePulseOn(false);
 
-    const t1 = window.setTimeout(() => {
-      requestAnimationFrame(() => setPostingAgePulseOn(true));
-    }, 380);
+        const t1 = window.setTimeout(() => {
+          requestAnimationFrame(() => setPostingAgePulseOn(true));
+        }, 220);
 
-    // Turn it back off after 3 pulses finish
-    const t2 = window.setTimeout(() => {
-      setPostingAgePulseOn(false);
-    }, 2700);
+        const t2 = window.setTimeout(() => {
+          setPostingAgePulseOn(false);
+        }, 1400);
 
-    // track timers so your reset clears them
-    timeoutsRef.current.push(t1);
-    timeoutsRef.current.push(t2);
-  }, [
+        timeoutsRef.current.push(t1);
+        timeoutsRef.current.push(t2);
+      }
+    }, 80);
+
+    timeoutsRef.current.push(t0);
+    }, [status, detectedPostingAgeStatusValue, openAnalysis]);
+
     detectedPostingAgeStatusValue,
     analysisSteps.detectedPostingAge,
     openAnalysis,
   ]);
 
 
-    // Auto-scroll to "WHAT WE DETECTED" when Posting Age is unavailable (blocked/js)
-  useEffect(() => {
-    const needsManualDate =
-      detectedPostingAgeStatusValue === 'blocked' ||
-      detectedPostingAgeStatusValue === 'js_required';
-
-    if (!needsManualDate) return;
-    if (status === 'idle') return;
-    if (didAutoScrollRef.current) return;
-
-    didAutoScrollRef.current = true;
-
-    // Ensure Analysis is open, then scroll to the card
-    setOpenAnalysis(true);
-
-    window.setTimeout(() => {
-      analysisSummaryRef.current?.scrollIntoView({
-        behavior: 'smooth',
-        block: 'start',
-      });
-
-      // trigger subtle pulse on the input
-      setPulsePostingDate(false);
-      window.setTimeout(() => setPulsePostingDate(true), 50);
-
-      // stop pulse after it runs (3 pulses x 650ms ≈ 1950ms, add buffer)
-      window.setTimeout(() => setPulsePostingDate(false), 2300);
-    }, 120);
-  }, [detectedPostingAgeStatusValue, status]);
+  // (Removed) Early scroll during "running" caused flash; handled by post-complete auto-scroll above.
 
 
   const toggleLegal = (section: 'terms' | 'privacy') => {
