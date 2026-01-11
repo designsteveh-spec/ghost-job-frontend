@@ -99,6 +99,9 @@ const [checkMode, setCheckMode] = useState<CheckMode>('basic');
   const postingAgeCtaRef = useRef<HTMLDivElement | null>(null);
   const [postingAgePulseOn, setPostingAgePulseOn] = useState(false);
 
+    // Auto-scroll target: Analysis Results summary box
+  const analysisSummaryRef = useRef<HTMLDivElement | null>(null);
+
   // Auto-scroll target: "WHAT WE DETECTED" card
   const whatWeDetectedRef = useRef<HTMLDivElement | null>(null);
 
@@ -270,7 +273,7 @@ const [gaugeRunId, setGaugeRunId] = useState<number>(0);
 
     // Scroll to the Posting Age CTA (inside "What we detected")
     window.setTimeout(() => {
-      postingAgeCtaRef.current?.scrollIntoView({
+      analysisSummaryRef.current?.scrollIntoView({
         behavior: 'smooth',
         block: 'start',
       });
@@ -314,7 +317,7 @@ const [gaugeRunId, setGaugeRunId] = useState<number>(0);
     setOpenAnalysis(true);
 
     window.setTimeout(() => {
-      whatWeDetectedRef.current?.scrollIntoView({
+      analysisSummaryRef.current?.scrollIntoView({
         behavior: 'smooth',
         block: 'start',
       });
@@ -915,7 +918,7 @@ setJobDescription('');
 
             {openAnalysis && (
               <div className="analysis-content">
-               <div className="analysis-results-summary">
+               <div className="analysis-results-summary" ref={analysisSummaryRef}>
   <div className="analysis-results-box">
     <div className="analysis-results-title">
       <span className="analysis-results-label">Results:</span>
