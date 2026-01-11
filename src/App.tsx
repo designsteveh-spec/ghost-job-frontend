@@ -849,7 +849,6 @@ onClick={() => {
                 </p>
 
                 <ul className="results-list">
-                  <ul className="results-list">
   <li className={signals.stale === 'complete' ? 'done' : 'pending'}>
     <img
       src={signals.stale === 'complete' ? checkOn : checkOff}
@@ -878,7 +877,6 @@ onClick={() => {
   </li>
 </ul>
 
-                </ul>
 
                 <button
                   className="secondary-btn primary-cta"
@@ -917,26 +915,45 @@ setJobDescription('');
 
             {openAnalysis && (
               <div className="analysis-content">
-                <div className="analysis-results-summary">
+               <div className="analysis-results-summary">
   <div className="analysis-results-box">
     <div className="analysis-results-title">
       <span className="analysis-results-label">Results:</span>
-      <span className={`analysis-results-status ${resultsStatusClass}`}>
-        {resultsStatusText}
+
+      <span
+        className={`analysis-results-status ${
+          status === 'complete' && score !== null ? getResultBucket(score).className : ''
+        }`}
+      >
+        {status === 'running'
+          ? 'In Progress'
+          : score === null
+          ? '—'
+          : getResultBucket(score).label}
       </span>
     </div>
 
     <div className="analysis-results-meta">
       <span>
-        Probability Score: <strong>{probabilityScore}%</strong>
+        Probability Score:{' '}
+        {score === null ? '—' : <strong>{score}%</strong>}
       </span>
-      <span className="analysis-results-sep">|</span>
-      <a className="analysis-results-link" href="#posting-date-input">
-        Provide Posting Age for Better Results
-      </a>
+
+      {(detectedPostingAgeStatusValue === 'blocked' ||
+        detectedPostingAgeStatusValue === 'js_required') && (
+        <>
+          <span className="analysis-results-sep">|</span>
+          <a className="analysis-results-link" href="#posting-date-input">
+            Provide Posting Age for Better Results
+          </a>
+        </>
+      )}
     </div>
   </div>
 </div>
+
+<div className="analysis-grid">
+
 
 <div className="analysis-grid">
                   
