@@ -395,7 +395,7 @@ input[type='url'] {
   align-items: baseline;
   justify-content: space-between;
   gap: 12px;
-  margin-bottom: 4px; /* tighter to textarea */
+  margin-bottom: 2px; /* tighter to textarea */
 }
 
 .deep-label {
@@ -408,6 +408,13 @@ input[type='url'] {
   font-size: 12px;
   color: #64748b;
 }
+
+/* Tighten the Deep Check label row spacing */
+.deep-label-row .deep-label,
+.deep-label-row .deep-hint {
+  margin: 0; /* overrides the later .deep-label { margin-bottom: 8px } */
+}
+
 
 .job-desc {
   width: 100%;
