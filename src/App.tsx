@@ -953,9 +953,6 @@ setJobDescription('');
 </div>
 
 <div className="analysis-grid">
-
-
-<div className="analysis-grid">
                   
                   {/* 1) VISIBLE SIGNALS PIPELINE */}
                   <div className="analysis-card">
