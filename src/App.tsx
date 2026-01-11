@@ -917,7 +917,29 @@ setJobDescription('');
 
             {openAnalysis && (
               <div className="analysis-content">
-                <div className="analysis-grid">
+                <div className="analysis-results-summary">
+  <div className="analysis-results-box">
+    <div className="analysis-results-title">
+      <span className="analysis-results-label">Results:</span>
+      <span className={`analysis-results-status ${resultsStatusClass}`}>
+        {resultsStatusText}
+      </span>
+    </div>
+
+    <div className="analysis-results-meta">
+      <span>
+        Probability Score: <strong>{probabilityScore}%</strong>
+      </span>
+      <span className="analysis-results-sep">|</span>
+      <a className="analysis-results-link" href="#posting-date-input">
+        Provide Posting Age for Better Results
+      </a>
+    </div>
+  </div>
+</div>
+
+<div className="analysis-grid">
+                  
                   {/* 1) VISIBLE SIGNALS PIPELINE */}
                   <div className="analysis-card">
                     <div className="analysis-card-title">VISIBLE SIGNALS PIPELINE</div>
@@ -1012,7 +1034,7 @@ setJobDescription('');
 
 <div className="postingage-cta-field">
   <div className="postingage-cta-label">Provide Posting Date</div>
-  <input
+  <input id="posting-date-input"
     type="text"
     className={`postingage-cta-input ${postingAgePulseOn ? 'postingage-cta-input-pulse' : ''}`}
     placeholder="e.g. 1/9/2026, 1-9-26, or 2026-01-09"
