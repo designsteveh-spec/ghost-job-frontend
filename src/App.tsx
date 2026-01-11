@@ -260,49 +260,57 @@ const [gaugeRunId, setGaugeRunId] = useState<number>(0);
 
 
   // Auto-scroll to Analysis summary AFTER results are complete (prevents early jump/flash)
+  
   useEffect(() => {
     if (status !== 'complete') return;
+    if (score === null) return;
     if (didAutoScrollRef.current) return;
-
-    didAutoScrollRef.current = true;
 
     const needsManualDate =
       detectedPostingAgeStatusValue === 'blocked' ||
       detectedPostingAgeStatusValue === 'js_required';
 
-    // Ensure Analysis is open so the summary exists in DOM
-    if (!openAnalysis) setOpenAnalysis(true);
+    // Ensure Analysis is open so the summary exists in DOM.
+    // IMPORTANT: if we open it here, wait for the next render before scrolling.
+    if (!openAnalysis) {
+      setOpenAnalysis(true);
+      return;
+    }
+
+    didAutoScrollRef.current = true;
 
     const t0 = window.setTimeout(() => {
-      analysisSummaryRef.current?.scrollIntoView({
-        behavior: 'smooth',
-        block: 'start',
+      // double-rAF ensures the final % text has actually painted before scrolling
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          analysisSummaryRef.current?.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start',
+          });
+
+          // If Posting Age is blocked/js_required, pulse the CTA in Analysis after we land
+          if (needsManualDate) {
+            setPostingAgePulseOn(false);
+
+            const t1 = window.setTimeout(() => {
+              requestAnimationFrame(() => setPostingAgePulseOn(true));
+            }, 160);
+
+            const t2 = window.setTimeout(() => {
+              setPostingAgePulseOn(false);
+            }, 1400);
+
+            timeoutsRef.current.push(t1);
+            timeoutsRef.current.push(t2);
+          }
+        });
       });
-
-      // If Posting Age is blocked/js_required, pulse the CTA in Analysis after we land
-      if (needsManualDate) {
-        setPostingAgePulseOn(false);
-
-        const t1 = window.setTimeout(() => {
-          requestAnimationFrame(() => setPostingAgePulseOn(true));
-        }, 220);
-
-        const t2 = window.setTimeout(() => {
-          setPostingAgePulseOn(false);
-        }, 1400);
-
-        timeoutsRef.current.push(t1);
-        timeoutsRef.current.push(t2);
-      }
-    }, 80);
+    }, 180); // tweak 120–260ms if you want it tighter/looser
 
     timeoutsRef.current.push(t0);
-    }, [status, detectedPostingAgeStatusValue, openAnalysis]);
+  }, [status, score, openAnalysis, detectedPostingAgeStatusValue]);
 
-    detectedPostingAgeStatusValue,
-    analysisSteps.detectedPostingAge,
-    openAnalysis,
-  ]);
+
 
 
   // (Removed) Early scroll during "running" caused flash; handled by post-complete auto-scroll above.
