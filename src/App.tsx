@@ -874,7 +874,14 @@ onClick={() => {
       <div className="postingdate-conflict-title">
         {postingDateConflictTitle || 'Posting Date Conflict'}
       </div>
+
       <div className="postingdate-conflict-body">{postingDateConflictBody}</div>
+
+      {postingAgeUsedForScoring && (
+        <div className="postingdate-conflict-body">
+          Used for scoring: {postingAgeUsedForScoring}
+        </div>
+      )}
     </div>
   )}
 
