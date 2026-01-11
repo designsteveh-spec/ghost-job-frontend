@@ -38,6 +38,11 @@ export default function App() {
 // Posting Date override (Analyze Again workflow)
 const [postingDateOverride, setPostingDateOverride] = useState('');
 const [lastAnalyzedUrl, setLastAnalyzedUrl] = useState('');
+
+// Posting Date conflict messaging + score source
+const [postingDateConflictTitle, setPostingDateConflictTitle] = useState<string | null>(null);
+const [postingDateConflictBody, setPostingDateConflictBody] = useState<string | null>(null);
+const [postingAgeUsedForScoring, setPostingAgeUsedForScoring] = useState<string | null>(null);
   const [formError, setFormError] = useState<string | null>(null);
 
   // Subtle pulse to draw attention to Posting Date input when Posting Age is blocked
@@ -357,6 +362,9 @@ setDetectedGoogleSnippetValue(null);
 setDetectedGoogleTopLinkValue(null);
 setPostingDateOverride('');
 setLastAnalyzedUrl('');
+setPostingDateConflictTitle(null);
+setPostingDateConflictBody(null);
+setPostingAgeUsedForScoring(null);
 didAutoScrollRef.current = false;
 
 
@@ -437,6 +445,9 @@ if (override?.postingDate !== undefined) setPostingDateOverride(override.posting
     // Reset state
 setStatus('running');
 setScore(null);
+setPostingDateConflictTitle(null);
+setPostingDateConflictBody(null);
+setPostingAgeUsedForScoring(null);
 
 // Reset "What we detected" values (new run)
 setDetectedPostingAgeValue(null);
@@ -555,6 +566,9 @@ scheduleStep('detectedGoogleSnippet', 1900);
       } catch {}
 
       setDetectedPostingAgeValue(data?.detected?.postingAge ?? null);
+setPostingDateConflictTitle(data?.detected?.postingAgeConflictTitle ?? null);
+setPostingDateConflictBody(data?.detected?.postingAgeConflictBody ?? null);
+setPostingAgeUsedForScoring(data?.detected?.postingAgeUsedForScoring ?? null);
       setDetectedPostingAgeStatusValue(data?.detected?.postingAgeStatus ?? null);
       setDetectedEmployerSourceValue(data?.detected?.employerSource ?? fallbackHost ?? null);
       setDetectedCanonicalJobIdValue(data?.detected?.canonicalJobId ?? fallbackJobId ?? null);
@@ -839,6 +853,45 @@ onClick={() => {
                   Probability Score:{' '}
                   {score === null ? '—' : <strong>{score}%</strong>}
                 </p>
+
+<div className="postingdate-inline">
+  <div className="postingage-cta-label">Posting Date (optional)</div>
+
+  <input
+    type="text"
+    className={`postingage-cta-input ${pulsePostingDate ? 'postingage-cta-pulse' : ''}`}
+    placeholder="e.g. 1/9/2026, 1-9-26, or 2026-01-09"
+    value={postingDateOverride}
+    onChange={(e) => setPostingDateOverride(e.target.value)}
+  />
+
+  <div className="postingdate-inline-hint">
+    If the listing shows an “Opening Date” or “Posted” date, add it to improve accuracy.
+  </div>
+
+  {postingDateConflictBody && (
+    <div className="postingdate-conflict" role="status">
+      <div className="postingdate-conflict-title">
+        {postingDateConflictTitle || 'Posting Date Conflict'}
+      </div>
+      <div className="postingdate-conflict-body">{postingDateConflictBody}</div>
+    </div>
+  )}
+
+  <button
+    className="analyze-btn postingdate-analyzeagain-btn"
+    disabled={status === 'running' || !lastAnalyzedUrl}
+    aria-disabled={status === 'running' || !lastAnalyzedUrl}
+    onClick={() => {
+      if (status === 'running' || !lastAnalyzedUrl) return;
+      handleAnalyze({ url: lastAnalyzedUrl, jobDescription: '', postingDate: postingDateOverride });
+    }}
+  >
+    <span className="analyze-desktop">Analyze Again</span>
+    <span className="analyze-mobile">Again</span>
+  </button>
+</div>
+
 
                 <p>
                   Checking posting freshness, content patterns, and activity
