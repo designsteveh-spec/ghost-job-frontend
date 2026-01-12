@@ -386,6 +386,8 @@ setGaugeRunId((n) => n + 1);
 
   // Posting Age dropdown: convert selected range → midpoint ISO date (YYYY-MM-DD)
   const postingAgeRangeToIsoDate = (rangeKey: string): string => {
+    if (!rangeKey || rangeKey === 'skip') return '';
+
     const map: Record<string, number> = {
       today_yesterday: 1,
       last_3_days: 2,
@@ -775,11 +777,12 @@ onClick={() => {
   <div className="postingage-cta-label">Approx. Posting Age (optional)</div>
 
   <select
-    className={`postingage-cta-input ${pulsePostingDate ? 'postingage-cta-pulse' : ''}`}
+    className={`postingage-cta-input ${pulsePostingDate ? 'postingage-cta-pulse' : ''} ${!postingDateOverride ? 'postingage-cta-select-placeholder' : ''}`}
     value={postingDateOverride}
     onChange={(e) => setPostingDateOverride(e.target.value)}
   >
-    <option value="">I don’t know / skip</option>
+    <option value="" disabled>Select a posting age</option>
+<option value="skip">I don’t know / skip</option>
     <option value="today_yesterday">Today / yesterday</option>
     <option value="last_3_days">Within the last 3 days</option>
     <option value="within_week">4–7 days ago (within a week)</option>
@@ -1087,11 +1090,12 @@ setJobDescription('');
 
   <select
     id="posting-age-select"
-    className={`postingage-cta-input ${postingAgePulseOn ? 'postingage-cta-input-pulse' : ''}`}
+    className={`postingage-cta-input ${postingAgePulseOn ? 'postingage-cta-input-pulse' : ''} ${!postingDateOverride ? 'postingage-cta-select-placeholder' : ''}`}
     value={postingDateOverride}
     onChange={(e) => setPostingDateOverride(e.target.value)}
   >
-    <option value="">I don’t know / skip</option>
+    <option value="" disabled>Select a posting age</option>
+<option value="skip">I don’t know / skip</option>
     <option value="today_yesterday">Today / yesterday</option>
     <option value="last_3_days">Within the last 3 days</option>
     <option value="within_week">4–7 days ago (within a week)</option>
@@ -1111,11 +1115,14 @@ setJobDescription('');
   disabled={
     status === 'running' ||
     !postingDateOverride.trim() ||
+postingDateOverride === 'skip' ||
+
     !(lastAnalyzedUrl || url).trim()
   }
   aria-disabled={
     status === 'running' ||
     !postingDateOverride.trim() ||
+    postingDateOverride === 'skip' ||
     !(lastAnalyzedUrl || url).trim()
   }
   onClick={() => {
