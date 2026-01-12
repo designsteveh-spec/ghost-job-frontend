@@ -1352,9 +1352,24 @@ button {
 
 /* Posting Age dropdown should look/feel like the input */
 select.postingage-cta-input {
-  background: #ffffff;
+  background-color: #ffffff;
   cursor: pointer;
-  padding-right: 17px; /* move chevron ~5px left */
+
+  /* Use a custom chevron so we can position it */
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+
+  /* extra room so text never overlaps the chevron */
+  padding-right: 40px;
+
+  /* custom chevron */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none'%3E%3Cpath d='M6 9l6 6 6-6' stroke='%230f172a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-size: 16px 16px;
+
+  /* 👇 this is the “move it ~5px left” part */
+  background-position: right 16px center;
 }
 
 /* Grey "placeholder" look when no selection yet */
