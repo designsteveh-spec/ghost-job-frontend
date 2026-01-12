@@ -742,8 +742,9 @@ button {
 }
 
 .pricing-price.free {
-  font-size: 14px;
-  color: #1e40ff;
+  font-size: 20px;     /* match paid tiers */
+  font-weight: 700;    /* match paid tiers */
+  color: #0f172a;      /* match paid tiers */
 }
 
 /* BUTTONS */
