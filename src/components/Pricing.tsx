@@ -13,8 +13,7 @@ export default function Pricing() {
         </h2>
 
         <p className="pricing-subtitle">
-          Free checks are always available. Paid plans simply increase daily
-          usage.
+          Same analysis engine across all plans. Free checks are always available — paid passes increase daily usage.
         </p>
 
         <div className="pricing-grid">
@@ -25,106 +24,99 @@ export default function Pricing() {
             <div className="pricing-card-body">
               <div className="pricing-title-row">
                 <img src={tierFree} alt="" className="pricing-icon" />
-                <h3>Free</h3>
+                <h3>Free Check</h3>
               </div>
 
-              <p className="pricing-tagline">Limited Free Usage</p>
+              <p className="pricing-tagline">Try the full analysis before you commit.</p>
 
               <p className="pricing-description">
-                Get a quick probability-based assessment using observable
-                signals.
+                Run the same analysis used in paid plans, with a limited number of daily checks.
               </p>
 
               <ul className="pricing-features">
-                <li>2 checks per day</li>
-                <li>Basic probability score</li>
-                <li>High-level signal summary</li>
+                <li>Full Basic + Deep Check analysis</li>
+                <li>Job link and job ad upload support</li>
+                <li>Up to 3 checks per day</li>
               </ul>
 
-              <div className="pricing-price free">FREE FOR EVERYONE</div>
+              <div className="pricing-price free">$0</div>
 
               <button className="pricing-btn secondary">Run Free Check</button>
             </div>
           </div>
 
-          {/* PLUS */}
+          {/* CASUAL PASS */}
           <div className="pricing-card pricing-card-highlight">
-            <div className="pricing-card-header plus">Plus</div>
+            <div className="pricing-card-header plus">Casual Pass</div>
 
             <div className="pricing-card-body">
               <div className="pricing-title-row">
                 <img src={tierPlus} alt="" className="pricing-icon" />
-                <h3>Plus</h3>
+                <h3>Casual Job Hunt Pass</h3>
               </div>
 
-              <p className="pricing-tagline">Most used</p>
+              <p className="pricing-tagline">For light or occasional job searching.</p>
 
               <p className="pricing-description">
-                Get deeper visibility into posting activity patterns so you can
-                focus your effort wisely.
+                Ideal if you’re browsing opportunities or applying selectively.
               </p>
 
-             <ul className="pricing-features">
-  <li>10 checks per day</li>
-  <li>Detailed signal breakdown</li>
-  <li>Stronger explanations</li>
-  <li>
-    Priority analysis queue{' '}
-    <span className="muted">(copy only)</span>
-  </li>
-  <li>Deep Check access</li>
-</ul>
-
+              <ul className="pricing-features">
+                <li>Full analysis engine (same as Free)</li>
+                <li>Job link + image/PDF uploads</li>
+                <li>Up to 10 checks per day</li>
+                <li>No subscription — ends automatically</li>
+              </ul>
 
               <div className="pricing-price">
-                $1.99 <span>/ month</span>
+                $4.99 <span>/ 30 days</span>
               </div>
 
-              <button className="pricing-btn primary">Upgrade to Plus</button>
+              <button className="pricing-btn primary">Start Casual Pass</button>
             </div>
           </div>
 
-          {/* PRO */}
+          {/* ACTIVE PASS */}
           <div className="pricing-card">
-            <div className="pricing-card-header pro">Pro</div>
+            <div className="pricing-card-header pro">Most Popular</div>
 
             <div className="pricing-card-body">
               <div className="pricing-title-row">
                 <img src={tierPro} alt="" className="pricing-icon" />
-                <h3>Pro</h3>
+                <h3>Active Job Hunt Pass</h3>
               </div>
 
-              <p className="pricing-tagline">Best overall</p>
+              <p className="pricing-tagline">Built for active job searching.</p>
 
               <p className="pricing-description">
-                Designed for frequent analysis and repeated job posting
-                evaluation.
+                Designed for frequent applications and deeper validation before you apply.
               </p>
 
-<ul className="pricing-features">
-  <li>30 checks per day</li>
-  <li>Full signal history (last 30 days)</li>
-  <li>Stronger pattern explanations</li>
-  <li>Priority support</li>
-  <li>Deep Check access</li>
-</ul>
-
+              <ul className="pricing-features">
+                <li>Full analysis engine (same as all plans)</li>
+                <li>Job link + image/PDF uploads</li>
+                <li>Up to 30 checks per day</li>
+                <li>Priority processing</li>
+                <li>No subscription — ends automatically</li>
+              </ul>
 
               <div className="pricing-price">
-                $4.99 <span>/ month</span>
+                $9.99 <span>/ 30 days</span>
               </div>
 
               <button className="pricing-btn primary outline">
-                Upgrade to Pro
+                Start Job Hunt Pass
               </button>
             </div>
           </div>
         </div>
 
         <p className="pricing-disclaimer">
-          All results are probability-based assessments using observable
-          signals. This tool does not verify hiring intent or make claims about
-          employers.
+          All results are probability-based assessments using observable signals. This tool does not verify hiring intent or make claims about employers.
+        </p>
+
+        <p className="pricing-disclaimer">
+          <strong>FAQ:</strong> Job Hunt Passes last 30 days and end automatically (no auto-renew). Each analysis counts as 1 check, regardless of input type (link, description, image, or PDF).
         </p>
       </div>
     </section>
