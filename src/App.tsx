@@ -589,11 +589,19 @@ setGaugeDurationMs(maxDelay + 300);
 
 
             const t4 = window.setTimeout(() => {
-        setScore(data.score);
-        completeAllAnalysisSteps();
-        setStatus('complete');
-      }, maxDelay + 300);
-      timeoutsRef.current.push(t4);
+  // 1) Set the score first so the UI can render the number
+  setScore(data.score);
+  completeAllAnalysisSteps();
+
+  // 2) Flip to "complete" on the next tick, so auto-scroll cannot fire while score is still "—"
+  const t4b = window.setTimeout(() => {
+    setStatus('complete');
+  }, 0);
+
+  timeoutsRef.current.push(t4b);
+}, maxDelay + 300);
+timeoutsRef.current.push(t4);
+
 
     } catch (err) {
       console.error(err);
