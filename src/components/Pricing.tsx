@@ -36,10 +36,11 @@ export default function Pricing() {
               </p>
 
               <ul className="pricing-features">
-                <li>Full Basic + Deep Check analysis</li>
-                <li>Job link and job ad upload support</li>
-                <li>Up to 3 checks per day</li>
-              </ul>
+  <li>Full Basic + Deep Check analysis</li>
+  <li>Job link checks</li>
+  <li>Up to 3 checks per day</li>
+</ul>
+
 
               <div className="pricing-price free">$0</div>
 
@@ -154,11 +155,14 @@ export default function Pricing() {
                 </tr>
 
                 <tr>
-                  <td className="compare-row-label">Image and PDF Checks</td>
-                  <td className="compare-center"><span className="compare-check">✓</span></td>
-                  <td className="compare-center"><span className="compare-check">✓</span></td>
-                  <td className="compare-center"><span className="compare-check">✓</span></td>
-                </tr>
+  <td className="compare-row-label">Image and PDF Checks</td>
+  <td className="compare-center">
+    <img className="compare-x" src={xIcon} alt="Not included" />
+  </td>
+  <td className="compare-center"><span className="compare-check">✓</span></td>
+  <td className="compare-center"><span className="compare-check">✓</span></td>
+</tr>
+
 
                 <tr>
                   <td className="compare-row-label">Priority Processing</td>
