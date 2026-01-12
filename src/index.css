@@ -22,8 +22,11 @@ body {
 
 .site-header {
   width: 100%;
-  background: #ffffff;
+  background: #f8fafc; /* light grey separation */
   border-bottom: 1px solid #e5e7eb;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.08);
+  position: relative;
+  z-index: 60;
 }
 
 .nav-inner {
@@ -780,93 +783,121 @@ button {
   color: #64748b;
 }
 
-/* ---------------- PRICING: PLAN DETAILS (FAQ / FACTS) ---------------- */
+/* ---------------- COMPARE PLANS TABLE ---------------- */
 
-.pricing-faq {
+.compare-plans {
   margin-top: 44px;
-  text-align: left;
+  padding: 54px 0;
+  background: #f8fafc; /* grey separator band like mock */
+  border-top: 1px solid #e5e7eb;
+  border-bottom: 1px solid #e5e7eb;
 }
 
-.pricing-faq-title {
-  font-size: 22px;
+.compare-title {
+  font-size: 40px;
   font-weight: 800;
+  margin: 0 0 20px;
+  text-align: center;
   color: #0f172a;
-  margin: 0 0 16px;
 }
 
-.pricing-faq-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 18px;
+.compare-table-wrap {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 0 24px; /* align with site gutters */
 }
 
-.pricing-faq-card {
+.compare-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
   background: #ffffff;
-  border-radius: 20px;
-  border: 2px solid #e5e7eb;
-  box-shadow: 0 10px 28px rgba(15, 23, 42, 0.08);
-  padding: 18px 18px 16px;
+  border: 1px solid #e5e7eb;
 }
 
-.pricing-faq-card-title {
-  font-size: 16px;
-  font-weight: 900;
-  color: #0f172a;
-  margin-bottom: 12px;
-}
-
-.pricing-faq-card-highlight {
-  border-color: #1e40ff;
-}
-
-.pricing-faq-section {
-  margin-bottom: 12px;
-}
-
-.pricing-faq-section:last-child {
-  margin-bottom: 0;
-}
-
-.pricing-faq-label {
-  font-size: 12px;
-  font-weight: 900;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: #1e40ff;
-  margin-bottom: 8px;
-}
-
-.pricing-faq-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.pricing-faq-list li {
-  display: flex;
-  gap: 10px;
+.compare-table th,
+.compare-table td {
+  padding: 14px 16px;
+  border-right: 1px solid #e5e7eb;
+  border-bottom: 1px solid #e5e7eb;
   font-size: 14px;
-  line-height: 1.55;
-  color: #475569;
-  margin-bottom: 8px;
 }
 
-.pricing-faq-list li:last-child {
-  margin-bottom: 0;
+.compare-table th:last-child,
+.compare-table td:last-child {
+  border-right: 0;
 }
 
-.pricing-faq-list li::before {
-  content: '✓';
+.compare-table thead th {
+  background: #ffffff;
+  font-size: 16px;
+  font-weight: 800;
+}
+
+.compare-col-label {
+  text-align: right;
+  color: #0f172a;
+  width: 28%;
+}
+
+.compare-col-plan {
+  text-align: center;
+  color: #1e40ff; /* blue plan titles like mock */
+}
+
+.compare-row-label {
+  text-align: right;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.compare-center {
+  text-align: center;
+}
+
+.compare-accent {
+  text-align: center;
   color: #1e40ff;
-  font-weight: 900;
+  font-weight: 700;
 }
 
-/* Responsive */
-@media (max-width: 900px) {
-  .pricing-faq-grid {
-    grid-template-columns: 1fr;
+/* stripe rows like mock */
+.compare-table tbody tr:nth-child(even):not(.compare-row-footer) td {
+  background: #f1f5f9;
+}
+
+/* bottom grey bar row */
+.compare-row-footer td {
+  background: #d1d5db;
+}
+
+.compare-check {
+  display: inline-block;
+  font-weight: 900;
+  color: #1e40ff;
+  font-size: 18px;
+  line-height: 1;
+}
+
+.compare-x {
+  width: 14px;
+  height: 14px;
+  opacity: 0.75;
+}
+
+/* mobile: prevent squish */
+@media (max-width: 768px) {
+  .compare-table-wrap {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .compare-table {
+    min-width: 760px;
   }
 }
+
+
 
 
 /* ---------------- MOBILE ---------------- */
@@ -959,11 +990,6 @@ button {
 }
 
 
-.site-header {
-  position: relative;
-  z-index: 60;
-}
-
 
 .nav-menu-icon {
   width: 18px;
@@ -1024,10 +1050,7 @@ button {
 
 /* NAVBAR ENHANCEMENTS (v1.0.m) */
 
-.site-header {
-  background: #f8fafc; /* light grey separation */
-  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.08);
-}
+
 
 .cta-primary {
   background: #1e40ff;
@@ -1160,15 +1183,6 @@ button {
 
 /* ---------------- MAILERLITE OVERRIDES ---------------- */
 
-.newsletter .ml-form-embedWrapper {
-  box-shadow: none !important;
-  background: transparent !important;
-  border: none !important;
-}
-
-.newsletter .ml-form-embedContainer {
-  background: transparent !important;
-}
 
 /* ---------------- ANALYSIS ACCORDION + CARDS (v1.0.t) ---------------- */
 
@@ -1655,30 +1669,7 @@ select.postingage-cta-input {
   }
 }
 
-/* ---------------- NEWSLETTER (MailerLite) ---------------- */
 
-.newsletter {
-  background: #ffffff;
-  padding: 96px 24px;
-}
-
-.newsletter-inner {
-  max-width: 420px;
-  margin: 0 auto;
-  text-align: center;
-}
-
-.newsletter h4 {
-  font-size: 26px;
-  margin-bottom: 8px;
-  color: #0f172a;
-}
-
-.newsletter p {
-  font-size: 14px;
-  color: #475569;
-  margin-bottom: 20px;
-}
 
 /* Scope ALL MailerLite styles safely */
 .newsletter .ml-form-embedContainer {

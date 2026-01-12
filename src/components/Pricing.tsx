@@ -3,6 +3,8 @@
 import tierFree from '../assets/PriceTier1.svg';
 import tierPlus from '../assets/PriceTier2.svg';
 import tierPro from '../assets/PriceTier3.svg';
+import xIcon from '../assets/red-checkmark.svg';
+
 
 export default function Pricing() {
   return (
@@ -115,103 +117,83 @@ export default function Pricing() {
           All results are probability-based assessments using observable signals. This tool does not verify hiring intent or make claims about employers.
         </p>
 
-        {/* PLAN DETAILS (FAQ / FACTS) */}
-        <div className="pricing-faq">
-          <h3 className="pricing-faq-title">Plan details (quick facts)</h3>
+        <section className="compare-plans">
+          <h3 className="compare-title">Compare Plans</h3>
 
-          <div className="pricing-faq-grid">
-            {/* FREE */}
-            <div className="pricing-faq-card">
-              <div className="pricing-faq-card-title">Free Check</div>
+          <div className="compare-table-wrap">
+            <table className="compare-table">
+              <thead>
+                <tr>
+                  <th className="compare-col-label">Plans</th>
+                  <th className="compare-col-plan">Free Check</th>
+                  <th className="compare-col-plan">Casual Job Hunt Pass</th>
+                  <th className="compare-col-plan">Active Job Hunt Pass</th>
+                </tr>
+              </thead>
 
-              <div className="pricing-faq-section">
-                <div className="pricing-faq-label">Usage</div>
-                <ul className="pricing-faq-list">
-                  <li>Up to 3 checks per day</li>
-                  <li>No account required</li>
-                </ul>
-              </div>
+              <tbody>
+                <tr>
+                  <td className="compare-row-label">Daily Usage</td>
+                  <td className="compare-accent">3 checks</td>
+                  <td className="compare-accent">10 checks</td>
+                  <td className="compare-accent">30 checks</td>
+                </tr>
 
-              <div className="pricing-faq-section">
-                <div className="pricing-faq-label">Includes</div>
-                <ul className="pricing-faq-list">
-                  <li>Full Basic + Deep Check analysis</li>
-                  <li>Job link + image/PDF uploads</li>
-                </ul>
-              </div>
+                <tr>
+                  <td className="compare-row-label">Analysis Engine Used</td>
+                  <td className="compare-center"><span className="compare-check">✓</span></td>
+                  <td className="compare-center"><span className="compare-check">✓</span></td>
+                  <td className="compare-center"><span className="compare-check">✓</span></td>
+                </tr>
 
-              <div className="pricing-faq-section">
-                <div className="pricing-faq-label">Counting</div>
-                <ul className="pricing-faq-list">
-                  <li>
-                    Each analysis counts as <strong>1 check</strong> (link, description, image, or PDF)
-                  </li>
-                </ul>
-              </div>
-            </div>
+                <tr>
+                  <td className="compare-row-label">Basic Link Checks</td>
+                  <td className="compare-center"><span className="compare-check">✓</span></td>
+                  <td className="compare-center"><span className="compare-check">✓</span></td>
+                  <td className="compare-center"><span className="compare-check">✓</span></td>
+                </tr>
 
-            {/* CASUAL */}
-            <div className="pricing-faq-card pricing-faq-card-highlight">
-              <div className="pricing-faq-card-title">Casual Job Hunt Pass</div>
+                <tr>
+                  <td className="compare-row-label">Image and PDF Checks</td>
+                  <td className="compare-center"><span className="compare-check">✓</span></td>
+                  <td className="compare-center"><span className="compare-check">✓</span></td>
+                  <td className="compare-center"><span className="compare-check">✓</span></td>
+                </tr>
 
-              <div className="pricing-faq-section">
-                <div className="pricing-faq-label">Duration</div>
-                <ul className="pricing-faq-list">
-                  <li>Lasts 30 days</li>
-                  <li>No subscription — ends automatically</li>
-                </ul>
-              </div>
+                <tr>
+                  <td className="compare-row-label">Priority Processing</td>
+                  <td className="compare-center">
+                    <img className="compare-x" src={xIcon} alt="Not included" />
+                  </td>
+                  <td className="compare-center">
+                    <img className="compare-x" src={xIcon} alt="Not included" />
+                  </td>
+                  <td className="compare-center"><span className="compare-check">✓</span></td>
+                </tr>
 
-              <div className="pricing-faq-section">
-                <div className="pricing-faq-label">Usage</div>
-                <ul className="pricing-faq-list">
-                  <li>Up to 10 checks per day</li>
-                  <li>Same analysis engine as all plans</li>
-                </ul>
-              </div>
+                <tr>
+                  <td className="compare-row-label">Subscription Length</td>
+                  <td className="compare-center">-</td>
+                  <td className="compare-accent">30 days</td>
+                  <td className="compare-accent">30 days</td>
+                </tr>
 
-              <div className="pricing-faq-section">
-                <div className="pricing-faq-label">Counting</div>
-                <ul className="pricing-faq-list">
-                  <li>
-                    Each analysis counts as <strong>1 check</strong> (link, description, image, or PDF)
-                  </li>
-                </ul>
-              </div>
-            </div>
-
-            {/* ACTIVE */}
-            <div className="pricing-faq-card">
-              <div className="pricing-faq-card-title">Active Job Hunt Pass</div>
-
-              <div className="pricing-faq-section">
-                <div className="pricing-faq-label">Duration</div>
-                <ul className="pricing-faq-list">
-                  <li>Lasts 30 days</li>
-                  <li>No subscription — ends automatically</li>
-                </ul>
-              </div>
-
-              <div className="pricing-faq-section">
-                <div className="pricing-faq-label">Usage</div>
-                <ul className="pricing-faq-list">
-                  <li>Up to 30 checks per day</li>
-                  <li>Priority processing</li>
-                  <li>Same analysis engine as all plans</li>
-                </ul>
-              </div>
-
-              <div className="pricing-faq-section">
-                <div className="pricing-faq-label">Counting</div>
-                <ul className="pricing-faq-list">
-                  <li>
-                    Each analysis counts as <strong>1 check</strong> (link, description, image, or PDF)
-                  </li>
-                </ul>
-              </div>
-            </div>
+                <tr className="compare-row-footer">
+                  <td className="compare-row-label">Monthly Renewal</td>
+                  <td className="compare-center">
+                    <img className="compare-x" src={xIcon} alt="No" />
+                  </td>
+                  <td className="compare-center">
+                    <img className="compare-x" src={xIcon} alt="No" />
+                  </td>
+                  <td className="compare-center">
+                    <img className="compare-x" src={xIcon} alt="No" />
+                  </td>
+                </tr>
+              </tbody>
+            </table>
           </div>
-        </div>
+        </section>
       </div>
     </section>
   );
