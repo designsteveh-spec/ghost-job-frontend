@@ -115,9 +115,103 @@ export default function Pricing() {
           All results are probability-based assessments using observable signals. This tool does not verify hiring intent or make claims about employers.
         </p>
 
-        <p className="pricing-disclaimer">
-          <strong>FAQ:</strong> Job Hunt Passes last 30 days and end automatically (no auto-renew). Each analysis counts as 1 check, regardless of input type (link, description, image, or PDF).
-        </p>
+        {/* PLAN DETAILS (FAQ / FACTS) */}
+        <div className="pricing-faq">
+          <h3 className="pricing-faq-title">Plan details (quick facts)</h3>
+
+          <div className="pricing-faq-grid">
+            {/* FREE */}
+            <div className="pricing-faq-card">
+              <div className="pricing-faq-card-title">Free Check</div>
+
+              <div className="pricing-faq-section">
+                <div className="pricing-faq-label">Usage</div>
+                <ul className="pricing-faq-list">
+                  <li>Up to 3 checks per day</li>
+                  <li>No account required</li>
+                </ul>
+              </div>
+
+              <div className="pricing-faq-section">
+                <div className="pricing-faq-label">Includes</div>
+                <ul className="pricing-faq-list">
+                  <li>Full Basic + Deep Check analysis</li>
+                  <li>Job link + image/PDF uploads</li>
+                </ul>
+              </div>
+
+              <div className="pricing-faq-section">
+                <div className="pricing-faq-label">Counting</div>
+                <ul className="pricing-faq-list">
+                  <li>
+                    Each analysis counts as <strong>1 check</strong> (link, description, image, or PDF)
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            {/* CASUAL */}
+            <div className="pricing-faq-card pricing-faq-card-highlight">
+              <div className="pricing-faq-card-title">Casual Job Hunt Pass</div>
+
+              <div className="pricing-faq-section">
+                <div className="pricing-faq-label">Duration</div>
+                <ul className="pricing-faq-list">
+                  <li>Lasts 30 days</li>
+                  <li>No subscription — ends automatically</li>
+                </ul>
+              </div>
+
+              <div className="pricing-faq-section">
+                <div className="pricing-faq-label">Usage</div>
+                <ul className="pricing-faq-list">
+                  <li>Up to 10 checks per day</li>
+                  <li>Same analysis engine as all plans</li>
+                </ul>
+              </div>
+
+              <div className="pricing-faq-section">
+                <div className="pricing-faq-label">Counting</div>
+                <ul className="pricing-faq-list">
+                  <li>
+                    Each analysis counts as <strong>1 check</strong> (link, description, image, or PDF)
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            {/* ACTIVE */}
+            <div className="pricing-faq-card">
+              <div className="pricing-faq-card-title">Active Job Hunt Pass</div>
+
+              <div className="pricing-faq-section">
+                <div className="pricing-faq-label">Duration</div>
+                <ul className="pricing-faq-list">
+                  <li>Lasts 30 days</li>
+                  <li>No subscription — ends automatically</li>
+                </ul>
+              </div>
+
+              <div className="pricing-faq-section">
+                <div className="pricing-faq-label">Usage</div>
+                <ul className="pricing-faq-list">
+                  <li>Up to 30 checks per day</li>
+                  <li>Priority processing</li>
+                  <li>Same analysis engine as all plans</li>
+                </ul>
+              </div>
+
+              <div className="pricing-faq-section">
+                <div className="pricing-faq-label">Counting</div>
+                <ul className="pricing-faq-list">
+                  <li>
+                    Each analysis counts as <strong>1 check</strong> (link, description, image, or PDF)
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </section>
   );

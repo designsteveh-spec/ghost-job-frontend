@@ -780,6 +780,95 @@ button {
   color: #64748b;
 }
 
+/* ---------------- PRICING: PLAN DETAILS (FAQ / FACTS) ---------------- */
+
+.pricing-faq {
+  margin-top: 44px;
+  text-align: left;
+}
+
+.pricing-faq-title {
+  font-size: 22px;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0 0 16px;
+}
+
+.pricing-faq-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+}
+
+.pricing-faq-card {
+  background: #ffffff;
+  border-radius: 20px;
+  border: 2px solid #e5e7eb;
+  box-shadow: 0 10px 28px rgba(15, 23, 42, 0.08);
+  padding: 18px 18px 16px;
+}
+
+.pricing-faq-card-title {
+  font-size: 16px;
+  font-weight: 900;
+  color: #0f172a;
+  margin-bottom: 12px;
+}
+
+.pricing-faq-card-highlight {
+  border-color: #1e40ff;
+}
+
+.pricing-faq-section {
+  margin-bottom: 12px;
+}
+
+.pricing-faq-section:last-child {
+  margin-bottom: 0;
+}
+
+.pricing-faq-label {
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #1e40ff;
+  margin-bottom: 8px;
+}
+
+.pricing-faq-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.pricing-faq-list li {
+  display: flex;
+  gap: 10px;
+  font-size: 14px;
+  line-height: 1.55;
+  color: #475569;
+  margin-bottom: 8px;
+}
+
+.pricing-faq-list li:last-child {
+  margin-bottom: 0;
+}
+
+.pricing-faq-list li::before {
+  content: '✓';
+  color: #1e40ff;
+  font-weight: 900;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .pricing-faq-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+
 /* ---------------- MOBILE ---------------- */
 
 @media (max-width: 900px) {
