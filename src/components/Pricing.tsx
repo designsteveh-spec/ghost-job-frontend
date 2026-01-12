@@ -37,7 +37,8 @@ export default function Pricing() {
 
               <ul className="pricing-features">
   <li>Full Basic + Deep Check analysis</li>
-  <li>Job link checks</li>
+  <li>Job ad link support</li>
+
   <li>Up to 3 checks per day</li>
 </ul>
 
