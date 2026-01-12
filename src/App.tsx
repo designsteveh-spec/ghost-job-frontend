@@ -385,8 +385,9 @@ setGaugeRunId((n) => n + 1);
 
 
   // Posting Age dropdown: convert selected range → midpoint ISO date (YYYY-MM-DD)
-  const postingAgeRangeToIsoDate = (rangeKey: string): string => {
-    if (!rangeKey || rangeKey === 'skip') return '';
+    const postingAgeRangeToIsoDate = (rangeKey: string): string => {
+    if (!rangeKey) return '';
+
 
     const map: Record<string, number> = {
       today_yesterday: 1,
@@ -776,14 +777,14 @@ onClick={() => {
 <div className="postingdate-inline">
   <div className="postingage-cta-label">Approx. Posting Age (optional)</div>
 
-  <select
+    <select
     className={`postingage-cta-input ${pulsePostingDate ? 'postingage-cta-pulse' : ''} ${!postingDateOverride ? 'postingage-cta-select-placeholder' : ''}`}
     value={postingDateOverride}
     onChange={(e) => setPostingDateOverride(e.target.value)}
   >
-    <option value="" disabled>Select a posting age</option>
-<option value="skip">I don’t know / skip</option>
+    <option value="">I don’t know / skip</option>
     <option value="today_yesterday">Today / yesterday</option>
+
     <option value="last_3_days">Within the last 3 days</option>
     <option value="within_week">4–7 days ago (within a week)</option>
     <option value="weeks_1_2">1–2 weeks ago</option>
@@ -1088,15 +1089,15 @@ setJobDescription('');
 <div className="postingage-cta-field">
   <div className="postingage-cta-label">Provide Posting Age</div>
 
-  <select
+    <select
     id="posting-age-select"
     className={`postingage-cta-input ${postingAgePulseOn ? 'postingage-cta-input-pulse' : ''} ${!postingDateOverride ? 'postingage-cta-select-placeholder' : ''}`}
     value={postingDateOverride}
     onChange={(e) => setPostingDateOverride(e.target.value)}
   >
-    <option value="" disabled>Select a posting age</option>
-<option value="skip">I don’t know / skip</option>
+    <option value="">I don’t know / skip</option>
     <option value="today_yesterday">Today / yesterday</option>
+
     <option value="last_3_days">Within the last 3 days</option>
     <option value="within_week">4–7 days ago (within a week)</option>
     <option value="weeks_1_2">1–2 weeks ago</option>
@@ -1112,19 +1113,18 @@ setJobDescription('');
 <button
   type="button"
   className="analyze-btn postingage-cta-btn"
-  disabled={
+    disabled={
     status === 'running' ||
     !postingDateOverride.trim() ||
-postingDateOverride === 'skip' ||
+    !(lastAnalyzedUrl || url).trim()
+  }
 
-    !(lastAnalyzedUrl || url).trim()
-  }
-  aria-disabled={
+    aria-disabled={
     status === 'running' ||
     !postingDateOverride.trim() ||
-    postingDateOverride === 'skip' ||
     !(lastAnalyzedUrl || url).trim()
   }
+
   onClick={() => {
     const rerunUrl = (lastAnalyzedUrl || url).trim();
     const pd = postingDateOverride.trim();
