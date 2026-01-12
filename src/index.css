@@ -791,7 +791,13 @@ button {
   background: #f8fafc; /* grey separator band like mock */
   border-top: 1px solid #e5e7eb;
   border-bottom: 1px solid #e5e7eb;
+
+  /* ✅ full-bleed band even inside max-width containers */
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+  margin-right: calc(50% - 50vw);
 }
+
 
 .compare-title {
   font-size: 40px;
