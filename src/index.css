@@ -1346,6 +1346,13 @@ button {
   font-size: 14px;
 }
 
+/* Posting Age dropdown should look/feel like the input */
+select.postingage-cta-input {
+  background: #ffffff;
+  cursor: pointer;
+}
+
+
 @keyframes postingAgePulse {
   0%   { box-shadow: 0 0 0 0 rgba(64, 64, 255, 0.0); transform: scale(1); }
   35%  { box-shadow: 0 0 0 6px rgba(64, 64, 255, 0.18); transform: scale(1.01); }

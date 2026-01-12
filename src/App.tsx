@@ -384,6 +384,32 @@ setGaugeRunId((n) => n + 1);
   };
 
 
+  // Posting Age dropdown: convert selected range → midpoint ISO date (YYYY-MM-DD)
+  const postingAgeRangeToIsoDate = (rangeKey: string): string => {
+    const map: Record<string, number> = {
+      today_yesterday: 1,
+      last_3_days: 2,
+      within_week: 5,      // 4–7 days midpoint
+      weeks_1_2: 10,
+      weeks_2_4: 21,
+      months_1_2: 45,
+      months_2_3: 75,
+      months_3_6: 135,
+      months_6_12: 270,
+      over_1_year: 540,
+    };
+
+    const days = map[rangeKey];
+    if (!days) return '';
+
+    const d = new Date();
+    d.setDate(d.getDate() - days);
+
+    const yyyy = d.getFullYear();
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    const dd = String(d.getDate()).padStart(2, '0');
+    return `${yyyy}-${mm}-${dd}`;
+  };
 
 
   const handleAnalyze = async (override?: { url?: string; jobDescription?: string; postingDate?: string }) => {
@@ -391,7 +417,14 @@ setGaugeRunId((n) => n + 1);
 
     const urlValue = (override?.url ?? url).trim();
 const descValue = (override?.jobDescription ?? jobDescription).trim();
-const postingDateValue = (override?.postingDate ?? postingDateOverride ?? '').trim();
+const postingAgeRangeKey = (override?.postingDate ?? postingDateOverride ?? '').trim();
+
+// Convert the selected range into a concrete ISO date (YYYY-MM-DD) midpoint.
+// If an ISO date is ever passed in directly, allow it.
+const postingDateValue =
+  postingAgeRangeKey && /^\d{4}-\d{2}-\d{2}$/.test(postingAgeRangeKey)
+    ? postingAgeRangeKey
+    : postingAgeRangeToIsoDate(postingAgeRangeKey);
 
 // Remember the last URL we analyzed (so "Analyze Again" can rerun even if user edits fields)
 if (urlValue) setLastAnalyzedUrl(urlValue);
@@ -739,16 +772,28 @@ onClick={() => {
 				{formError && <p className="form-error">{formError}</p>}
 
 <div className="postingdate-inline">
-  <div className="postingage-cta-label">Posting Date (optional)</div>
-  <input
-    type="text"
+  <div className="postingage-cta-label">Approx. Posting Age (optional)</div>
+
+  <select
     className={`postingage-cta-input ${pulsePostingDate ? 'postingage-cta-pulse' : ''}`}
-    placeholder="e.g. 1/9/2026, 1-9-26, or 2026-01-09"
     value={postingDateOverride}
     onChange={(e) => setPostingDateOverride(e.target.value)}
-  />
+  >
+    <option value="">I don’t know / skip</option>
+    <option value="today_yesterday">Today / yesterday</option>
+    <option value="last_3_days">Within the last 3 days</option>
+    <option value="within_week">4–7 days ago (within a week)</option>
+    <option value="weeks_1_2">1–2 weeks ago</option>
+    <option value="weeks_2_4">2–4 weeks ago</option>
+    <option value="months_1_2">1–2 months ago</option>
+    <option value="months_2_3">2–3 months ago</option>
+    <option value="months_3_6">3–6 months ago</option>
+    <option value="months_6_12">6–12 months ago</option>
+    <option value="over_1_year">Over 1 year ago</option>
+  </select>
+
   <div className="postingdate-inline-hint">
-    If the listing shows an “Opening Date” or “Posted” date, add it to improve accuracy.
+    If the listing shows “Posted” or “Opening Date,” pick the closest range to improve accuracy.
   </div>
 </div>
 
@@ -933,9 +978,10 @@ setJobDescription('');
         detectedPostingAgeStatusValue === 'js_required') && (
         <>
           <span className="analysis-results-sep">|</span>
-          <a className="analysis-results-link" href="#posting-date-input">
-            Provide Posting Age for Better Results
-          </a>
+          <a className="analysis-results-link" href="#posting-age-select">
+  Add posting age to improve accuracy
+</a>
+
         </>
       )}
     </div>
@@ -1032,19 +1078,31 @@ setJobDescription('');
       </div>
 
       <div className="postingage-cta-body">
-  Posting age couldn’t be read from this page. If the listing shows an “Opening Date” or “Posted” date,
-  enter it below and rerun.
+  Posting age couldn’t be read from this page. If the listing shows “Posted” or “Opening Date,”
+  select the closest range below and rerun.
 </div>
 
 <div className="postingage-cta-field">
-  <div className="postingage-cta-label">Provide Posting Date</div>
-  <input id="posting-date-input"
-    type="text"
+  <div className="postingage-cta-label">Provide Posting Age</div>
+
+  <select
+    id="posting-age-select"
     className={`postingage-cta-input ${postingAgePulseOn ? 'postingage-cta-input-pulse' : ''}`}
-    placeholder="e.g. 1/9/2026, 1-9-26, or 2026-01-09"
     value={postingDateOverride}
     onChange={(e) => setPostingDateOverride(e.target.value)}
-  />
+  >
+    <option value="">I don’t know / skip</option>
+    <option value="today_yesterday">Today / yesterday</option>
+    <option value="last_3_days">Within the last 3 days</option>
+    <option value="within_week">4–7 days ago (within a week)</option>
+    <option value="weeks_1_2">1–2 weeks ago</option>
+    <option value="weeks_2_4">2–4 weeks ago</option>
+    <option value="months_1_2">1–2 months ago</option>
+    <option value="months_2_3">2–3 months ago</option>
+    <option value="months_3_6">3–6 months ago</option>
+    <option value="months_6_12">6–12 months ago</option>
+    <option value="over_1_year">Over 1 year ago</option>
+  </select>
 </div>
 
 <button
