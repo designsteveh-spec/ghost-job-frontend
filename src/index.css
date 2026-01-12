@@ -1354,6 +1354,7 @@ button {
 select.postingage-cta-input {
   background: #ffffff;
   cursor: pointer;
+  padding-right: 17px; /* move chevron ~5px left */
 }
 
 /* Grey "placeholder" look when no selection yet */
