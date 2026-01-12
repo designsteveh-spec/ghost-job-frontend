@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useLayoutEffect, useRef } from 'react';
 
 import './index.css';
 import Pricing from './components/Pricing';
@@ -261,54 +261,49 @@ const [gaugeRunId, setGaugeRunId] = useState<number>(0);
 
   // Auto-scroll to Analysis summary AFTER results are complete (prevents early jump/flash)
   
-  useEffect(() => {
-    if (status !== 'complete') return;
-    if (score === null) return;
-    if (didAutoScrollRef.current) return;
+  useLayoutEffect(() => {
+  // Only scroll once the numeric score exists (i.e. UI can show "63%")
+  if (score === null) return;
+  if (didAutoScrollRef.current) return;
 
-    const needsManualDate =
-      detectedPostingAgeStatusValue === 'blocked' ||
-      detectedPostingAgeStatusValue === 'js_required';
+  const needsManualDate =
+    detectedPostingAgeStatusValue === 'blocked' ||
+    detectedPostingAgeStatusValue === 'js_required';
 
-    // Ensure Analysis is open so the summary exists in DOM.
-    // IMPORTANT: if we open it here, wait for the next render before scrolling.
-    if (!openAnalysis) {
-      setOpenAnalysis(true);
-      return;
-    }
+  // Ensure Analysis is open so the summary exists in DOM
+  if (!openAnalysis) {
+    setOpenAnalysis(true);
+    return;
+  }
 
-    didAutoScrollRef.current = true;
+  didAutoScrollRef.current = true;
 
-    const t0 = window.setTimeout(() => {
-      // double-rAF ensures the final % text has actually painted before scrolling
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-          analysisSummaryRef.current?.scrollIntoView({
-            behavior: 'smooth',
-            block: 'start',
-          });
-
-          // If Posting Age is blocked/js_required, pulse the CTA in Analysis after we land
-          if (needsManualDate) {
-            setPostingAgePulseOn(false);
-
-            const t1 = window.setTimeout(() => {
-              requestAnimationFrame(() => setPostingAgePulseOn(true));
-            }, 160);
-
-            const t2 = window.setTimeout(() => {
-              setPostingAgePulseOn(false);
-            }, 1400);
-
-            timeoutsRef.current.push(t1);
-            timeoutsRef.current.push(t2);
-          }
-        });
+  // Wait until after paint, then scroll (no arbitrary 180ms delay)
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      analysisSummaryRef.current?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start',
       });
-    }, 180); // tweak 120–260ms if you want it tighter/looser
 
-    timeoutsRef.current.push(t0);
-  }, [status, score, openAnalysis, detectedPostingAgeStatusValue]);
+      if (needsManualDate) {
+        setPostingAgePulseOn(false);
+
+        const t1 = window.setTimeout(() => {
+          requestAnimationFrame(() => setPostingAgePulseOn(true));
+        }, 160);
+
+        const t2 = window.setTimeout(() => {
+          setPostingAgePulseOn(false);
+        }, 1400);
+
+        timeoutsRef.current.push(t1);
+        timeoutsRef.current.push(t2);
+      }
+    });
+  });
+}, [score, openAnalysis, detectedPostingAgeStatusValue]);
+
 
 
 
