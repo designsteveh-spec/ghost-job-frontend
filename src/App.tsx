@@ -41,7 +41,7 @@ const [lastAnalyzedUrl, setLastAnalyzedUrl] = useState('');
   const [formError, setFormError] = useState<string | null>(null);
 
   // Subtle pulse to draw attention to Posting Date input when Posting Age is blocked
-  const [pulsePostingDate, setPulsePostingDate] = useState<boolean>(false);
+  const [pulsePostingDate] = useState<boolean>(false);
 
 
 
