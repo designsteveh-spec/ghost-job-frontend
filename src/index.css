@@ -444,13 +444,44 @@ input[type='url']::placeholder {
 
 .postingdate-inline {
   margin-top: 14px;
-  max-width: 520px;
+  max-width: 820px;
 }
+
 
 .postingdate-inline-hint {
   margin-top: 6px;
   font-size: 12px;
   color: #64748b;
+}
+
+/* Text Scrub: Posting age dropdown + Analyze button on same row */
+.postingage-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 8px;
+  max-width: 820px;
+}
+
+.postingage-row .postingage-cta-input {
+  flex: 1;
+}
+
+.postingage-analyze-btn {
+  padding: 12px 18px;
+  white-space: nowrap;
+}
+
+/* Mobile: stack dropdown then button (like mock responsiveness) */
+@media (max-width: 640px) {
+  .postingage-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .postingage-analyze-btn {
+    width: 100%;
+  }
 }
 
 

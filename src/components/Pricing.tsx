@@ -35,12 +35,12 @@ export default function Pricing() {
                 Run the same analysis used in paid plans, with a limited number of daily checks.
               </p>
 
-              <ul className="pricing-features">
-  <li>Full Basic + Deep Check analysis</li>
-  <li>Job ad link support</li>
-
+                            <ul className="pricing-features">
+  <li>Full Link Check + Text Scrub analysis</li>
+  <li>Job link support</li>
   <li>Up to 3 checks per day</li>
 </ul>
+
 
 
               <div className="pricing-price free">$0</div>
@@ -51,7 +51,8 @@ export default function Pricing() {
 
           {/* CASUAL PASS */}
           <div className="pricing-card pricing-card-highlight">
-            <div className="pricing-card-header plus">Casual Pass</div>
+                        <div className="pricing-card-header plus">CASUAL PASS</div>
+
 
             <div className="pricing-card-body">
               <div className="pricing-title-row">
@@ -67,7 +68,8 @@ export default function Pricing() {
 
               <ul className="pricing-features">
                 <li>Full analysis engine (same as Free)</li>
-                <li>Job link + image/PDF uploads</li>
+                                <li>Job link + image/PDF checks</li>
+
                 <li>Up to 10 checks per day</li>
                 <li>No subscription — ends automatically</li>
               </ul>
@@ -82,7 +84,8 @@ export default function Pricing() {
 
           {/* ACTIVE PASS */}
           <div className="pricing-card">
-            <div className="pricing-card-header pro">Most Popular</div>
+                        <div className="pricing-card-header pro">MOST POPULAR</div>
+
 
             <div className="pricing-card-body">
               <div className="pricing-title-row">
@@ -149,14 +152,14 @@ export default function Pricing() {
                 </tr>
 
                 <tr>
-                  <td className="compare-row-label">Basic Link Checks</td>
+                  <td className="compare-row-label">Link Check</td>
                   <td className="compare-center"><span className="compare-check">✓</span></td>
                   <td className="compare-center"><span className="compare-check">✓</span></td>
                   <td className="compare-center"><span className="compare-check">✓</span></td>
                 </tr>
 
                 <tr>
-  <td className="compare-row-label">Image and PDF Checks</td>
+    <td className="compare-row-label">Image & PDF Checks</td>
   <td className="compare-center">
     <img className="compare-x" src={xIcon} alt="Not included" />
   </td>
