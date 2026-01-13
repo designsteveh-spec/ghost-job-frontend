@@ -386,7 +386,8 @@ setGaugeRunId((n) => n + 1);
 
   // Posting Age dropdown: convert selected range → midpoint ISO date (YYYY-MM-DD)
     const postingAgeRangeToIsoDate = (rangeKey: string): string => {
-    if (!rangeKey) return '';
+    if (!rangeKey || rangeKey === 'skip') return '';
+
 
 
     const map: Record<string, number> = {
@@ -782,7 +783,9 @@ onClick={() => {
     value={postingDateOverride}
     onChange={(e) => setPostingDateOverride(e.target.value)}
   >
-    <option value="">I don’t know / skip</option>
+    <option value="">Select a posting age</option>
+<option value="skip">I don’t know / skip</option>
+
     <option value="today_yesterday">Today / yesterday</option>
 
     <option value="last_3_days">Within the last 3 days</option>
@@ -1095,7 +1098,9 @@ setJobDescription('');
     value={postingDateOverride}
     onChange={(e) => setPostingDateOverride(e.target.value)}
   >
-    <option value="">I don’t know / skip</option>
+   <option value="">Select a posting age</option>
+<option value="skip">I don’t know / skip</option>
+
     <option value="today_yesterday">Today / yesterday</option>
 
     <option value="last_3_days">Within the last 3 days</option>
@@ -1116,12 +1121,16 @@ setJobDescription('');
     disabled={
     status === 'running' ||
     !postingDateOverride.trim() ||
+postingDateOverride === 'skip' ||
+
     !(lastAnalyzedUrl || url).trim()
   }
 
     aria-disabled={
     status === 'running' ||
     !postingDateOverride.trim() ||
+postingDateOverride === 'skip' ||
+
     !(lastAnalyzedUrl || url).trim()
   }
 
