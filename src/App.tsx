@@ -62,7 +62,7 @@ const canUseDeep = userTier !== 'free' || DEV_UNLOCK_DEEP;
 type CheckMode = 'basic' | 'deep';
 const [checkMode, setCheckMode] = useState<CheckMode>('basic');
 
-  const isDeep = checkMode === 'deep';
+  
   const hasUrl = !!url.trim();
   const hasDesc = !!jobDescription.trim();
 
