@@ -464,6 +464,13 @@ if (override?.postingDate !== undefined) setPostingDateOverride(override.posting
       return;
     }
 
+    // Upload requires a file
+    if (checkMode === 'upload' && !uploadFile) {
+      setFormError('Load a PDF or image to run Image/PDF Check.');
+      return;
+    }
+
+
 
     // Kill any prior timers so tab switching/reset can't be overwritten
     clearAllTimeouts();
@@ -700,8 +707,11 @@ timeoutsRef.current.push(t4);
 
   setUrl('');
   setJobDescription('');
+  setUploadFile(null);
+  setUploadFileName('');
   setFormError(null);
 }}
+
 
 
       >
@@ -724,8 +734,11 @@ onClick={() => {
 
   setUrl('');
   setJobDescription('');
+  setUploadFile(null);
+  setUploadFileName('');
   setFormError(null);
 }}
+
 
 
 >
@@ -748,8 +761,11 @@ onClick={() => {
 
           setUrl('');
           setJobDescription('');
+          setUploadFile(null);
+          setUploadFileName('');
           setFormError(null);
         }}
+
       >
         Image or PDF
       </button>
