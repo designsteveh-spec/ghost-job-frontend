@@ -9,6 +9,7 @@ import lockIcon from './assets/lock.svg';
 import Navbar from './components/Navbar';
 import ActivityGauge from './components/ActivityGauge';
 
+import tipsIcon from './assets/lightbulb.svg';
 
 
 // Hero + education images
@@ -59,18 +60,28 @@ const DEV_UNLOCK_DEEP = true;
 const canUseDeep = userTier !== 'free' || DEV_UNLOCK_DEEP;
 
 
-type CheckMode = 'basic' | 'deep';
+type CheckMode = 'basic' | 'deep' | 'upload';
+
 const [checkMode, setCheckMode] = useState<CheckMode>('basic');
+// Upload mode state
+const [uploadFile, setUploadFile] = useState<File | null>(null);
+const [uploadFileName, setUploadFileName] = useState('');
+const uploadInputRef = useRef<HTMLInputElement | null>(null);
+
 
   
   const hasUrl = !!url.trim();
   const hasDesc = !!jobDescription.trim();
+  const hasUpload = !!uploadFile;
+
 
   // Analyze rules:
   // - Basic: link only
   // - Deep: link OR description (separate buttons to prevent mismatches)
     const canAnalyzeLinkNow = checkMode === 'basic' && hasUrl;
-  const canAnalyzeDescNow = checkMode === 'deep' && hasDesc;
+const canAnalyzeDescNow = checkMode === 'deep' && hasDesc;
+const canAnalyzeUploadNow = checkMode === 'upload' && hasUpload;
+
 
 
   // If both are present, show a mismatch warning (should be rare due to auto-clearing)
@@ -201,6 +212,9 @@ const [gaugeRunId, setGaugeRunId] = useState<number>(0);
 
   const resetAnalysisSteps = () => {
     setAnalysisSteps(makeInitialAnalysisSteps());
+    setUploadFile(null);
+setUploadFileName('');
+
   };
 
   const scheduleStep = (key: AnalysisStepKey, delayMs: number) => {
@@ -521,17 +535,29 @@ scheduleStep('detectedGoogleSnippet', 1900);
 
 
     try {
-      const res = await fetch(`${API_BASE}/api/analyze`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-  mode: checkMode,
-  url: urlValue,
-  jobDescription: descValue,
-  postingDate: postingDateValue,
-}),
+            const res =
+        checkMode === 'upload'
+          ? await fetch(`${API_BASE}/api/analyze-upload`, {
+              method: 'POST',
+              body: (() => {
+                const fd = new FormData();
+                if (uploadFile) fd.append('file', uploadFile);
+                fd.append('mode', 'upload');
+                fd.append('postingDate', postingDateValue || '');
+                return fd;
+              })(),
+            })
+          : await fetch(`${API_BASE}/api/analyze`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                mode: checkMode,
+                url: urlValue,
+                jobDescription: descValue,
+                postingDate: postingDateValue,
+              }),
+            });
 
-      });
 
       // ✅ Stop flutter as soon as we have a response
       stopGaugeFlutter();
@@ -708,9 +734,30 @@ onClick={() => {
   {!canUseDeep && <img src={lockIcon} alt="" className="tab-lock-icon" />}
 </button>
 
+      {/* UPLOAD TAB */}
+      <button
+        className={`check-tab ${checkMode === 'upload' ? 'active' : ''}`}
+        onClick={() => {
+          setCheckMode('upload');
+
+          if (status !== 'idle') {
+            resetAnalysis();
+            setUrl('');
+            setJobDescription('');
+          }
+
+          setUrl('');
+          setJobDescription('');
+          setFormError(null);
+        }}
+      >
+        Image or PDF
+      </button>
+
     </div>
   </div>
 </div>
+
  
 
 	  
@@ -737,113 +784,234 @@ onClick={() => {
                 </h1>
 
                                 <p className="subtitle">
-                  {checkMode === 'basic'
-                    ? (
-                      <>
-                        Paste any public job posting link to receive a probability-based assessment using observable signals. This
-                        tool provides insight — not accusations — to help you decide where to focus your time.
-                      </>
-                    )
-                    : (
-                      <>
-                        Copy and paste any text from a job description into the input below to receive a probability-based assessment using observable signals.
-                        This tool provides insight — not accusations — to help you decide where to focus your time.
-                      </>
-                    )}
-                </p>
+  {checkMode === 'basic' ? (
+    <>
+      Paste any public job posting link to receive a probability-based assessment using observable signals. This
+      tool provides insight — not accusations — to help you decide where to focus your time.
+    </>
+  ) : checkMode === 'deep' ? (
+    <>
+      Copy and paste any text from a job description into the input below to receive a probability-based assessment
+      using observable signals. This tool provides insight — not accusations — to help you decide where to focus your time.
+    </>
+  ) : (
+    <>
+      Upload a screenshot or PDF of a job posting to scan visible activity signals. Results are based only on extractable
+      text and structural cues — insight, not accusations.
+    </>
+  )}
+</p>
+
 
 
                                 {checkMode === 'basic' ? (
-                  <>
-                    <div className="input-group">
-                      <input
-                        type="url"
-                        placeholder="Copy and paste job link here"
-                        value={url}
-                        onChange={(e) => {
-                          const next = e.target.value;
-                          setUrl(next);
-                          if (formError) setFormError(null);
-                        }}
-                      />
+  <>
+    <div className="input-group">
+      <input
+        type="url"
+        placeholder="Copy and paste job link here"
+        value={url}
+        onChange={(e) => {
+          const next = e.target.value;
+          setUrl(next);
+          if (formError) setFormError(null);
+        }}
+      />
 
-                      <button
-                        className="analyze-btn"
-                        onClick={() => handleAnalyze()}
-                        disabled={!canAnalyzeLinkNow}
-                        aria-disabled={!canAnalyzeLinkNow}
-                      >
-                        <span className="analyze-desktop">Analyze Job Link</span>
-                        <span className="analyze-mobile">Analyze</span>
-                      </button>
-                    </div>
+      <button
+        className="analyze-btn"
+        onClick={() => handleAnalyze()}
+        disabled={!canAnalyzeLinkNow}
+        aria-disabled={!canAnalyzeLinkNow}
+      >
+        <span className="analyze-desktop">Analyze Job Link</span>
+        <span className="analyze-mobile">Analyze</span>
+      </button>
+    </div>
 
-                    {formError && <p className="form-error">{formError}</p>}
-                  </>
-                ) : (
-                  <>
-                    {formError && <p className="form-error">{formError}</p>}
+    {formError && <p className="form-error">{formError}</p>}
+  </>
+) : checkMode === 'deep' ? (
+  <>
+    {formError && <p className="form-error">{formError}</p>}
 
-                    <div className="postingdate-inline">
-                      <div className="postingage-cta-label">Approx. Posting Age (optional)</div>
+    <div className="postingdate-inline">
+      <div className="postingage-cta-label">Approx. Posting Age (optional)</div>
 
-                      <div className="postingage-row">
-                        <select
-                          className={`postingage-cta-input ${pulsePostingDate ? 'postingage-cta-pulse' : ''} ${!postingDateOverride ? 'postingage-cta-select-placeholder' : ''}`}
-                          value={postingDateOverride}
-                          onChange={(e) => setPostingDateOverride(e.target.value)}
-                        >
-                          <option value="">Select a posting age</option>
-                          <option value="skip">I don’t know / skip</option>
+      <div className="postingage-row">
+        <select
+          className={`postingage-cta-input ${pulsePostingDate ? 'postingage-cta-pulse' : ''} ${!postingDateOverride ? 'postingage-cta-select-placeholder' : ''}`}
+          value={postingDateOverride}
+          onChange={(e) => setPostingDateOverride(e.target.value)}
+        >
+          <option value="">Select a posting age</option>
+          <option value="skip">I don’t know / skip</option>
 
-                          <option value="today_yesterday">Today / yesterday</option>
-                          <option value="last_3_days">Within the last 3 days</option>
-                          <option value="within_week">4–7 days ago (within a week)</option>
-                          <option value="weeks_1_2">1–2 weeks ago</option>
-                          <option value="weeks_2_4">2–4 weeks ago</option>
-                          <option value="months_1_2">1–2 months ago</option>
-                          <option value="months_2_3">2–3 months ago</option>
-                          <option value="months_3_6">3–6 months ago</option>
-                          <option value="months_6_12">6–12 months ago</option>
-                          <option value="over_1_year">Over 1 year ago</option>
-                        </select>
+          <option value="today_yesterday">Today / yesterday</option>
+          <option value="last_3_days">Within the last 3 days</option>
+          <option value="within_week">4–7 days ago (within a week)</option>
+          <option value="weeks_1_2">1–2 weeks ago</option>
+          <option value="weeks_2_4">2–4 weeks ago</option>
+          <option value="months_1_2">1–2 months ago</option>
+          <option value="months_2_3">2–3 months ago</option>
+          <option value="months_3_6">3–6 months ago</option>
+          <option value="months_6_12">6–12 months ago</option>
+          <option value="over_1_year">Over 1 year ago</option>
+        </select>
 
-                        <button
-                          className="analyze-btn postingage-analyze-btn"
-                          onClick={() => handleAnalyze({ jobDescription, url: '' })}
-                          disabled={!canAnalyzeDescNow}
-                          aria-disabled={!canAnalyzeDescNow}
-                        >
-                          <span className="analyze-desktop">Analyze Description</span>
-                          <span className="analyze-mobile">Analyze</span>
-                        </button>
-                      </div>
+        <button
+          className="analyze-btn postingage-analyze-btn"
+          onClick={() => handleAnalyze({ jobDescription, url: '' })}
+          disabled={!canAnalyzeDescNow}
+          aria-disabled={!canAnalyzeDescNow}
+        >
+          <span className="analyze-desktop">Analyze Description</span>
+          <span className="analyze-mobile">Analyze</span>
+        </button>
+      </div>
 
-                      <div className="postingdate-inline-hint">
-                        If the listing shows “Posted” or “Opening Date,” pick the closest range to improve accuracy.
-                      </div>
-                    </div>
+      <div className="postingdate-inline-hint">
+        If the listing shows “Posted” or “Opening Date,” pick the closest range to improve accuracy.
+      </div>
+    </div>
 
-                    <div className="deep-block">
-                      <div className="deep-label-row">
-                        <div className="deep-label">Job Description (Deep Check)</div>
-                        <div className="deep-hint">Paste a job description instead of a link.</div>
-                      </div>
+    <div className="deep-block">
+      <div className="deep-label-row">
+        <div className="deep-label">Job Description (Deep Check)</div>
+        <div className="deep-hint">Paste a job description instead of a link.</div>
+      </div>
 
-                      <textarea
-                        ref={jobDescRef}
-                        className="job-desc"
-                        placeholder="Copy and paste job description here"
-                        value={jobDescription}
-                        onChange={(e) => {
-                          const next = e.target.value;
-                          setJobDescription(next);
-                          if (formError) setFormError(null);
-                        }}
-                      />
-                    </div>
-                  </>
-                )}
+      <textarea
+        ref={jobDescRef}
+        className="job-desc"
+        placeholder="Copy and paste job description here"
+        value={jobDescription}
+        onChange={(e) => {
+          const next = e.target.value;
+          setJobDescription(next);
+          if (formError) setFormError(null);
+        }}
+      />
+    </div>
+  </>
+) : (
+  <>
+    {formError && <p className="form-error">{formError}</p>}
+
+    <div className="upload-block">
+      <div className="upload-label">Load PDF or Image</div>
+
+      <div className="upload-row">
+        <input
+          className="upload-file-input"
+          type="text"
+          value={uploadFileName}
+          placeholder="Load a PDF or image file (i.e. JPG or PNG)."
+          readOnly
+        />
+
+        <input
+          ref={uploadInputRef}
+          type="file"
+          accept="image/*,application/pdf"
+          className="upload-hidden-input"
+          onChange={(e) => {
+            const f = e.target.files?.[0] || null;
+            setUploadFile(f);
+            setUploadFileName(f ? f.name : '');
+            if (formError) setFormError(null);
+          }}
+        />
+
+        <button
+          type="button"
+          className="browse-btn"
+          onClick={() => uploadInputRef.current?.click()}
+        >
+          Browse
+        </button>
+
+        <button
+          className="analyze-btn"
+          onClick={() => handleAnalyze()}
+          disabled={!canAnalyzeUploadNow}
+          aria-disabled={!canAnalyzeUploadNow}
+        >
+          <span className="analyze-desktop">Analyze Job</span>
+          <span className="analyze-mobile">Analyze</span>
+        </button>
+      </div>
+
+      <div className="postingdate-inline" style={{ marginTop: 18 }}>
+        <div className="postingage-cta-label">Approx. Posting Age (optional)</div>
+
+        <div className="postingage-row">
+          <select
+            className={`postingage-cta-input ${!postingDateOverride ? 'postingage-cta-select-placeholder' : ''}`}
+            value={postingDateOverride}
+            onChange={(e) => setPostingDateOverride(e.target.value)}
+          >
+            <option value="">Select a posting age</option>
+            <option value="skip">I don’t know / skip</option>
+
+            <option value="today_yesterday">Today / yesterday</option>
+            <option value="last_3_days">Within the last 3 days</option>
+            <option value="within_week">4–7 days ago (within a week)</option>
+            <option value="weeks_1_2">1–2 weeks ago</option>
+            <option value="weeks_2_4">2–4 weeks ago</option>
+            <option value="months_1_2">1–2 months ago</option>
+            <option value="months_2_3">2–3 months ago</option>
+            <option value="months_3_6">3–6 months ago</option>
+            <option value="months_6_12">6–12 months ago</option>
+            <option value="over_1_year">Over 1 year ago</option>
+          </select>
+        </div>
+
+        <div className="postingdate-inline-hint">
+          If the listing shows “Posted” or “Opening Date,” pick the closest range to improve accuracy.
+        </div>
+      </div>
+
+      <div className="tips-card">
+        <div className="tips-head">Tips to Screen Capture Jobs</div>
+
+        <div className="tips-body">
+          <div className="tips-title-row">
+            <img src={tipsIcon} alt="" className="tips-icon" />
+            <div className="tips-title">
+              For Full-Page Screenshots <span className="tips-reco">(Recommended)</span>
+            </div>
+          </div>
+
+          <div className="tips-section">
+            <div className="tips-section-title">• Google Chrome (Built-in)</div>
+            <ol className="tips-steps">
+              <li>Press <strong>F12</strong> or <strong>Ctrl+Shift+I</strong> (Cmd+Option+I on Mac) to open Developer Tools.</li>
+              <li>Press <strong>Ctrl+Shift+P</strong> (Cmd+Shift+P on Mac) to open the Command Menu.</li>
+              <li>Type <strong>Screenshot</strong> and select <strong>Capture full size screenshot</strong>.</li>
+            </ol>
+          </div>
+
+          <div className="tips-section">
+            <div className="tips-section-title">• Microsoft Edge (Web Capture)</div>
+            <ol className="tips-steps">
+              <li>Go to the page and press <strong>Ctrl+Shift+S</strong> or click the three dots (…) &gt; <strong>Web capture</strong>.</li>
+              <li>Select <strong>Capture full page</strong>.</li>
+            </ol>
+          </div>
+
+          <div className="tips-section">
+            <div className="tips-section-title">• Browser Extensions</div>
+            <div className="tips-muted">
+              Install extensions like “GoFullPage” for Chrome/Edge for a simple one-click capture.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </>
+)}
+
 
 
 
