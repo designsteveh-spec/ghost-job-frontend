@@ -68,6 +68,10 @@ const [uploadFile, setUploadFile] = useState<File | null>(null);
 const [uploadFileName, setUploadFileName] = useState('');
 const uploadInputRef = useRef<HTMLInputElement | null>(null);
 
+// Client-side cap (matches server intent). Keeps UX deterministic.
+const MAX_UPLOAD_BYTES = 6 * 1024 * 1024; // 6 MB
+
+
 
   
   const hasUrl = !!url.trim();
@@ -542,10 +546,16 @@ scheduleStep('detectedGoogleSnippet', 1900);
 
 
     try {
-            const res =
+                  // Hard timeout so UI never flutters forever
+      const controller = new AbortController();
+      const REQUEST_TIMEOUT_MS = 25000;
+      const timeoutId = window.setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+
+      const res =
         checkMode === 'upload'
           ? await fetch(`${API_BASE}/api/analyze-upload`, {
               method: 'POST',
+              signal: controller.signal,
               body: (() => {
                 const fd = new FormData();
                 if (uploadFile) fd.append('file', uploadFile);
@@ -556,6 +566,7 @@ scheduleStep('detectedGoogleSnippet', 1900);
             })
           : await fetch(`${API_BASE}/api/analyze`, {
               method: 'POST',
+              signal: controller.signal,
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
                 mode: checkMode,
@@ -565,21 +576,32 @@ scheduleStep('detectedGoogleSnippet', 1900);
               }),
             });
 
+      window.clearTimeout(timeoutId);
+
+
 
       // ✅ Stop flutter as soon as we have a response
       stopGaugeFlutter();
       setGaugeDurationMs(gaugeDurationRef.current);
 
-      if (!res.ok) {
-        let msg = 'Analyze failed';
+            if (!res.ok) {
+        let msg = `Analyze failed (HTTP ${res.status})`;
+
         try {
           const errData = await res.json();
           if (errData?.error) msg = errData.error;
         } catch {}
+
+        // Friendly known cases
+        if (res.status === 413) {
+          msg = 'File too large. Please upload a smaller image/PDF (max 6 MB).';
+        }
+
         setFormError(msg);
         setStatus('idle');
         return;
       }
+
 
             const data = await res.json();
 
@@ -677,7 +699,13 @@ timeoutsRef.current.push(t4);
       stopGaugeFlutter();
       setGaugeDurationMs(gaugeDurationRef.current);
 
-      setFormError('Network error. Please try again.');
+      const name = (err as any)?.name;
+      if (name === 'AbortError') {
+        setFormError('Request timed out. Try a smaller capture (crop the page) and retry.');
+      } else {
+        setFormError('Network error. Please try again.');
+      }
+
       setStatus('idle');
       setScore(null);
     }
@@ -933,10 +961,29 @@ onClick={() => {
           className="upload-hidden-input"
           onChange={(e) => {
             const f = e.target.files?.[0] || null;
+
+            // Clear previous selection if user cancels
+            if (!f) {
+              setUploadFile(null);
+              setUploadFileName('');
+              return;
+            }
+
+            // 6MB cap (prevents server "image_too_large" + improves UX)
+            if (f.size > MAX_UPLOAD_BYTES) {
+              setUploadFile(null);
+              setUploadFileName('');
+              setFormError('File too large. Please upload a smaller image/PDF (max 6 MB).');
+              // allow re-selecting the same file after rejection
+              e.target.value = '';
+              return;
+            }
+
             setUploadFile(f);
             setUploadFileName(f ? f.name : '');
             if (formError) setFormError(null);
           }}
+
         />
 
         <button
