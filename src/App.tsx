@@ -100,13 +100,11 @@ const [lastAnalyzedUrl, setLastAnalyzedUrl] = useState('');
 
 
 
-    // Auto-scroll target: Analysis Results summary box
-  const analysisSummaryRef = useRef<HTMLDivElement | null>(null);
 
 
 
-  // Prevent repeated scroll during one run
-  const didAutoScrollRef = useRef<boolean>(false);
+
+
 
 
 // Gauge UI (front-end only)
@@ -262,32 +260,7 @@ const [gaugeRunId, setGaugeRunId] = useState<number>(0);
 
   // Auto-scroll to Analysis summary AFTER results are complete (prevents early jump/flash)
   
-  useLayoutEffect(() => {
-  // Only scroll once the numeric score exists (i.e. UI can show "63%")
-  if (score === null) return;
-  if (didAutoScrollRef.current) return;
-
   
-
-  // Ensure Analysis is open so the summary exists in DOM
-  if (!openAnalysis) {
-    setOpenAnalysis(true);
-    return;
-  }
-
-  didAutoScrollRef.current = true;
-
-  // Wait until after paint, then scroll (no arbitrary 180ms delay)
-  requestAnimationFrame(() => {
-    requestAnimationFrame(() => {
-      analysisSummaryRef.current?.scrollIntoView({
-        behavior: 'smooth',
-        block: 'start',
-      });
-
-    });
-  });
-}, [score, openAnalysis]);
 
 
 
@@ -328,7 +301,7 @@ setDetectedGoogleTopLinkValue(null);
 setPostingDateOverride('');
 setLastAnalyzedUrl('');
 
-didAutoScrollRef.current = false;
+
 
 
 
@@ -451,7 +424,7 @@ setLastAnalyzedUrl(urlValue);
 
     // Kill any prior timers so tab switching/reset can't be overwritten
     clearAllTimeouts();
-    didAutoScrollRef.current = false;
+
 
     // Reset state
 setStatus('running');
@@ -904,7 +877,8 @@ setJobDescription('');
 
             {openAnalysis && (
               <div className="analysis-content">
-               <div className="analysis-results-summary" ref={analysisSummaryRef}>
+              <div className="analysis-results-summary">
+
   <div className="analysis-results-box">
     <div className="analysis-results-title">
       <span className="analysis-results-label">Results:</span>
