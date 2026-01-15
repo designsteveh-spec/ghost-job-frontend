@@ -444,44 +444,13 @@ input[type='url']::placeholder {
 
 .postingdate-inline {
   margin-top: 14px;
-  max-width: 820px;
+  max-width: 520px;
 }
-
 
 .postingdate-inline-hint {
   margin-top: 6px;
   font-size: 12px;
   color: #64748b;
-}
-
-/* Text Scrub: Posting age dropdown + Analyze button on same row */
-.postingage-row {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-top: 8px;
-  max-width: 820px;
-}
-
-.postingage-row .postingage-cta-input {
-  flex: 1;
-}
-
-.postingage-analyze-btn {
-  padding: 12px 18px;
-  white-space: nowrap;
-}
-
-/* Mobile: stack dropdown then button (like mock responsiveness) */
-@media (max-width: 640px) {
-  .postingage-row {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .postingage-analyze-btn {
-    width: 100%;
-  }
 }
 
 
@@ -545,147 +514,7 @@ button {
 }
 
 
-/* ---------------- UPLOAD MODE (Image or PDF) ---------------- */
-
-.upload-block {
-  margin-top: 18px;
-  max-width: 820px;
-}
-
-.upload-label {
-  font-size: 13px;
-  font-weight: 700;
-  color: #1e40ff;
-  margin-bottom: 8px;
-}
-
-.upload-row {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.upload-file-input {
-  flex: 1;
-  padding: 14px 16px;
-  border-radius: 10px;
-  border: 1px solid #cbd5e1;
-  font-size: 15px;
-  background: #ffffff;
-}
-
-.upload-file-input::placeholder {
-  color: #64748b;
-}
-
-.upload-hidden-input {
-  display: none;
-}
-
-.browse-btn {
-  background: #1e40ff;
-  color: #ffffff;
-  border: 2px solid #1e40ff;
-  font-weight: 800;
-  padding: 12px 18px;
-  border-radius: 999px;
-  white-space: nowrap;
-}
-
-.browse-btn:hover {
-  background: #1e3ae8;
-  border-color: #1e3ae8;
-}
-
-/* Mobile: stack like your other inputs */
-@media (max-width: 640px) {
-  .upload-row {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .browse-btn,
-  .upload-row .analyze-btn {
-    width: 100%;
-  }
-}
-
-/* ---------------- TIPS CARD ---------------- */
-
-.tips-card {
-  margin-top: 22px;
-  border-radius: 18px;
-  border: 2px solid #4040FF;
-  overflow: hidden;
-  background: #ffffff;
-  box-shadow: 0 12px 32px rgba(15, 23, 42, 0.10);
-}
-
-.tips-head {
-  background: #1e40ff;
-  color: #ffffff;
-  font-weight: 900;
-  text-align: center;
-  padding: 12px 14px;
-  font-size: 16px;
-}
-
-.tips-body {
-  padding: 18px 18px 20px;
-  color: #0f172a;
-  font-size: 13px;
-  line-height: 1.55;
-}
-
-.tips-title-row {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 12px;
-}
-
-.tips-icon {
-  width: 26px;
-  height: 26px;
-  flex-shrink: 0;
-}
-
-.tips-title {
-  font-weight: 900;
-  color: #1e40ff;
-  font-size: 16px;
-}
-
-.tips-reco {
-  font-weight: 600;
-  color: #475569;
-  font-size: 13px;
-}
-
-.tips-section {
-  margin-top: 14px;
-}
-
-.tips-section-title {
-  font-weight: 900;
-  margin-bottom: 8px;
-}
-
-.tips-steps {
-  margin: 0 0 0 18px;
-  padding: 0;
-}
-
-.tips-steps li {
-  margin-bottom: 6px;
-}
-
-.tips-muted {
-  color: #475569;
-}
-
 /* ---------------- EDUCATION ---------------- */
-
 
 .education {
   background: #f8fafc;
