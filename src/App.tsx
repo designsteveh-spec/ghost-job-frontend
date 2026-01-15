@@ -315,7 +315,8 @@ setFormError(null);
 
 // Reset "What we detected" values
 setDetectedPostingAgeValue(null);
-setDetectedPostingAgeStatusValue(data?.detected?.postingAgeStatus ?? null);
+// (removed) detectedPostingAgeStatusValue reset — unused
+
 
 setDetectedEmployerSourceValue(null);
 setDetectedCanonicalJobIdValue(null);
@@ -458,7 +459,8 @@ setScore(null);
 
 // Reset "What we detected" values (new run)
 setDetectedPostingAgeValue(null);
-setDetectedPostingAgeStatusValue(null);
+// (removed) detectedPostingAgeStatusValue — unused
+
 setDetectedEmployerSourceValue(null);
 setDetectedCanonicalJobIdValue(null);
 setDetectedGoogleIndexedValue(null);
@@ -591,7 +593,8 @@ scheduleStep('detectedGoogleSnippet', 1900);
       } catch {}
 
       setDetectedPostingAgeValue(data?.detected?.postingAge ?? null);
-      setDetectedPostingAgeStatusValue(data?.detected?.postingAgeStatus ?? null);
+     // (removed) detectedPostingAgeStatusValue — unused
+
       setDetectedEmployerSourceValue(data?.detected?.employerSource ?? fallbackHost ?? null);
       setDetectedCanonicalJobIdValue(data?.detected?.canonicalJobId ?? fallbackJobId ?? null);
 
@@ -1005,9 +1008,8 @@ setJobDescription('');
                         <div className="analysis-tag-text">
                           <div className="analysis-tag-title">Posting Age</div>
                           <div className="analysis-tag-value">{detectedPostingAgeValue ?? postingDateOverride ?? '—'}</div>
-                          <div className="analysis-tag-subvalue">
-  {detectedPostingAgeStatusValue ? `Source: ${detectedPostingAgeStatusValue}` : ''}
-</div>
+                          {/* (removed) posting age source — unused */}
+
 
 
                         </div>
