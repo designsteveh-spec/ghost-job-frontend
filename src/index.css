@@ -376,6 +376,8 @@ body {
 
 
 .input-group {
+  margin-top: 10px;
+
   display: flex;
   gap: 12px;
   margin-top: 24px;
@@ -467,6 +469,8 @@ input[type='url']::placeholder {
 }
 
 .postingage-row .postingage-cta-input {
+  margin-top: 10px;
+
   flex: 1;
   min-width: 0;
 }
