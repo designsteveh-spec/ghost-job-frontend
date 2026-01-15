@@ -1010,7 +1010,9 @@ setJobDescription('');
                         <img src={checkComplete} alt="" className="analysis-tag-icon" />
                         <div className="analysis-tag-text">
                           <div className="analysis-tag-title">Posting Age</div>
-                          <div className="analysis-tag-value">{detectedPostingAgeValue ?? postingDateOverride ?? '—'}</div>
+                          <div className="analysis-tag-value">
+  {detectedPostingAgeValue ?? (postingDateOverride === 'skip' ? 'I don’t know' : postingDateOverride) ?? '—'}
+</div>
                           {/* (removed) posting age source — unused */}
 
 
