@@ -67,7 +67,7 @@ export default function Pricing() {
 
               <ul className="pricing-features">
                 <li>Full analysis engine (same as Free)</li>
-                <li>Job link + image/PDF uploads</li>
+                
                 <li>Up to 10 checks per day</li>
                 <li>No subscription — ends automatically</li>
               </ul>
@@ -98,7 +98,7 @@ export default function Pricing() {
 
               <ul className="pricing-features">
                 <li>Full analysis engine (same as all plans)</li>
-                <li>Job link + image/PDF uploads</li>
+                
                 <li>Up to 30 checks per day</li>
                 <li>Priority processing</li>
                 <li>No subscription — ends automatically</li>
@@ -155,14 +155,7 @@ export default function Pricing() {
                   <td className="compare-center"><span className="compare-check">✓</span></td>
                 </tr>
 
-                <tr>
-  <td className="compare-row-label">Image and PDF Checks</td>
-  <td className="compare-center">
-    <img className="compare-x" src={xIcon} alt="Not included" />
-  </td>
-  <td className="compare-center"><span className="compare-check">✓</span></td>
-  <td className="compare-center"><span className="compare-check">✓</span></td>
-</tr>
+                
 
 
                 <tr>

@@ -9,6 +9,7 @@ import lockIcon from './assets/lock.svg';
 import Navbar from './components/Navbar';
 import ActivityGauge from './components/ActivityGauge';
 
+import tipsIcon from './assets/lightbulb.svg';
 
 
 // Hero + education images
@@ -54,23 +55,33 @@ const [lastAnalyzedUrl, setLastAnalyzedUrl] = useState('');
   // Tier + tab state (UI only for now)
 const userTier: 'free' | 'plus' | 'pro' = 'free';
 
-// DEV ONLY: unlock Deep Check while building/testing UI
+// DEV ONLY: unlock Text Scrub while building/testing UI
 const DEV_UNLOCK_DEEP = true;
 const canUseDeep = userTier !== 'free' || DEV_UNLOCK_DEEP;
 
 
 type CheckMode = 'basic' | 'deep';
+
+
 const [checkMode, setCheckMode] = useState<CheckMode>('basic');
 
-  const isDeep = checkMode === 'deep';
+
+
+
+  
   const hasUrl = !!url.trim();
   const hasDesc = !!jobDescription.trim();
+
+
 
   // Analyze rules:
   // - Basic: link only
   // - Deep: link OR description (separate buttons to prevent mismatches)
-  const canAnalyzeLinkNow = hasUrl;
-  const canAnalyzeDescNow = isDeep && hasDesc;
+    const canAnalyzeLinkNow = checkMode === 'basic' && hasUrl;
+const canAnalyzeDescNow = checkMode === 'deep' && hasDesc;
+
+
+
 
   // If both are present, show a mismatch warning (should be rare due to auto-clearing)
 
@@ -92,7 +103,7 @@ const [checkMode, setCheckMode] = useState<CheckMode>('basic');
   const [detectedGoogleTopLinkValue, setDetectedGoogleTopLinkValue] = useState<string | null>(null);
 
 
-  // Deep Check CTA focus target
+  // Text Scrub CTA focus target
   const jobDescRef = useRef<HTMLTextAreaElement | null>(null);
 
   // Posting Age CTA scroll + pulse
@@ -201,6 +212,7 @@ const [gaugeRunId, setGaugeRunId] = useState<number>(0);
   const resetAnalysisSteps = () => {
     setAnalysisSteps(makeInitialAnalysisSteps());
   };
+
 
   const scheduleStep = (key: AnalysisStepKey, delayMs: number) => {
     const t = window.setTimeout(() => {
@@ -385,8 +397,10 @@ setGaugeRunId((n) => n + 1);
 
 
   // Posting Age dropdown: convert selected range → midpoint ISO date (YYYY-MM-DD)
-  const postingAgeRangeToIsoDate = (rangeKey: string): string => {
+    const postingAgeRangeToIsoDate = (rangeKey: string): string => {
     if (!rangeKey || rangeKey === 'skip') return '';
+
+
 
     const map: Record<string, number> = {
       today_yesterday: 1,
@@ -435,17 +449,21 @@ if (urlValue) setLastAnalyzedUrl(urlValue);
 if (override?.postingDate !== undefined) setPostingDateOverride(override.postingDate);
 
 
-    // Basic requires URL
+        // Link Check requires URL
     if (checkMode === 'basic' && !urlValue) {
-      setFormError('Paste a job link to run Basic Check.');
+      setFormError('Paste a job link to run Link Check.');
       return;
     }
 
-    // Deep requires URL OR Description
-    if (checkMode === 'deep' && !urlValue && !descValue) {
-      setFormError('Add a job link or paste a job description to run Deep Check.');
+    // Text Scrub requires description
+    if (checkMode === 'deep' && !descValue) {
+      setFormError('Paste a job description to run Text Scrub.');
       return;
     }
+
+
+
+
 
     // Kill any prior timers so tab switching/reset can't be overwritten
     clearAllTimeouts();
@@ -517,32 +535,50 @@ scheduleStep('detectedGoogleSnippet', 1900);
 
 
     try {
+                  // Hard timeout so UI never flutters forever
+      const controller = new AbortController();
+      const REQUEST_TIMEOUT_MS = 25000;
+      const timeoutId = window.setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+
       const res = await fetch(`${API_BASE}/api/analyze`, {
         method: 'POST',
+        signal: controller.signal,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-  mode: checkMode,
-  url: urlValue,
-  jobDescription: descValue,
-  postingDate: postingDateValue,
-}),
-
+          mode: checkMode,
+          url: urlValue,
+          jobDescription: descValue,
+          postingDate: postingDateValue,
+        }),
       });
+
+
+      window.clearTimeout(timeoutId);
+
+
 
       // ✅ Stop flutter as soon as we have a response
       stopGaugeFlutter();
       setGaugeDurationMs(gaugeDurationRef.current);
 
-      if (!res.ok) {
-        let msg = 'Analyze failed';
+            if (!res.ok) {
+        let msg = `Analyze failed (HTTP ${res.status})`;
+
         try {
           const errData = await res.json();
           if (errData?.error) msg = errData.error;
         } catch {}
+
+        // Friendly known cases
+        if (res.status === 413) {
+          msg = 'File too large. Please upload a smaller image/PDF (max 6 MB).';
+        }
+
         setFormError(msg);
         setStatus('idle');
         return;
       }
+
 
             const data = await res.json();
 
@@ -640,7 +676,13 @@ timeoutsRef.current.push(t4);
       stopGaugeFlutter();
       setGaugeDurationMs(gaugeDurationRef.current);
 
-      setFormError('Network error. Please try again.');
+      const name = (err as any)?.name;
+      if (name === 'AbortError') {
+        setFormError('Request timed out. Try a smaller capture (crop the page) and retry.');
+      } else {
+        setFormError('Network error. Please try again.');
+      }
+
       setStatus('idle');
       setScore(null);
     }
@@ -670,12 +712,14 @@ timeoutsRef.current.push(t4);
 
   setUrl('');
   setJobDescription('');
+
   setFormError(null);
 }}
 
 
+
       >
-        Basic Check
+        Link Check
       </button>
 
       {/* DEEP TAB */}
@@ -694,18 +738,24 @@ onClick={() => {
 
   setUrl('');
   setJobDescription('');
+
   setFormError(null);
 }}
 
 
+
 >
-  Deep Check
+  Text Scrub
+
   {!canUseDeep && <img src={lockIcon} alt="" className="tab-lock-icon" />}
 </button>
+
+ 
 
     </div>
   </div>
 </div>
+
  
 
 	  
@@ -731,83 +781,98 @@ onClick={() => {
                   <span className="accent">job posting activity</span>
                 </h1>
 
-                <p className="subtitle">
-                  Paste any public job posting link to receive a
-                  probability-based assessment using observable signals. This
-                  tool provides insight — not accusations — to help you decide
-                  where to focus your time.
-                </p>
+                                <p className="subtitle">
+  {checkMode === 'basic' ? (
+    <>
+      Paste any public job posting link to receive a probability-based assessment using observable signals. This
+      tool provides insight — not accusations — to help you decide where to focus your time.
+    </>
+  ) : (
+    <>
+      Copy and paste any text from a job description into the input below to receive a probability-based assessment
+      using observable signals. This tool provides insight — not accusations — to help you decide where to focus your time.
+    </>
+  )}
 
-                <div className="input-group">
-                  <input
-                    type="url"
-                    placeholder={isDeep ? "Paste job link (or use description below)" : "Copy and paste job link here"}
-
-                    value={url}
-                    onChange={(e) => {
-  const next = e.target.value;
-  setUrl(next);
-  if (formError) setFormError(null);
-
-  // Deep rule: if user starts using link, clear description
-  if (isDeep && next.trim() && jobDescription.trim()) {
-    setJobDescription('');
-  }
-}}
+</p>
 
 
-                  />
-                 <button
-  className="analyze-btn"
-  onClick={() => handleAnalyze()}
 
-  disabled={!canAnalyzeLinkNow || (isDeep && hasDesc)}
-  aria-disabled={!canAnalyzeLinkNow || (isDeep && hasDesc)}
->
-
-
-                    <span className="analyze-desktop">Analyze Job Link</span>
-                    <span className="analyze-mobile">Analyze</span>
-                  </button>
-                </div>
-				
-				{formError && <p className="form-error">{formError}</p>}
-
-<div className="postingdate-inline">
-  <div className="postingage-cta-label">Approx. Posting Age (optional)</div>
-
-  <select
-    className={`postingage-cta-input ${pulsePostingDate ? 'postingage-cta-pulse' : ''} ${!postingDateOverride ? 'postingage-cta-select-placeholder' : ''}`}
-    value={postingDateOverride}
-    onChange={(e) => setPostingDateOverride(e.target.value)}
-  >
-    <option value="" disabled>Select a posting age</option>
-<option value="skip">I don’t know / skip</option>
-    <option value="today_yesterday">Today / yesterday</option>
-    <option value="last_3_days">Within the last 3 days</option>
-    <option value="within_week">4–7 days ago (within a week)</option>
-    <option value="weeks_1_2">1–2 weeks ago</option>
-    <option value="weeks_2_4">2–4 weeks ago</option>
-    <option value="months_1_2">1–2 months ago</option>
-    <option value="months_2_3">2–3 months ago</option>
-    <option value="months_3_6">3–6 months ago</option>
-    <option value="months_6_12">6–12 months ago</option>
-    <option value="over_1_year">Over 1 year ago</option>
-  </select>
-
-  <div className="postingdate-inline-hint">
-    If the listing shows “Posted” or “Opening Date,” pick the closest range to improve accuracy.
-  </div>
-</div>
-
-
-{isDeep && (
+                                {checkMode === 'basic' ? (
   <>
+    <div className="input-group">
+      <input
+        type="url"
+        placeholder="Copy and paste job link here"
+        value={url}
+        onChange={(e) => {
+          const next = e.target.value;
+          setUrl(next);
+          if (formError) setFormError(null);
+        }}
+      />
+
+      <button
+        className="analyze-btn"
+        onClick={() => handleAnalyze()}
+        disabled={!canAnalyzeLinkNow}
+        aria-disabled={!canAnalyzeLinkNow}
+      >
+        <span className="analyze-desktop">Analyze Job Link</span>
+        <span className="analyze-mobile">Analyze</span>
+      </button>
+    </div>
+
+    {formError && <p className="form-error">{formError}</p>}
+  </>
+) : (
+  <>
+    {formError && <p className="form-error">{formError}</p>}
+
+    <div className="postingdate-inline">
+      <div className="postingage-cta-label">Approx. Posting Age (optional)</div>
+
+      <div className="postingage-row">
+        <select
+          className={`postingage-cta-input ${pulsePostingDate ? 'postingage-cta-pulse' : ''} ${!postingDateOverride ? 'postingage-cta-select-placeholder' : ''}`}
+          value={postingDateOverride}
+          onChange={(e) => setPostingDateOverride(e.target.value)}
+        >
+          <option value="">Select a posting age</option>
+          <option value="skip">I don’t know / skip</option>
+
+          <option value="today_yesterday">Today / yesterday</option>
+          <option value="last_3_days">Within the last 3 days</option>
+          <option value="within_week">4–7 days ago (within a week)</option>
+          <option value="weeks_1_2">1–2 weeks ago</option>
+          <option value="weeks_2_4">2–4 weeks ago</option>
+          <option value="months_1_2">1–2 months ago</option>
+          <option value="months_2_3">2–3 months ago</option>
+          <option value="months_3_6">3–6 months ago</option>
+          <option value="months_6_12">6–12 months ago</option>
+          <option value="over_1_year">Over 1 year ago</option>
+        </select>
+
+        <button
+          className="analyze-btn postingage-analyze-btn"
+          onClick={() => handleAnalyze({ jobDescription, url: '' })}
+          disabled={!canAnalyzeDescNow}
+          aria-disabled={!canAnalyzeDescNow}
+        >
+          <span className="analyze-desktop">Analyze Description</span>
+          <span className="analyze-mobile">Analyze</span>
+        </button>
+      </div>
+
+      <div className="postingdate-inline-hint">
+        If the listing shows “Posted” or “Opening Date,” pick the closest range to improve accuracy.
+      </div>
+    </div>
+
     <div className="deep-block">
       <div className="deep-label-row">
         <div className="deep-label">Job Description (Deep Check)</div>
         <div className="deep-hint">Paste a job description instead of a link.</div>
-
       </div>
 
       <textarea
@@ -815,40 +880,18 @@ onClick={() => {
         className="job-desc"
         placeholder="Copy and paste job description here"
         value={jobDescription}
-       onChange={(e) => {
-  const next = e.target.value;
-  setJobDescription(next);
-  if (formError) setFormError(null);
-
-  // Deep rule: if user starts using description, clear link
-  if (next.trim() && url.trim()) {
-    setUrl('');
-  }
-}}
-
+        onChange={(e) => {
+          const next = e.target.value;
+          setJobDescription(next);
+          if (formError) setFormError(null);
+        }}
       />
-	  
-	  <div className="input-group">
-  <button
-    className="analyze-btn"
-    onClick={() => handleAnalyze({ jobDescription, url: '' })}
-    disabled={!canAnalyzeDescNow || hasUrl}
-    aria-disabled={!canAnalyzeDescNow || hasUrl}
-  >
-    <span className="analyze-desktop">Analyze Description</span>
-    <span className="analyze-mobile">Analyze</span>
-  </button>
-</div>
-
-	  
-	  
     </div>
-
-    
-
-    
   </>
 )}
+
+
+
 
 
 
@@ -1088,15 +1131,17 @@ setJobDescription('');
 <div className="postingage-cta-field">
   <div className="postingage-cta-label">Provide Posting Age</div>
 
-  <select
+    <select
     id="posting-age-select"
     className={`postingage-cta-input ${postingAgePulseOn ? 'postingage-cta-input-pulse' : ''} ${!postingDateOverride ? 'postingage-cta-select-placeholder' : ''}`}
     value={postingDateOverride}
     onChange={(e) => setPostingDateOverride(e.target.value)}
   >
-    <option value="" disabled>Select a posting age</option>
+   <option value="">Select a posting age</option>
 <option value="skip">I don’t know / skip</option>
+
     <option value="today_yesterday">Today / yesterday</option>
+
     <option value="last_3_days">Within the last 3 days</option>
     <option value="within_week">4–7 days ago (within a week)</option>
     <option value="weeks_1_2">1–2 weeks ago</option>
@@ -1112,19 +1157,22 @@ setJobDescription('');
 <button
   type="button"
   className="analyze-btn postingage-cta-btn"
-  disabled={
+    disabled={
     status === 'running' ||
     !postingDateOverride.trim() ||
 postingDateOverride === 'skip' ||
 
     !(lastAnalyzedUrl || url).trim()
   }
-  aria-disabled={
+
+    aria-disabled={
     status === 'running' ||
     !postingDateOverride.trim() ||
-    postingDateOverride === 'skip' ||
+postingDateOverride === 'skip' ||
+
     !(lastAnalyzedUrl || url).trim()
   }
+
   onClick={() => {
     const rerunUrl = (lastAnalyzedUrl || url).trim();
     const pd = postingDateOverride.trim();
