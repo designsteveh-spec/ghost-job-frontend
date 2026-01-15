@@ -9,7 +9,7 @@ import lockIcon from './assets/lock.svg';
 import Navbar from './components/Navbar';
 import ActivityGauge from './components/ActivityGauge';
 
-import tipsIcon from './assets/lightbulb.svg';
+
 
 
 // Hero + education images
