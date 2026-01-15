@@ -1770,8 +1770,9 @@ select.postingage-cta-input {
 .newsletter .ml-form-embedWrapper {
   background: #ffffff !important;
   border-radius: 16px !important;
-  box-shadow: 0 12px 32px rgba(15, 23, 42, 0.08);
+  box-shadow: none !important;
 }
+
 
 
 /* ---------------- TINY SCREEN PADDING CONSISTENCY (<= 360px) ---------------- */
