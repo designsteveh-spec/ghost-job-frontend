@@ -86,7 +86,7 @@ const [lastAnalyzedUrl, setLastAnalyzedUrl] = useState('');
 
   // "What we detected" values (UI only)
   const [detectedPostingAgeValue, setDetectedPostingAgeValue] = useState<string | null>(null);
-  const [detectedPostingAgeStatusValue, setDetectedPostingAgeStatusValue] = useState<string | null>(null);
+  // (removed) detectedPostingAgeStatusValue — unused (TS6133)
   const [detectedEmployerSourceValue, setDetectedEmployerSourceValue] = useState<string | null>(null);
   const [detectedCanonicalJobIdValue, setDetectedCanonicalJobIdValue] = useState<string | null>(null);
 
@@ -315,7 +315,8 @@ setFormError(null);
 
 // Reset "What we detected" values
 setDetectedPostingAgeValue(null);
-setDetectedPostingAgeStatusValue(null);
+setDetectedPostingAgeStatusValue(data?.detected?.postingAgeStatus ?? null);
+
 setDetectedEmployerSourceValue(null);
 setDetectedCanonicalJobIdValue(null);
 
@@ -1004,6 +1005,10 @@ setJobDescription('');
                         <div className="analysis-tag-text">
                           <div className="analysis-tag-title">Posting Age</div>
                           <div className="analysis-tag-value">{detectedPostingAgeValue ?? postingDateOverride ?? '—'}</div>
+                          <div className="analysis-tag-subvalue">
+  {detectedPostingAgeStatusValue ? `Source: ${detectedPostingAgeStatusValue}` : ''}
+</div>
+
 
                         </div>
                       </div>
