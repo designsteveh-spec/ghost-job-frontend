@@ -757,6 +757,8 @@ timeoutsRef.current.push(t4);
         }}
       >
         <option value="">Select a posting age</option>
+<option value="skip">I don’t know</option>
+
         <option value="today_yesterday">Today / yesterday</option>
         <option value="last_3_days">Within the last 3 days</option>
         <option value="within_week">4–7 days ago (within a week)</option>
