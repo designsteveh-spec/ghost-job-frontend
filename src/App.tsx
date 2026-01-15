@@ -1,4 +1,5 @@
-import { useState, useEffect, useLayoutEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
+
 
 import './index.css';
 import Pricing from './components/Pricing';
