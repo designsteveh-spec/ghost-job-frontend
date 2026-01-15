@@ -3,7 +3,6 @@ import { useState, useEffect, useLayoutEffect, useRef } from 'react';
 import './index.css';
 import Pricing from './components/Pricing';
 import MailerLiteForm from './components/MailerLiteForm';
-import lockIcon from './assets/lock.svg';
 
 
 import Navbar from './components/Navbar';
@@ -36,13 +35,14 @@ export default function App() {
 
   const [jobDescription, setJobDescription] = useState('');
 
-// Posting Date override (Analyze Again workflow)
+// Posting Age selection (required)
 const [postingDateOverride, setPostingDateOverride] = useState('');
 const [lastAnalyzedUrl, setLastAnalyzedUrl] = useState('');
+
+
   const [formError, setFormError] = useState<string | null>(null);
 
-  // Subtle pulse to draw attention to Posting Date input when Posting Age is blocked
-  const [pulsePostingDate] = useState<boolean>(false);
+
 
 
 
@@ -52,33 +52,27 @@ const [lastAnalyzedUrl, setLastAnalyzedUrl] = useState('');
   type SignalStatus = 'pending' | 'complete';
 
   const [status, setStatus] = useState<AnalysisStatus>('idle');
-  // Tier + tab state (UI only for now)
-const userTier: 'free' | 'plus' | 'pro' = 'free';
 
-// DEV ONLY: unlock Text Scrub while building/testing UI
-const DEV_UNLOCK_DEEP = true;
-const canUseDeep = userTier !== 'free' || DEV_UNLOCK_DEEP;
-
-
-type CheckMode = 'basic' | 'deep';
-
-
-const [checkMode, setCheckMode] = useState<CheckMode>('basic');
 
 
 
 
   
   const hasUrl = !!url.trim();
-  const hasDesc = !!jobDescription.trim();
 
 
 
-  // Analyze rules:
-  // - Basic: link only
-  // - Deep: link OR description (separate buttons to prevent mismatches)
-    const canAnalyzeLinkNow = checkMode === 'basic' && hasUrl;
-const canAnalyzeDescNow = checkMode === 'deep' && hasDesc;
+
+  // Analyze rules (Unified):
+  // - Link is required
+  // - Posting Age is required
+  // - Description is optional
+  const hasPostingAge =
+    !!postingDateOverride.trim();
+
+
+  const canAnalyzeNow = hasUrl && hasPostingAge;
+
 
 
 
@@ -103,18 +97,13 @@ const canAnalyzeDescNow = checkMode === 'deep' && hasDesc;
   const [detectedGoogleTopLinkValue, setDetectedGoogleTopLinkValue] = useState<string | null>(null);
 
 
-  // Text Scrub CTA focus target
-  const jobDescRef = useRef<HTMLTextAreaElement | null>(null);
 
-  // Posting Age CTA scroll + pulse
-  const postingAgeCtaRef = useRef<HTMLDivElement | null>(null);
-  const [postingAgePulseOn, setPostingAgePulseOn] = useState(false);
+
 
     // Auto-scroll target: Analysis Results summary box
   const analysisSummaryRef = useRef<HTMLDivElement | null>(null);
 
-  // Auto-scroll target: "WHAT WE DETECTED" card
-  const whatWeDetectedRef = useRef<HTMLDivElement | null>(null);
+
 
   // Prevent repeated scroll during one run
   const didAutoScrollRef = useRef<boolean>(false);
@@ -278,9 +267,7 @@ const [gaugeRunId, setGaugeRunId] = useState<number>(0);
   if (score === null) return;
   if (didAutoScrollRef.current) return;
 
-  const needsManualDate =
-    detectedPostingAgeStatusValue === 'blocked' ||
-    detectedPostingAgeStatusValue === 'js_required';
+  
 
   // Ensure Analysis is open so the summary exists in DOM
   if (!openAnalysis) {
@@ -298,23 +285,10 @@ const [gaugeRunId, setGaugeRunId] = useState<number>(0);
         block: 'start',
       });
 
-      if (needsManualDate) {
-        setPostingAgePulseOn(false);
-
-        const t1 = window.setTimeout(() => {
-          requestAnimationFrame(() => setPostingAgePulseOn(true));
-        }, 160);
-
-        const t2 = window.setTimeout(() => {
-          setPostingAgePulseOn(false);
-        }, 1400);
-
-        timeoutsRef.current.push(t1);
-        timeoutsRef.current.push(t2);
-      }
     });
   });
-}, [score, openAnalysis, detectedPostingAgeStatusValue]);
+}, [score, openAnalysis]);
+
 
 
 
@@ -351,6 +325,7 @@ setDetectedGoogleSnippetValue(null);
 setDetectedGoogleTopLinkValue(null);
 setPostingDateOverride('');
 setLastAnalyzedUrl('');
+
 didAutoScrollRef.current = false;
 
 
@@ -432,7 +407,9 @@ setGaugeRunId((n) => n + 1);
     setFormError(null);
 
     const urlValue = (override?.url ?? url).trim();
+
 const descValue = (override?.jobDescription ?? jobDescription).trim();
+
 const postingAgeRangeKey = (override?.postingDate ?? postingDateOverride ?? '').trim();
 
 // Convert the selected range into a concrete ISO date (YYYY-MM-DD) midpoint.
@@ -442,24 +419,29 @@ const postingDateValue =
     ? postingAgeRangeKey
     : postingAgeRangeToIsoDate(postingAgeRangeKey);
 
-// Remember the last URL we analyzed (so "Analyze Again" can rerun even if user edits fields)
-if (urlValue) setLastAnalyzedUrl(urlValue);
+
 
 // Keep manual posting date unless this call explicitly overrides it (Analyze Again sets it)
 if (override?.postingDate !== undefined) setPostingDateOverride(override.postingDate);
 
 
-        // Link Check requires URL
-    if (checkMode === 'basic' && !urlValue) {
-      setFormError('Paste a job link to run Link Check.');
+    // Unified validation (Link + Posting Age required, Description optional)
+    if (!urlValue) {
+  setFormError('Paste a job link to analyze.');
+  return;
+}
+
+setLastAnalyzedUrl(urlValue);
+
+
+    
+
+    if (!postingAgeRangeKey) {
+
+      setFormError('Select a posting age to analyze.');
       return;
     }
 
-    // Text Scrub requires description
-    if (checkMode === 'deep' && !descValue) {
-      setFormError('Paste a job description to run Text Scrub.');
-      return;
-    }
 
 
 
@@ -545,7 +527,7 @@ scheduleStep('detectedGoogleSnippet', 1900);
         signal: controller.signal,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          mode: checkMode,
+                    mode: descValue ? 'deep' : 'basic',
           url: urlValue,
           jobDescription: descValue,
           postingDate: postingDateValue,
@@ -696,65 +678,7 @@ timeoutsRef.current.push(t4);
       {/* HERO */}
       <section id="hero" className="hero">
 	  
-	 <div className="check-tabs-frame">
-  <div className="check-tabs-inner">
-    <div className="check-tabs">
-      {/* BASIC TAB */}
-      <button
-        className={`check-tab ${checkMode === 'basic' ? 'active' : ''}`}
-        onClick={() => {
-  setCheckMode('basic');
-  if (status !== 'idle') {
-  resetAnalysis();
-  setUrl('');
-  setJobDescription('');
-}
-
-  setUrl('');
-  setJobDescription('');
-
-  setFormError(null);
-}}
-
-
-
-      >
-        Link Check
-      </button>
-
-      {/* DEEP TAB */}
-      <button
-  className={`check-tab ${checkMode === 'deep' ? 'active' : ''} ${
-    !canUseDeep ? 'locked' : ''
-  }`}
-onClick={() => {
-  if (!canUseDeep) return;
-  setCheckMode('deep');
-  if (status !== 'idle') {
-  resetAnalysis();
-  setUrl('');
-  setJobDescription('');
-}
-
-  setUrl('');
-  setJobDescription('');
-
-  setFormError(null);
-}}
-
-
-
->
-  Text Scrub
-
-  {!canUseDeep && <img src={lockIcon} alt="" className="tab-lock-icon" />}
-</button>
-
- 
-
-    </div>
-  </div>
-</div>
+	 
 
  
 
@@ -781,114 +705,91 @@ onClick={() => {
                   <span className="accent">job posting activity</span>
                 </h1>
 
-                                <p className="subtitle">
-  {checkMode === 'basic' ? (
-    <>
-      Paste any public job posting link to receive a probability-based assessment using observable signals. This
-      tool provides insight — not accusations — to help you decide where to focus your time.
-    </>
-  ) : (
-    <>
-      Copy and paste any text from a job description into the input below to receive a probability-based assessment
-      using observable signals. This tool provides insight — not accusations — to help you decide where to focus your time.
-    </>
-  )}
-
+                              <p className="subtitle">
+  Paste any public job posting link to receive a probability-based assessment using observable signals.
+  This tool provides insight — not accusations — to help you decide where to focus your time.
 </p>
 
+<div className="unified-form">
+  <div className="unified-row">
+    <div className="unified-main">
+      <div className="field-label">Post Job Link (Required)</div>
 
-
-                                {checkMode === 'basic' ? (
-  <>
-    <div className="input-group">
-      <input
-        type="url"
-        placeholder="Copy and paste job link here"
-        value={url}
-        onChange={(e) => {
-          const next = e.target.value;
-          setUrl(next);
-          if (formError) setFormError(null);
-        }}
-      />
-
-      <button
-        className="analyze-btn"
-        onClick={() => handleAnalyze()}
-        disabled={!canAnalyzeLinkNow}
-        aria-disabled={!canAnalyzeLinkNow}
-      >
-        <span className="analyze-desktop">Analyze Job Link</span>
-        <span className="analyze-mobile">Analyze</span>
-      </button>
-    </div>
-
-    {formError && <p className="form-error">{formError}</p>}
-  </>
-) : (
-  <>
-    {formError && <p className="form-error">{formError}</p>}
-
-    <div className="postingdate-inline">
-      <div className="postingage-cta-label">Approx. Posting Age (optional)</div>
-
-      <div className="postingage-row">
-        <select
-          className={`postingage-cta-input ${pulsePostingDate ? 'postingage-cta-pulse' : ''} ${!postingDateOverride ? 'postingage-cta-select-placeholder' : ''}`}
-          value={postingDateOverride}
-          onChange={(e) => setPostingDateOverride(e.target.value)}
-        >
-          <option value="">Select a posting age</option>
-          <option value="skip">I don’t know / skip</option>
-
-          <option value="today_yesterday">Today / yesterday</option>
-          <option value="last_3_days">Within the last 3 days</option>
-          <option value="within_week">4–7 days ago (within a week)</option>
-          <option value="weeks_1_2">1–2 weeks ago</option>
-          <option value="weeks_2_4">2–4 weeks ago</option>
-          <option value="months_1_2">1–2 months ago</option>
-          <option value="months_2_3">2–3 months ago</option>
-          <option value="months_3_6">3–6 months ago</option>
-          <option value="months_6_12">6–12 months ago</option>
-          <option value="over_1_year">Over 1 year ago</option>
-        </select>
+      <div className="input-group">
+        <input
+          type="url"
+          placeholder="Paste job link (or use description below)"
+          value={url}
+          onChange={(e) => {
+            const next = e.target.value;
+            setUrl(next);
+            if (formError) setFormError(null);
+          }}
+        />
 
         <button
-          className="analyze-btn postingage-analyze-btn"
-          onClick={() => handleAnalyze({ jobDescription, url: '' })}
-          disabled={!canAnalyzeDescNow}
-          aria-disabled={!canAnalyzeDescNow}
+          className="analyze-btn"
+          onClick={() => handleAnalyze()}
+          disabled={!canAnalyzeNow}
+          aria-disabled={!canAnalyzeNow}
         >
-          <span className="analyze-desktop">Analyze Description</span>
+          <span className="analyze-desktop">Analyze Job</span>
           <span className="analyze-mobile">Analyze</span>
         </button>
       </div>
 
-      <div className="postingdate-inline-hint">
-        If the listing shows “Posted” or “Opening Date,” pick the closest range to improve accuracy.
-      </div>
-    </div>
+      {formError && <p className="form-error">{formError}</p>}
 
-    <div className="deep-block">
-      <div className="deep-label-row">
-        <div className="deep-label">Job Description (Deep Check)</div>
-        <div className="deep-hint">Paste a job description instead of a link.</div>
+      <div className="field-label" style={{ marginTop: 14 }}>
+        Select Posting Age (Required)
       </div>
 
-      <textarea
-        ref={jobDescRef}
-        className="job-desc"
-        placeholder="Copy and paste job description here"
-        value={jobDescription}
+      <select
+        className={`postingage-cta-input ${!postingDateOverride ? 'postingage-cta-select-placeholder' : ''}`}
+        value={postingDateOverride}
         onChange={(e) => {
-          const next = e.target.value;
-          setJobDescription(next);
+          setPostingDateOverride(e.target.value);
           if (formError) setFormError(null);
         }}
-      />
+      >
+        <option value="">Select a posting age</option>
+        <option value="today_yesterday">Today / yesterday</option>
+        <option value="last_3_days">Within the last 3 days</option>
+        <option value="within_week">4–7 days ago (within a week)</option>
+        <option value="weeks_1_2">1–2 weeks ago</option>
+        <option value="weeks_2_4">2–4 weeks ago</option>
+        <option value="months_1_2">1–2 months ago</option>
+        <option value="months_2_3">2–3 months ago</option>
+        <option value="months_3_6">3–6 months ago</option>
+        <option value="months_6_12">6–12 months ago</option>
+        <option value="over_1_year">Over 1 year ago</option>
+      </select>
+
+      <div className="postingdate-inline-hint">
+        If the listing shows “Posted” or “Opening Date,” pick the closest range.
+      </div>
+
+      <div className="deep-block" style={{ marginTop: 14 }}>
+        <div className="deep-label-row">
+          <div className="deep-label">Add Job Description for Better Accuracy</div>
+          <div className="deep-hint">Paste a job description instead of a link.</div>
+        </div>
+
+        <textarea
+          className="job-desc"
+          placeholder="Copy and paste job description here"
+          value={jobDescription}
+          onChange={(e) => {
+            const next = e.target.value;
+            setJobDescription(next);
+            if (formError) setFormError(null);
+          }}
+        />
+      </div>
     </div>
-  </>
-)}
+  </div>
+</div>
+
 
 
 
@@ -1020,16 +921,7 @@ setJobDescription('');
         {score === null ? '—' : <strong>{score}%</strong>}
       </span>
 
-      {(detectedPostingAgeStatusValue === 'blocked' ||
-        detectedPostingAgeStatusValue === 'js_required') && (
-        <>
-          <span className="analysis-results-sep">|</span>
-          <a className="analysis-results-link" href="#posting-age-select">
-  Add posting age to improve accuracy
-</a>
-
-        </>
-      )}
+      
     </div>
   </div>
 </div>
@@ -1102,101 +994,21 @@ setJobDescription('');
                   </div>
 
                   {/* 2) WHAT WE DETECTED */}
-                  <div className="analysis-card" ref={whatWeDetectedRef}>
+                  <div className="analysis-card">
+
                     <div className="analysis-card-title">WHAT WE DETECTED</div>
 
-                    {analysisSteps.detectedPostingAge === 'complete' && (
-  (detectedPostingAgeStatusValue === 'blocked' ||
-   detectedPostingAgeStatusValue === 'js_required') ? (
+                                        {analysisSteps.detectedPostingAge === 'complete' && (
+                      <div className="analysis-tag" data-tip="Posting age used for scoring (from your selection when required).">
+                        <img src={checkComplete} alt="" className="analysis-tag-icon" />
+                        <div className="analysis-tag-text">
+                          <div className="analysis-tag-title">Posting Age</div>
+                          <div className="analysis-tag-value">{detectedPostingAgeValue ?? postingDateOverride ?? '—'}</div>
 
-    <div
-      ref={postingAgeCtaRef}
-      className={`analysis-tag postingage-cta ${postingAgePulseOn ? 'postingage-cta-pulse' : ''}`}
-      data-tip="If available, detects posting age / recency cues."
-    >
-      <div className="postingage-cta-head">
-        <div className="postingage-cta-title">Posting Age</div>
-        <div className="postingage-cta-sub">
-  {detectedPostingAgeStatusValue === 'js_required'
-    ? 'Unavailable (requires JS render)'
-    : 'Unavailable (blocked)'}
-</div>
-      </div>
+                        </div>
+                      </div>
+                    )}
 
-      <div className="postingage-cta-body">
-  Posting age couldn’t be read from this page. If the listing shows “Posted” or “Opening Date,”
-  select the closest range below and rerun.
-</div>
-
-<div className="postingage-cta-field">
-  <div className="postingage-cta-label">Provide Posting Age</div>
-
-    <select
-    id="posting-age-select"
-    className={`postingage-cta-input ${postingAgePulseOn ? 'postingage-cta-input-pulse' : ''} ${!postingDateOverride ? 'postingage-cta-select-placeholder' : ''}`}
-    value={postingDateOverride}
-    onChange={(e) => setPostingDateOverride(e.target.value)}
-  >
-   <option value="">Select a posting age</option>
-<option value="skip">I don’t know / skip</option>
-
-    <option value="today_yesterday">Today / yesterday</option>
-
-    <option value="last_3_days">Within the last 3 days</option>
-    <option value="within_week">4–7 days ago (within a week)</option>
-    <option value="weeks_1_2">1–2 weeks ago</option>
-    <option value="weeks_2_4">2–4 weeks ago</option>
-    <option value="months_1_2">1–2 months ago</option>
-    <option value="months_2_3">2–3 months ago</option>
-    <option value="months_3_6">3–6 months ago</option>
-    <option value="months_6_12">6–12 months ago</option>
-    <option value="over_1_year">Over 1 year ago</option>
-  </select>
-</div>
-
-<button
-  type="button"
-  className="analyze-btn postingage-cta-btn"
-    disabled={
-    status === 'running' ||
-    !postingDateOverride.trim() ||
-postingDateOverride === 'skip' ||
-
-    !(lastAnalyzedUrl || url).trim()
-  }
-
-    aria-disabled={
-    status === 'running' ||
-    !postingDateOverride.trim() ||
-postingDateOverride === 'skip' ||
-
-    !(lastAnalyzedUrl || url).trim()
-  }
-
-  onClick={() => {
-    const rerunUrl = (lastAnalyzedUrl || url).trim();
-    const pd = postingDateOverride.trim();
-    if (!rerunUrl || !pd || status === 'running') return;
-    handleAnalyze({ url: rerunUrl, jobDescription: '', postingDate: pd });
-  }}
->
-  Analyze Again
-</button>
-
-    </div>
-
-  ) : (
-
-    <div className="analysis-tag" data-tip="If available, detects posting age / recency cues.">
-      <img src={checkComplete} alt="" className="analysis-tag-icon" />
-      <div className="analysis-tag-text">
-        <div className="analysis-tag-title">Posting Age</div>
-        <div className="analysis-tag-value">{detectedPostingAgeValue ?? '—'}</div>
-      </div>
-    </div>
-
-  )
-)}
 
 
                     {analysisSteps.detectedEmployerSource === 'complete' && (
@@ -1289,10 +1101,11 @@ postingDateOverride === 'skip' ||
                     )}
 
                     {analysisSteps.detectedApplyLinkBehavior === 'complete' && (
-                      hasUrl ? (
-                        <a
-                          className="analysis-tag analysis-tag-link"
-                          href={url}
+  (lastAnalyzedUrl || url).trim() ? (
+    <a
+      className="analysis-tag analysis-tag-link"
+      href={(lastAnalyzedUrl || url).trim()}
+
                           target="_blank"
                           rel="noreferrer"
                           data-tip="Opens the provided job link in a new tab."

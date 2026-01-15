@@ -15,8 +15,9 @@ export default function Pricing() {
         </h2>
 
         <p className="pricing-subtitle">
-          Same analysis engine across all plans. Free checks are always available — paid passes increase daily usage.
-        </p>
+  Everything is included in every plan. Free checks are always available — paid passes increase daily usage.
+</p>
+
 
         <div className="pricing-grid">
           {/* FREE */}
@@ -31,16 +32,16 @@ export default function Pricing() {
 
               <p className="pricing-tagline">Try the full analysis before you commit.</p>
 
-              <p className="pricing-description">
-                Run the same analysis used in paid plans, with a limited number of daily checks.
-              </p>
+             <p className="pricing-description">
+  Run the full analysis with a limited number of daily checks.
+</p>
+
 
               <ul className="pricing-features">
-  <li>Full Basic + Deep Check analysis</li>
-  <li>Job ad link support</li>
-
+  <li>Full analysis (same as paid plans)</li>
   <li>Up to 3 checks per day</li>
 </ul>
+
 
 
               <div className="pricing-price free">$0</div>
@@ -66,11 +67,11 @@ export default function Pricing() {
               </p>
 
               <ul className="pricing-features">
-                <li>Full analysis engine (same as Free)</li>
-                
-                <li>Up to 10 checks per day</li>
-                <li>No subscription — ends automatically</li>
-              </ul>
+  <li>Full analysis included</li>
+  <li>Up to 10 checks per day</li>
+  <li>No subscription — ends automatically</li>
+</ul>
+
 
               <div className="pricing-price">
                 $4.99 <span>/ 30 days</span>
@@ -97,12 +98,12 @@ export default function Pricing() {
               </p>
 
               <ul className="pricing-features">
-                <li>Full analysis engine (same as all plans)</li>
-                
-                <li>Up to 30 checks per day</li>
-                <li>Priority processing</li>
-                <li>No subscription — ends automatically</li>
-              </ul>
+  <li>Full analysis included</li>
+  <li>Up to 30 checks per day</li>
+  <li>Priority processing</li>
+  <li>No subscription — ends automatically</li>
+</ul>
+
 
               <div className="pricing-price">
                 $9.99 <span>/ 30 days</span>
@@ -149,7 +150,7 @@ export default function Pricing() {
                 </tr>
 
                 <tr>
-                  <td className="compare-row-label">Basic Link Checks</td>
+                  <td className="compare-row-label">Full Analysis Included</td>
                   <td className="compare-center"><span className="compare-check">✓</span></td>
                   <td className="compare-center"><span className="compare-check">✓</span></td>
                   <td className="compare-center"><span className="compare-check">✓</span></td>

@@ -225,10 +225,9 @@ body {
 
 
 .check-tabs-frame {
-  background: #f8fafc;
-  padding-top: 16px; /* more space below navbar */
-  border-bottom: 0;
+  display: none; /* ✅ tabs removed (collapsed UI) */
 }
+
 
 
 
@@ -361,6 +360,20 @@ body {
   color: #475569;
   max-width: 520px;
 }
+
+/* ---------------- UNIFIED FORM (v1.0.y) ---------------- */
+
+.unified-form {
+  margin-top: 18px;
+  max-width: 820px; /* match deep-block width */
+}
+
+.field-label {
+  font-size: 13px;
+  font-weight: 800;
+  color: #0f172a;
+}
+
 
 .input-group {
   display: flex;
@@ -519,28 +532,7 @@ button {
   color: #64748b;
 }
 
-.deep-desc {
-  margin-top: 18px;
-}
 
-.deep-label {
-  display: block;
-  font-size: 14px;
-  font-weight: 600;
-  color: #0f172a;
-  margin-bottom: 8px;
-}
-
-.deep-textarea {
-  width: 100%;
-  padding: 14px 16px;
-  border-radius: 10px;
-  border: 1px solid #cbd5e1;
-  font-size: 15px;
-  font-family: inherit;
-  resize: vertical;
-  min-height: 220px;
-}
 
 
 /* ---------------- EDUCATION ---------------- */
