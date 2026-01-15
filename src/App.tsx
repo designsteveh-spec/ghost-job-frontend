@@ -530,11 +530,12 @@ scheduleStep('detectedGoogleSnippet', 1900);
         signal: controller.signal,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-                    mode: descValue ? 'deep' : 'basic',
-          url: urlValue,
-          jobDescription: descValue,
-          postingDate: postingDateValue,
-        }),
+  mode: descValue ? 'deep' : 'basic',
+  url: urlValue,
+  jobDescription: descValue,
+  ...(postingDateValue ? { postingDate: postingDateValue } : {}),
+}),
+
       });
 
 
