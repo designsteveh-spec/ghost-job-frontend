@@ -378,8 +378,9 @@ body {
 .input-group {
   display: flex;
   gap: 12px;
-  margin-top: 10px;
+  margin-top: 6px; /* matches deep label->textarea rhythm */
 }
+
 
 
 @media (max-width: 420px) {
@@ -496,6 +497,11 @@ input[type='url']::placeholder {
   margin-top: 6px;
   font-size: 12px;
   color: #64748b;
+}
+
+/* HERO FORM: make Posting Age select spacing match Deep block */
+.unified-form select.postingage-cta-input {
+  margin-top: 6px;
 }
 
 
