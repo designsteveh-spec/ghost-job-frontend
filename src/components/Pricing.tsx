@@ -7,6 +7,27 @@ import xIcon from '../assets/red-checkmark.svg';
 
 
 export default function Pricing() {
+  const API_BASE =
+    (import.meta as any).env?.VITE_API_BASE || 'https://ghost-job-api.onrender.com';
+
+  async function startCheckout(plan: 'casual' | 'active') {
+    try {
+      const r = await fetch(`${API_BASE}/api/stripe/create-checkout-session`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ plan }),
+      });
+
+      const data = await r.json().catch(() => null);
+
+      if (!r.ok || !data?.url) return;
+
+      window.location.href = data.url;
+    } catch {
+      // no-op (keep UI calm)
+    }
+  }
+
   return (
     <section id="pricing" className="pricing">
       <div className="pricing-inner">
@@ -77,7 +98,9 @@ export default function Pricing() {
                 $4.99 <span>/ 30 days</span>
               </div>
 
-              <button className="pricing-btn primary">Start Casual Pass</button>
+              <button className="pricing-btn primary" onClick={() => startCheckout('casual')}>
+  Start Casual Pass
+</button>
             </div>
           </div>
 
@@ -109,9 +132,9 @@ export default function Pricing() {
                 $9.99 <span>/ 30 days</span>
               </div>
 
-              <button className="pricing-btn primary outline">
-                Start Job Hunt Pass
-              </button>
+              <button className="pricing-btn primary outline" onClick={() => startCheckout('active')}>
+  Start Job Hunt Pass
+</button>
             </div>
           </div>
         </div>
