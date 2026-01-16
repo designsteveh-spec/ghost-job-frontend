@@ -1775,7 +1775,7 @@ select.postingage-cta-input {
 
 
 
-/* ---------------- TINY SCREEN PADDING CONSISTENCY (<= 360px) ---------------- */
+/* ---------------- TINY SCREEN PADDING CONSISTENCY 1 (<= 360px) ---------------- */
 @media (max-width: 360px) {
   .nav-inner,
   .check-tabs-inner,
