@@ -1383,8 +1383,8 @@ button {
   background: #ffffff;
   position: relative;
   z-index: 0; /* ✅ allow hovered tag to rise above siblings */
+  
 }
-
 
 .analysis-tag:hover {
   z-index: 50; /* ✅ brings tooltip above the tags below */
@@ -1775,7 +1775,7 @@ select.postingage-cta-input {
 
 
 
-/* ---------------- TINY SCREEN PADDING CONSISTENCY 1 (<= 360px) ---------------- */
+/* ---------------- TINY SCREEN PADDING CONSISTENCY (<= 360px) ---------------- */
 @media (max-width: 360px) {
   .nav-inner,
   .check-tabs-inner,
@@ -1801,70 +1801,3 @@ select.postingage-cta-input {
     overflow-wrap: anywhere;
   }
 }
-
-
-/* Site Reliability card (match mock: blue header + white body + centered button) */
-.analysis-tag.site-reliability-tag {
-  display: block;         /* override .analysis-tag flex */
-  padding: 0;             /* header/body control spacing */
-  border-radius: 14px;
-  overflow: hidden;
-  background: #ffffff;
-}
-
-/* Header strip */
-.site-reliability-tag-header {
-  display: flex;
-  gap: 10px;
-  align-items: flex-start;
-  padding: 12px 14px;     /* slightly wider like mock */
-  background: #4040FF;
-}
-
-/* check icon on blue */
-.site-reliability-tag-header .analysis-tag-icon {
-  margin-top: 1px;
-  filter: brightness(0) invert(1);
-}
-
-/* Title/value on blue */
-.site-reliability-tag-header .analysis-tag-title,
-.site-reliability-tag-header .analysis-tag-value {
-  color: #ffffff;
-}
-
-/* White body */
-.site-reliability-tag-body {
-  padding: 14px 14px 16px;
-  background: #ffffff;
-}
-
-/* Body text */
-.site-reliability-cta-text {
-  font-size: 13px;
-  line-height: 1.35;
-  color: #4040FF;
-  margin: 0 0 14px;
-}
-
-/* Button: centered, not full-width */
-.site-reliability-cta-btn {
-  display: block;
-  width: 210px;                 /* matches mock better */
-  max-width: calc(100% - 12px);
-  margin: 0 auto;
-  padding: 10px 16px;
-  border-radius: 999px;
-  border: 2px solid #4040FF;
-  background: #FFCD2E;
-  color: #4040FF;
-  font-weight: 800;
-  cursor: pointer;
-}
-
-.site-reliability-cta-btn:hover {
-  background: #ffd84d;
-}
-
-
-
