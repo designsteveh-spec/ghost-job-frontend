@@ -697,9 +697,10 @@ timeoutsRef.current.push(t4);
                 <span className="eyebrow">Ghost Job Link Checker</span>
 
                 <h1>
-                  Use probability indicators to assess{' '}
-                  <span className="accent">job posting activity</span>
-                </h1>
+  Stop wasting time applying to ghost jobs with our{' '}
+  <span className="accent">link checking tool</span>.
+</h1>
+
 
                               <p className="subtitle">
   Paste any public job posting link to receive a probability-based assessment using observable signals.
