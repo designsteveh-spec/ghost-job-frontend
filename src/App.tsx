@@ -109,7 +109,8 @@ const [scoreBreakdown, setScoreBreakdown] = useState<{
 
   // "What we detected" values (UI only)
 const [detectedPostingAgeValue, setDetectedPostingAgeValue] = useState<string | null>(null);
-const [detectedPostingAgeStatusValue, setDetectedPostingAgeStatusValue] = useState<string | null>(null);
+const [_, setDetectedPostingAgeStatusValue] = useState<string | null>(null);
+
 
   const [detectedEmployerSourceValue, setDetectedEmployerSourceValue] = useState<string | null>(null);
   const [detectedCanonicalJobIdValue, setDetectedCanonicalJobIdValue] = useState<string | null>(null);
