@@ -1844,19 +1844,5 @@ select.postingage-cta-input {
 }
 
 
-.site-reliability-cta-text {
-  font-size: 13px;
-  line-height: 1.35;
-  margin-bottom: 12px;
-}
+/* (removed duplicate overrides) */
 
-.site-reliability-cta-btn {
-  width: 100%;
-  height: 40px;
-  border-radius: 999px;
-  border: 2px solid #1e36c9;
-  background: #f4c542;
-  color: #1e36c9;
-  font-weight: 700;
-  cursor: pointer;
-}
