@@ -753,7 +753,7 @@ timeoutsRef.current.push(t4);
       <div className="deep-block" style={{ marginTop: 14 }}>
         <div className="deep-label-row">
           <div className="deep-label">Add Job Description for Better Accuracy</div>
-          <div className="deep-hint">Paste a job description instead of a link.</div>
+          
         </div>
 
         <textarea
