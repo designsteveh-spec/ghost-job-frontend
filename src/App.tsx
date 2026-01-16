@@ -85,6 +85,17 @@ const [lastAnalyzedUrl, setLastAnalyzedUrl] = useState('');
 
     const [score, setScore] = useState<number | null>(null);
 
+// Score Breakdown (from backend)
+const [scoreBreakdown, setScoreBreakdown] = useState<{
+  postingAge?: number;
+  freshness1?: number;
+  contentUniqueness?: number;
+  activityIndicators?: number;
+  freshness2?: number;
+  siteReliability?: number;
+} | null>(null);
+
+
   // "What we detected" values (UI only)
   const [detectedPostingAgeValue, setDetectedPostingAgeValue] = useState<string | null>(null);
   // (removed) detectedPostingAgeStatusValue — unused (TS6133)
@@ -285,6 +296,8 @@ const [gaugeRunId, setGaugeRunId] = useState<number>(0);
     stopGaugeFlutter();
     setStatus('idle');
 setScore(null);
+setScoreBreakdown(null);
+
 setFormError(null);
 
 // Reset "What we detected" values
@@ -430,6 +443,8 @@ setLastAnalyzedUrl(urlValue);
     // Reset state
 setStatus('running');
 setScore(null);
+setScoreBreakdown(null);
+
 
 // Reset "What we detected" values (new run)
 setDetectedPostingAgeValue(null);
@@ -541,6 +556,8 @@ scheduleStep('detectedGoogleSnippet', 1900);
 
 
             const data = await res.json();
+setScoreBreakdown(data?.breakdown ?? null);
+
 
       // Fill "What we detected" values:
       // - Prefer API-provided detected fields if present
@@ -1139,7 +1156,10 @@ setJobDescription('');
                         <img src={checkComplete} alt="" className="analysis-tag-icon" />
                         <div className="analysis-tag-text">
                           <div className="analysis-tag-title">Posting Age</div>
-                          <div className="analysis-tag-value">−25</div>
+                          <div className="analysis-tag-value">
+  {scoreBreakdown?.postingAge ?? '—'}
+</div>
+
                         </div>
                       </div>
                     )}
@@ -1149,7 +1169,9 @@ setJobDescription('');
                         <img src={checkComplete} alt="" className="analysis-tag-icon" />
                         <div className="analysis-tag-text">
                           <div className="analysis-tag-title">Freshness Indicators</div>
-                          <div className="analysis-tag-value">−10</div>
+                          <div className="analysis-tag-value">
+  {scoreBreakdown?.freshness1 ?? '—'}
+</div>
                         </div>
                       </div>
                     )}
@@ -1159,7 +1181,9 @@ setJobDescription('');
                         <img src={checkComplete} alt="" className="analysis-tag-icon" />
                         <div className="analysis-tag-text">
                           <div className="analysis-tag-title">Content Uniqueness</div>
-                          <div className="analysis-tag-value">+5</div>
+                          <div className="analysis-tag-value">
+  {scoreBreakdown?.contentUniqueness ?? '—'}
+</div>
                         </div>
                       </div>
                     )}
@@ -1169,7 +1193,9 @@ setJobDescription('');
                         <img src={checkComplete} alt="" className="analysis-tag-icon" />
                         <div className="analysis-tag-text">
                           <div className="analysis-tag-title">Activity Indicators</div>
-                          <div className="analysis-tag-value">+10</div>
+                          <div className="analysis-tag-value">
+  {scoreBreakdown?.activityIndicators ?? '—'}
+</div>
                         </div>
                       </div>
                     )}
@@ -1179,7 +1205,9 @@ setJobDescription('');
                         <img src={checkComplete} alt="" className="analysis-tag-icon" />
                         <div className="analysis-tag-text">
                           <div className="analysis-tag-title">Freshness Indicators</div>
-                          <div className="analysis-tag-value">−10</div>
+                          <div className="analysis-tag-value">
+  {scoreBreakdown?.freshness2 ?? '—'}
+</div>
                         </div>
                       </div>
                     )}
@@ -1189,7 +1217,10 @@ setJobDescription('');
                         <img src={checkComplete} alt="" className="analysis-tag-icon" />
                         <div className="analysis-tag-text">
                           <div className="analysis-tag-title">Site Reliability Indicators</div>
-                          <div className="analysis-tag-value">+5</div>
+                          <div className="analysis-tag-value">
+  {scoreBreakdown?.siteReliability ?? '—'}
+</div>
+
                         </div>
                       </div>
                     )}
