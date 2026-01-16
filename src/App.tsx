@@ -44,6 +44,10 @@ const [lastAnalyzedUrl, setLastAnalyzedUrl] = useState('');
   const [formError, setFormError] = useState<string | null>(null);
 
 
+const scrollToJobDescription = () => {
+  const el = document.getElementById('job-description-input');
+  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+};
 
 
 
@@ -69,10 +73,20 @@ const [lastAnalyzedUrl, setLastAnalyzedUrl] = useState('');
   // - Posting Age is required
   // - Description is optional
   const hasPostingAge =
-    !!postingDateOverride.trim();
+  !!postingDateOverride.trim() && postingDateOverride !== 'skip';
+
 
 
   const canAnalyzeNow = hasUrl && hasPostingAge;
+
+function showJobDescriptionPrompt() {
+  return (
+    (scoreBreakdown?.siteReliability ?? 0) >= 10 &&
+    (detectedPostingAgeStatusValue === 'blocked' ||
+      detectedPostingAgeStatusValue === 'js_required') &&
+    !jobDescription.trim()
+  );
+}
 
 
 
@@ -97,8 +111,9 @@ const [scoreBreakdown, setScoreBreakdown] = useState<{
 
 
   // "What we detected" values (UI only)
-  const [detectedPostingAgeValue, setDetectedPostingAgeValue] = useState<string | null>(null);
-  // (removed) detectedPostingAgeStatusValue — unused (TS6133)
+const [detectedPostingAgeValue, setDetectedPostingAgeValue] = useState<string | null>(null);
+const [detectedPostingAgeStatusValue, setDetectedPostingAgeStatusValue] = useState<string | null>(null);
+
   const [detectedEmployerSourceValue, setDetectedEmployerSourceValue] = useState<string | null>(null);
   const [detectedCanonicalJobIdValue, setDetectedCanonicalJobIdValue] = useState<string | null>(null);
 
@@ -302,7 +317,8 @@ setFormError(null);
 
 // Reset "What we detected" values
 setDetectedPostingAgeValue(null);
-// (removed) detectedPostingAgeStatusValue reset — unused
+setDetectedPostingAgeStatusValue(null);
+
 
 
 setDetectedEmployerSourceValue(null);
@@ -448,7 +464,8 @@ setScoreBreakdown(null);
 
 // Reset "What we detected" values (new run)
 setDetectedPostingAgeValue(null);
-// (removed) detectedPostingAgeStatusValue — unused
+setDetectedPostingAgeStatusValue(null);
+
 
 setDetectedEmployerSourceValue(null);
 setDetectedCanonicalJobIdValue(null);
@@ -585,7 +602,9 @@ setScoreBreakdown(data?.breakdown ?? null);
       } catch {}
 
       setDetectedPostingAgeValue(data?.detected?.postingAge ?? null);
-     // (removed) detectedPostingAgeStatusValue — unused
+      setDetectedPostingAgeStatusValue(data?.detected?.postingAgeStatus ?? null);
+
+     
 
       setDetectedEmployerSourceValue(data?.detected?.employerSource ?? fallbackHost ?? null);
       setDetectedCanonicalJobIdValue(data?.detected?.canonicalJobId ?? fallbackJobId ?? null);
@@ -773,9 +792,11 @@ timeoutsRef.current.push(t4);
         </div>
 
         <textarea
-          className="job-desc"
-          placeholder="Copy and paste job description here"
-          value={jobDescription}
+  id="job-description-input"
+  className="job-desc"
+  placeholder="Copy and paste job description here"
+  value={jobDescription}
+
           onChange={(e) => {
             const next = e.target.value;
             setJobDescription(next);
@@ -1213,17 +1234,34 @@ setJobDescription('');
                     )}
 
                     {analysisSteps.scoreSiteReliability === 'complete' && (
-                      <div className="analysis-tag" data-tip="Site reliability cues (major platforms vs unknown).">
-                        <img src={checkComplete} alt="" className="analysis-tag-icon" />
-                        <div className="analysis-tag-text">
-                          <div className="analysis-tag-title">Site Reliability Indicators</div>
-                          <div className="analysis-tag-value">
-  {scoreBreakdown?.siteReliability ?? '—'}
-</div>
+  <div className="analysis-tag" data-tip="Site reliability cues (major platforms vs unknown).">
+    <img src={checkComplete} alt="" className="analysis-tag-icon" />
+    <div className="analysis-tag-text">
+      <div className="analysis-tag-title">Site Reliability Indicators</div>
+      <div className="analysis-tag-value">
+        {scoreBreakdown?.siteReliability ?? '—'}
+      </div>
 
-                        </div>
-                      </div>
-                    )}
+      {showJobDescriptionPrompt() && (
+
+        <div className="site-reliability-cta">
+          <div className="site-reliability-cta-text">
+            This site is blocking some of our access. Please paste in the job description for more accuracy.
+          </div>
+
+          <button
+            type="button"
+            className="site-reliability-cta-btn"
+            onClick={scrollToJobDescription}
+          >
+            Job Description
+          </button>
+        </div>
+      )}
+    </div>
+  </div>
+)}
+
                   </div>
                 </div>
               </div>
