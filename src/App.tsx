@@ -82,12 +82,21 @@ const scrollToJobDescription = () => {
 
 function showJobDescriptionPrompt() {
   const isHighReliability = (scoreBreakdown?.siteReliability ?? 0) >= 10;
+
+  const s = (detectedPostingAgeStatusValue ?? '').toLowerCase();
+
+  // Accept more backend variants (this is why you sometimes only see the “pill”)
   const wasBlocked =
-    detectedPostingAgeStatusValue === 'blocked' ||
-    detectedPostingAgeStatusValue === 'js_required';
+    s === 'blocked' ||
+    s === 'js_required' ||
+    s === 'blocked_html' ||
+    s === 'js_required_html' ||
+    s.includes('blocked') ||
+    s.includes('js');
 
   return isHighReliability && wasBlocked && !jobDescription.trim();
 }
+
 
 
 
