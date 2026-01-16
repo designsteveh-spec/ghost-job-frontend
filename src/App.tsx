@@ -81,8 +81,14 @@ const scrollToJobDescription = () => {
   const canAnalyzeNow = hasUrl && hasPostingAge;
 
 function showJobDescriptionPrompt() {
-  return (scoreBreakdown?.siteReliability ?? 0) >= 10 && !jobDescription.trim();
+  const isHighReliability = (scoreBreakdown?.siteReliability ?? 0) >= 10;
+  const wasBlocked =
+    detectedPostingAgeStatusValue === 'blocked' ||
+    detectedPostingAgeStatusValue === 'js_required';
+
+  return isHighReliability && wasBlocked && !jobDescription.trim();
 }
+
 
 
 
@@ -1232,33 +1238,33 @@ setJobDescription('');
                     )}
 
                     {analysisSteps.scoreSiteReliability === 'complete' && (
-  <div className="analysis-tag" data-tip="Site reliability cues (major platforms vs unknown).">
-    <img src={checkComplete} alt="" className="analysis-tag-icon" />
-    <div className="analysis-tag-text">
-      <div className="analysis-tag-title">Site Reliability Indicators</div>
-      <div className="analysis-tag-value">
-        {scoreBreakdown?.siteReliability ?? '—'}
+  <div className="analysis-tag site-reliability-tag" data-tip="Site reliability cues (major platforms vs unknown).">
+    <div className="site-reliability-tag-header">
+      <img src={checkComplete} alt="" className="analysis-tag-icon" />
+      <div className="analysis-tag-text">
+        <div className="analysis-tag-title">Site Reliability Indicators</div>
+        <div className="analysis-tag-value">{scoreBreakdown?.siteReliability ?? '—'}</div>
       </div>
-
-      {showJobDescriptionPrompt() && (
-
-        <div className="site-reliability-cta">
-          <div className="site-reliability-cta-text">
-            This site is blocking some of our access. Please paste in the job description for more accuracy.
-          </div>
-
-          <button
-            type="button"
-            className="site-reliability-cta-btn"
-            onClick={scrollToJobDescription}
-          >
-            Job Description
-          </button>
-        </div>
-      )}
     </div>
+
+    {showJobDescriptionPrompt() && (
+      <div className="site-reliability-tag-body">
+        <div className="site-reliability-cta-text">
+          This site is blocking some of our access. Please paste in the job description for more accuracy.
+        </div>
+
+        <button
+          type="button"
+          className="site-reliability-cta-btn"
+          onClick={scrollToJobDescription}
+        >
+          Job Description
+        </button>
+      </div>
+    )}
   </div>
 )}
+
 
                   </div>
                 </div>

@@ -1803,13 +1803,46 @@ select.postingage-cta-input {
 }
 
 
-.site-reliability-cta {
-  margin-top: 10px;
-  padding: 12px;
-  border-radius: 14px;
-  background: #244bff;
+/* Site Reliability card (match mockup: clean header + separate body) */
+.site-reliability-tag {
+  padding: 0; /* header/body handle spacing */
+  overflow: hidden; /* keeps header corners clean */
+}
+
+.site-reliability-tag-header {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  padding: 12px 12px 10px;
+  background: #2f43ff; /* use your existing brand blue if different */
   color: #fff;
 }
+
+.site-reliability-tag-header .analysis-tag-title,
+.site-reliability-tag-header .analysis-tag-value {
+  color: #fff;
+}
+
+.site-reliability-tag-body {
+  padding: 12px;
+  background: #fff;
+}
+
+.site-reliability-cta-text {
+  font-size: 13px;
+  line-height: 1.35;
+  color: #2f43ff; /* match mockup */
+  margin-bottom: 10px;
+}
+
+.site-reliability-cta-btn {
+  display: block;
+  width: 100%;
+  max-width: 210px;
+  margin: 0 auto;
+  border-radius: 999px;
+}
+
 
 .site-reliability-cta-text {
   font-size: 13px;
