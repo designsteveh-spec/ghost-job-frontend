@@ -688,9 +688,6 @@ timeoutsRef.current.push(t4);
     runId={gaugeRunId}
   />
 </div>
-
-
-
           <div className="hero-content">
             {status === 'idle' ? (
               <>
