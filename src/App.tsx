@@ -747,7 +747,8 @@ timeoutsRef.current.push(t4);
         }}
       >
         <option value="">Select a posting age</option>
-<option value="skip">I don’t know</option>
+<option value="skip">Not listed / I don’t know</option>
+
 
         <option value="today_yesterday">Today / yesterday</option>
         <option value="last_3_days">Within the last 3 days</option>
@@ -1001,7 +1002,8 @@ setJobDescription('');
                         <div className="analysis-tag-text">
                           <div className="analysis-tag-title">Posting Age</div>
                           <div className="analysis-tag-value">
-  {detectedPostingAgeValue ?? (postingDateOverride === 'skip' ? 'I don’t know' : postingDateOverride) ?? '—'}
+  {detectedPostingAgeValue ?? (postingDateOverride === 'skip' ? 'Not listed / I don’t know' : postingDateOverride) ?? '—'}
+
 </div>
                           {/* (removed) posting age source — unused */}
 
