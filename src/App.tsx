@@ -1157,7 +1157,8 @@ setJobDescription('');
                         <div className="analysis-tag-text">
                           <div className="analysis-tag-title">Posting Age</div>
                           <div className="analysis-tag-value">
-  {scoreBreakdown?.postingAge ?? '—'}
+    {scoreBreakdown?.postingAge ?? 0}
+
 </div>
 
                         </div>
@@ -1170,7 +1171,8 @@ setJobDescription('');
                         <div className="analysis-tag-text">
                           <div className="analysis-tag-title">Freshness Indicators</div>
                           <div className="analysis-tag-value">
-  {scoreBreakdown?.freshness1 ?? '—'}
+    {scoreBreakdown?.freshness1 ?? 0}
+
 </div>
                         </div>
                       </div>
@@ -1182,7 +1184,7 @@ setJobDescription('');
                         <div className="analysis-tag-text">
                           <div className="analysis-tag-title">Content Uniqueness</div>
                           <div className="analysis-tag-value">
-  {scoreBreakdown?.contentUniqueness ?? '—'}
+  {scoreBreakdown?.contentUniqueness ?? 0}
 </div>
                         </div>
                       </div>
@@ -1194,7 +1196,7 @@ setJobDescription('');
                         <div className="analysis-tag-text">
                           <div className="analysis-tag-title">Activity Indicators</div>
                           <div className="analysis-tag-value">
-  {scoreBreakdown?.activityIndicators ?? '—'}
+  {scoreBreakdown?.activityIndicators ?? 0}
 </div>
                         </div>
                       </div>
@@ -1206,7 +1208,7 @@ setJobDescription('');
                         <div className="analysis-tag-text">
                           <div className="analysis-tag-title">Freshness Indicators</div>
                           <div className="analysis-tag-value">
-  {scoreBreakdown?.freshness2 ?? '—'}
+  {scoreBreakdown?.freshness2 ?? 0}
 </div>
                         </div>
                       </div>
@@ -1218,7 +1220,7 @@ setJobDescription('');
                         <div className="analysis-tag-text">
                           <div className="analysis-tag-title">Site Reliability Indicators</div>
                           <div className="analysis-tag-value">
-  {scoreBreakdown?.siteReliability ?? '—'}
+  {scoreBreakdown?.siteReliability ?? 0}
 </div>
 
                         </div>
