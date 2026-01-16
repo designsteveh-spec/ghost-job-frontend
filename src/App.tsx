@@ -73,20 +73,17 @@ const scrollToJobDescription = () => {
   // - Posting Age is required
   // - Description is optional
   const hasPostingAge =
-  !!postingDateOverride.trim() && postingDateOverride !== 'skip';
+  !!postingDateOverride.trim();
+
 
 
 
   const canAnalyzeNow = hasUrl && hasPostingAge;
 
 function showJobDescriptionPrompt() {
-  return (
-    (scoreBreakdown?.siteReliability ?? 0) >= 10 &&
-    (detectedPostingAgeStatusValue === 'blocked' ||
-      detectedPostingAgeStatusValue === 'js_required') &&
-    !jobDescription.trim()
-  );
+  return (scoreBreakdown?.siteReliability ?? 0) >= 10 && !jobDescription.trim();
 }
+
 
 
 
