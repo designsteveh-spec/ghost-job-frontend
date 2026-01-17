@@ -1852,6 +1852,21 @@ select.postingage-cta-input {
   background: #ffffff;
 }
 
+/* Contact Title dropdown chevron spacing (match Posting Age select) */
+.contact-field select {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+
+  padding-right: 40px; /* room for chevron */
+
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none'%3E%3Cpath d='M6 9l6 6 6-6' stroke='%230f172a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-size: 16px 16px;
+  background-position: right 16px center;
+}
+
+
 .contact-field textarea {
   min-height: 140px;
   resize: vertical;
@@ -1883,6 +1898,13 @@ select.postingage-cta-input {
 
 .contact-submit:hover {
   background: #1e40af;
+}
+
+.contact-submit:disabled,
+.contact-submit[aria-disabled='true'] {
+  opacity: 0.45;
+  cursor: not-allowed;
+  pointer-events: none;
 }
 
 .contact-submit:disabled,
