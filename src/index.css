@@ -1758,7 +1758,7 @@ select.postingage-cta-input {
 
 .newsletter {
   background: #ffffff;
-  padding: 20px 24px 96px;
+  padding: 20px 24px 48px;
 }
 
 .newsletter-inner {
@@ -1809,7 +1809,7 @@ select.postingage-cta-input {
 
 .contact-section {
   background: #f8fafc;
-  padding: 96px 16px;
+  padding: 64px 16px 96px;
 }
 
 .contact-inner {

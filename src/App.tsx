@@ -1280,17 +1280,15 @@ setJobDescription('');
         </div>
       </section>
 
-      {/* PRICING */}
-<Pricing />
-
-{/* CONTACT */}
-<ContactSection />
-
-
-
+            {/* PRICING */}
+      <Pricing />
 
       {/* NEWSLETTER */}
       <MailerLiteForm />
+
+      {/* CONTACT */}
+      <ContactSection />
+
 
       {/* LEGAL SECTIONS */}
       <section id="legal" className="legal">
