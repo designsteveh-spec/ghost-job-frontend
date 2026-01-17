@@ -8,8 +8,16 @@ export default function ContactSection() {
   const [title, setTitle] = useState('');
   const [message, setMessage] = useState('');
 
+    const canSubmit =
+    email.trim().length > 0 &&
+    name.trim().length > 0 &&
+    title.trim().length > 0 &&
+    message.trim().length > 0;
+
+
   const onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!canSubmit) return;
 
     const subject = `[Ghost Job Checker] ${title}`;
     const body = [
@@ -85,9 +93,15 @@ export default function ContactSection() {
           </div>
 
           <div className="contact-actions">
-            <button type="submit" className="contact-submit">
-              Send Mail
-            </button>
+            <button
+  type="submit"
+  className="contact-submit"
+  disabled={!canSubmit}
+  aria-disabled={!canSubmit}
+>
+  Send Mail
+</button>
+
           </div>
         </form>
       </div>

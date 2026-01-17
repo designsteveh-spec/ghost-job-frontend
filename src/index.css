@@ -1884,3 +1884,10 @@ select.postingage-cta-input {
 .contact-submit:hover {
   background: #1e40af;
 }
+
+.contact-submit:disabled,
+.contact-submit[aria-disabled='true'] {
+  opacity: 0.45;
+  cursor: not-allowed;
+  pointer-events: none;
+}
