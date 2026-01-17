@@ -29,6 +29,8 @@ import twitterIcon from './assets/socialTwitter.svg';
 import tiktokIcon from './assets/socialTikTok.svg';
 
 export default function App() {
+  const API_BASE =
+    import.meta.env.VITE_API_BASE || 'https://ghost-job-api.onrender.com';
 
   const [url, setUrl] = useState('');
 
@@ -513,7 +515,7 @@ scheduleStep('detectedGoogleSnippet', 1900);
       const REQUEST_TIMEOUT_MS = 25000;
       const timeoutId = window.setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
 
-      const res = await fetch(`${API_BASE}/api/analyze`, {
+      const res = await fetch(`${import.meta.env.VITE_API_BASE || 'https://ghost-job-api.onrender.com'}/api/analyze`, {
         method: 'POST',
         signal: controller.signal,
         headers: { 'Content-Type': 'application/json' },
