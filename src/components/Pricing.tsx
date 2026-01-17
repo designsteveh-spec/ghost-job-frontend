@@ -20,11 +20,14 @@ export default function Pricing() {
 
       const data = await r.json().catch(() => null);
 
-      if (!r.ok || !data?.url) return;
+      if (!r.ok || !data?.url) {
+        alert(data?.error || 'Checkout could not be started. Please try again.');
+        return;
+      }
 
       window.location.href = data.url;
     } catch {
-      // no-op (keep UI calm)
+      alert('Checkout could not be started. Please try again.');
     }
   }
 
@@ -67,7 +70,16 @@ export default function Pricing() {
 
               <div className="pricing-price free">$0</div>
 
-              <button className="pricing-btn secondary">Run Free Check</button>
+              <button
+                className="pricing-btn secondary"
+                onClick={() => {
+                  const el = document.getElementById('hero');
+                  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                  else window.location.hash = '#hero';
+                }}
+              >
+                Run Free Check
+              </button>
             </div>
           </div>
 

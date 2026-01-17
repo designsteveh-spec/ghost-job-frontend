@@ -74,6 +74,27 @@ const [lastAnalyzedUrl, setLastAnalyzedUrl] = useState('');
 
   const canAnalyzeNow = hasUrl && hasPostingAge;
 
+  const startCheckout = async (plan: 'casual' | 'active') => {
+    try {
+      const r = await fetch(`${API_BASE}/api/stripe/create-checkout-session`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ plan }),
+      });
+
+      const data = await r.json().catch(() => null);
+
+      if (!r.ok || !data?.url) {
+        alert(data?.error || 'Checkout could not be started. Please try again.');
+        return;
+      }
+
+      window.location.href = data.url;
+    } catch {
+      alert('Checkout could not be started. Please try again.');
+    }
+  };
+
 
 
 
@@ -1279,7 +1300,10 @@ setJobDescription('');
       </section>
 
       {/* PRICING */}
-      <Pricing />
+      <Pricing
+  onCheckoutCasual={() => startCheckout('casual')}
+  onCheckoutActive={() => startCheckout('active')}
+/>
 
       {/* NEWSLETTER */}
       <MailerLiteForm />
