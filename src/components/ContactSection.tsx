@@ -1,6 +1,7 @@
 import { useState } from 'react';
 
-const TO_EMAIL = 'designsteveh@gmail.com';
+const API_BASE =
+  (import.meta as any).env?.VITE_API_BASE || 'https://ghost-job-api.onrender.com';
 
 export default function ContactSection() {
   const [email, setEmail] = useState('');
@@ -8,31 +9,54 @@ export default function ContactSection() {
   const [title, setTitle] = useState('');
   const [message, setMessage] = useState('');
 
-    const canSubmit =
+  const canSend =
     email.trim().length > 0 &&
     name.trim().length > 0 &&
     title.trim().length > 0 &&
     message.trim().length > 0;
 
+  const [sendState, setSendState] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle');
+  const [sendError, setSendError] = useState<string>('');
 
-  const onSubmit = (e: React.FormEvent) => {
+  const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!canSubmit) return;
 
-    const subject = `[Ghost Job Checker] ${title}`;
-    const body = [
-      `From: ${name} <${email}>`,
-      `Title: ${title}`,
-      '',
-      message,
-    ].join('\n');
+    setSendState('sending');
+    setSendError('');
 
-    const mailto = `mailto:${encodeURIComponent(TO_EMAIL)}?subject=${encodeURIComponent(
-      subject
-    )}&body=${encodeURIComponent(body)}`;
+    try {
+      const r = await fetch(`${API_BASE}/api/contact`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email,
+          name,
+          title,
+          message,
+        }),
+      });
 
-    window.location.href = mailto;
+      const data = await r.json().catch(() => null);
+
+      if (!r.ok || !data?.ok) {
+        setSendState('error');
+        setSendError(data?.error || 'Message could not be sent. Please try again.');
+        return;
+      }
+
+      setSendState('sent');
+
+      // Clear fields after send
+      setEmail('');
+      setName('');
+      setTitle('');
+      setMessage('');
+    } catch {
+      setSendState('error');
+      setSendError('Network error. Please try again.');
+    }
   };
+
 
   return (
     <section id="contact" className="contact-section">
@@ -93,16 +117,24 @@ export default function ContactSection() {
           </div>
 
           <div className="contact-actions">
-            <button
-  type="submit"
-  className="contact-submit"
-  disabled={!canSubmit}
-  aria-disabled={!canSubmit}
->
-  Send Mail
-</button>
+  <button
+    type="submit"
+    className="contact-submit"
+    disabled={!canSend || sendState === 'sending'}
+    aria-disabled={!canSend || sendState === 'sending'}
+  >
+    {sendState === 'sending' ? 'Sending…' : sendState === 'sent' ? 'Mail Sent' : 'Send Mail'}
+  </button>
+</div>
 
-          </div>
+{sendState === 'sent' && (
+  <div className="contact-status contact-status-success">Message sent.</div>
+)}
+
+{sendState === 'error' && (
+  <div className="contact-status contact-status-error">{sendError || 'Message could not be sent.'}</div>
+)}
+
         </form>
       </div>
     </section>

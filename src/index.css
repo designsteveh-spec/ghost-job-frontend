@@ -1745,9 +1745,17 @@ select.postingage-cta-input {
 
 /* Success state */
 .newsletter .ml-form-successBody h4 {
-  font-size: 24px;
-  margin-bottom: 6px;
+  text-align: center;
+  font-size: 32px;
+  font-weight: 700;
+  margin: 0 0 16px;
 }
+
+.newsletter .ml-form-embedWrapper,
+.newsletter .ml-form-embedContainer {
+  margin: 0 !important;
+}
+
 
 .newsletter .ml-form-successBody p {
   font-size: 14px;
@@ -1758,7 +1766,7 @@ select.postingage-cta-input {
 
 .newsletter {
   background: #ffffff;
-  padding: 20px 24px 48px;
+  padding: 64px 24px 64px;
 }
 
 .newsletter-inner {
@@ -1913,3 +1921,18 @@ select.postingage-cta-input {
   cursor: not-allowed;
   pointer-events: none;
 }
+
+.contact-status {
+  margin-top: 14px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.contact-status-success {
+  color: #0f766e;
+}
+
+.contact-status-error {
+  color: #b91c1c;
+}
+
