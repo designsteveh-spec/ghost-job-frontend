@@ -626,7 +626,7 @@ button {
 /* ---------------- PRICING ---------------- */
 
 .pricing {
-  padding: 96px 0 88px;
+  padding: 96px 0 32px; /* tighten bottom so newsletter sits closer */
 }
 
 .pricing-inner {
@@ -1765,9 +1765,12 @@ select.postingage-cta-input {
 /* ---------------- NEWSLETTER ---------------- */
 
 .newsletter {
-  background: #ffffff;
-  padding: 64px 24px 64px;
+  background: #fff7ed !important; /* TEMP: obvious tint */
+  padding: 64px 24px 64px !important;
+  border-top: 2px solid #fb923c !important; /* TEMP */
+  border-bottom: 2px solid #fb923c !important; /* TEMP */
 }
+
 
 .newsletter-inner {
   max-width: 420px; /* ← KEY: controls form width */
@@ -1779,6 +1782,17 @@ select.postingage-cta-input {
   background: #ffffff !important;
   border-radius: 16px !important;
   box-shadow: none !important;
+}
+
+/* Newsletter heading: match Contact title */
+.newsletter h1,
+.newsletter h2,
+.newsletter h3,
+.newsletter h4 {
+  text-align: center !important;
+  font-size: 32px !important;
+  font-weight: 700 !important;
+  margin: 0 0 16px !important;
 }
 
 
