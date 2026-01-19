@@ -264,39 +264,6 @@ const [gaugeRunId, setGaugeRunId] = useState<number>(0);
 
 
   useEffect(() => {
-  // If user returns from Stripe, mint/store the pass token (no accounts)
-  const params = new URLSearchParams(window.location.search);
-  const paid = params.get('paid');
-  const sessionId = params.get('session_id');
-
-  if (paid === '1' && sessionId) {
-    (async () => {
-      try {
-        const r = await fetch(`${API_BASE}/api/entitlement/exchange`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ session_id: sessionId }),
-        });
-
-        const data = await r.json().catch(() => null);
-
-        if (r.ok && data?.token) {
-          localStorage.setItem('gjc_pass_token', data.token);
-        }
-      } catch {
-        // ignore (user can still use free tier)
-      } finally {
-        // Clean URL so refresh doesn’t re-exchange
-        const next = new URL(window.location.href);
-        next.searchParams.delete('paid');
-        next.searchParams.delete('session_id');
-        window.history.replaceState({}, '', next.toString());
-      }
-    })();
-  }
-}, [API_BASE]);
-
-useEffect(() => {
     const hash = window.location.hash.replace('#', '');
     if (hash === 'terms' || hash === 'refund' || hash === 'privacy') {
   setOpenLegal(hash);
@@ -549,15 +516,10 @@ scheduleStep('detectedGoogleSnippet', 1900);
       const REQUEST_TIMEOUT_MS = 25000;
       const timeoutId = window.setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
 
-      const passToken = localStorage.getItem('gjc_pass_token') || '';
-
-const res = await fetch(`${API_BASE}/api/analyze`, {
+      const res = await fetch(`${API_BASE}/api/analyze`, {
         method: 'POST',
         signal: controller.signal,
-        headers: {
-          'Content-Type': 'application/json',
-          ...(passToken ? { Authorization: `Bearer ${passToken}` } : {}),
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
   mode: descValue ? 'deep' : 'basic',
   url: urlValue,
