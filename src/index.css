@@ -1766,18 +1766,16 @@ select.postingage-cta-input {
 
 .newsletter {
   background: #ffffff;
-  padding: 0 24px;              /* keep horizontal gutters */
-  display: flex;
-  flex-direction: column;
-}
 
-/* Split available vertical space evenly above + below the form */
-.newsletter::before,
-.newsletter::after {
-  content: '';
-  display: block;
-  flex: 1;
-  min-height: 96px;             /* tune this number if you want tighter/looser */
+  /* Big change: give the section real height so “equal whitespace” is possible */
+  min-height: 70vh; /* try 60vh–85vh; 70vh is a strong default */
+
+  /* Keep consistent side gutters + minimum top/bottom breathing room */
+  padding: 96px 24px;
+
+  /* Center the form vertically within the section */
+  display: grid;
+  place-items: center;
 }
 
 
