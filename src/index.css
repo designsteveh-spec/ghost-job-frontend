@@ -1766,7 +1766,7 @@ select.postingage-cta-input {
 
 .newsletter {
   background: #ffffff;
-  padding: 144px 24px 144px; /* +80 top & bottom from 64px */
+  padding: 120px 24px; /* equal top/bottom */
 }
 
 
