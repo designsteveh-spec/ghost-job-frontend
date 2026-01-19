@@ -47,7 +47,7 @@ const [lastAnalyzedUrl, setLastAnalyzedUrl] = useState('');
 
 
 
-  const [openLegal, setOpenLegal] = useState<null | 'terms' | 'privacy'>(null);
+  const [openLegal, setOpenLegal] = useState<null | 'terms' | 'refund' | 'privacy'>(null);
 
   type AnalysisStatus = 'idle' | 'running' | 'complete';
   type SignalStatus = 'pending' | 'complete';
@@ -265,9 +265,10 @@ const [gaugeRunId, setGaugeRunId] = useState<number>(0);
 
   useEffect(() => {
     const hash = window.location.hash.replace('#', '');
-    if (hash === 'terms' || hash === 'privacy') {
-      setOpenLegal(hash);
-    }
+    if (hash === 'terms' || hash === 'refund' || hash === 'privacy') {
+  setOpenLegal(hash);
+}
+
   }, []);
 
 
@@ -283,7 +284,7 @@ const [gaugeRunId, setGaugeRunId] = useState<number>(0);
   // (Removed) Early scroll during "running" caused flash; handled by post-complete auto-scroll above.
 
 
-  const toggleLegal = (section: 'terms' | 'privacy') => {
+  const toggleLegal = (section: 'terms' | 'refund' | 'privacy') => {
     setOpenLegal((prev) => (prev === section ? null : section));
   };
 
@@ -1323,6 +1324,50 @@ setJobDescription('');
           )}
         </div>
 
+
+        {/* REFUND */}
+        <div id="refund" className="legal-section">
+          <button
+            className="legal-header"
+            aria-expanded={openLegal === 'refund'}
+            onClick={() => toggleLegal('refund')}
+          >
+            <span className="legal-toggle">
+              {openLegal === 'refund' ? '−' : '+'}
+            </span>
+            <h3>Refund Policy</h3>
+          </button>
+
+          {openLegal === 'refund' && (
+            <div className="legal-content">
+              <p>
+                We want you to feel confident trying Ghost Job Checker.
+              </p>
+
+              <p>
+                If you believe you were charged in error or experienced a technical issue that prevented normal use of the service,
+                you may request a refund within 24 hours of purchase.
+              </p>
+
+              <p>
+                Refund requests are reviewed on a case-by-case basis and are generally limited to accidental duplicate purchases,
+                technical issues that prevented access or usage, or billing errors.
+              </p>
+
+              <p>
+                Refunds are not guaranteed and are not provided for normal usage dissatisfaction, results that did not meet expectations,
+                or usage after the 24-hour window.
+              </p>
+
+              <p>
+                To request a refund, contact support@trusted-tools.com and include the email used at checkout, the date of purchase,
+                and a brief description of the issue.
+              </p>
+            </div>
+          )}
+        </div>
+
+
         {/* PRIVACY */}
         <div id="privacy" className="legal-section">
           <button
@@ -1392,6 +1437,9 @@ setJobDescription('');
             <span>We aim to meet WCAG 2.1 AA guidelines.</span>
             <a href="#terms" onClick={() => setOpenLegal('terms')}>
               Terms of Service
+            </a>
+            <a href="#refund" onClick={() => setOpenLegal('refund')}>
+              Refund Policy
             </a>
             <a href="#privacy" onClick={() => setOpenLegal('privacy')}>
               Privacy Policy
