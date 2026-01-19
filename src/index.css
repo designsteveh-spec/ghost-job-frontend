@@ -816,7 +816,7 @@ button {
 /* ---------------- COMPARE PLANS TABLE ---------------- */
 
 .compare-plans {
-  margin-top: 44px;
+  margin-top: 124px; /* +80px spacing above Compare Plans */
   padding: 54px 0;
   background: #f8fafc; /* grey separator band like mock */
   border-top: 1px solid #e5e7eb;
