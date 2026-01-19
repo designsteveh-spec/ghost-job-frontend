@@ -28,20 +28,34 @@ import facebookIcon from './assets/socialFacebook.svg';
 import twitterIcon from './assets/socialTwitter.svg';
 import tiktokIcon from './assets/socialTikTok.svg';
 
+
+
 export default function App() {
   const API_BASE =
     import.meta.env.VITE_API_BASE || 'https://ghost-job-api.onrender.com';
 
+  const path = window.location.pathname || '/';
+  const isCasualRoute = path === '/casual';
+  const isActiveRoute = path === '/active';
+  const isPaidRoute = isCasualRoute || isActiveRoute;
+
+  const [accessCode, setAccessCode] = useState('');
+
   const [url, setUrl] = useState('');
+
 
   const [jobDescription, setJobDescription] = useState('');
 
+
+
+  
 // Posting Age selection (required)
 const [postingDateOverride, setPostingDateOverride] = useState('');
 const [lastAnalyzedUrl, setLastAnalyzedUrl] = useState('');
 
 
   const [formError, setFormError] = useState<string | null>(null);
+  const [entitlement, setEntitlement] = useState<{ plan: string; exp: number } | null>(null);
 
 
 
@@ -72,7 +86,7 @@ const [lastAnalyzedUrl, setLastAnalyzedUrl] = useState('');
     !!postingDateOverride.trim();
 
 
-  const canAnalyzeNow = hasUrl && hasPostingAge;
+  const canAnalyzeNow = hasUrl && hasPostingAge && (!isPaidRoute || !!accessCode.trim());
 
 
 
@@ -264,11 +278,72 @@ const [gaugeRunId, setGaugeRunId] = useState<number>(0);
 
 
   useEffect(() => {
+  // Stripe success flow:
+  // If we have ?paid=1&session_id=..., mint an access code and redirect to /casual?code=... or /active?code=...
+  const params = new URLSearchParams(window.location.search);
+  const paid = (params.get('paid') || '').trim();
+  const sessionId = (params.get('session_id') || '').trim();
+
+  if (paid === '1' && sessionId) {
+    (async () => {
+      try {
+        const r = await fetch(`${API_BASE}/api/access/mint?session_id=${encodeURIComponent(sessionId)}`);
+        const data = await r.json().catch(() => null);
+
+        if (!r.ok || !data?.code || !data?.plan) {
+          setFormError(data?.error || 'Could not activate your pass. Please contact support@trusted-tools.com.');
+          return;
+        }
+
+        // Persist code
+        setAccessCode(String(data.code));
+        localStorage.setItem('gj_access_code', String(data.code));
+        setEntitlement({ plan: String(data.plan), exp: Number(data.exp || 0) });
+
+        // Redirect to plan route with code in URL, and remove session_id from the address bar
+        const planPath = String(data.plan).toLowerCase() === 'active' ? '/active' : '/casual';
+        window.location.replace(`${planPath}?code=${encodeURIComponent(String(data.code))}`);
+      } catch {
+        setFormError('Could not activate your pass due to a network error. Please retry or contact support@trusted-tools.com.');
+      }
+    })();
+
+    // Important: stop here so the rest of the effect doesn't run during mint/redirect
+    return;
+  }
+
+  // Paid pass: capture code from URL (?code=...) and persist it
+  const codeFromUrl = (params.get('code') || '').trim();
+  const stored = (localStorage.getItem('gj_access_code') || '').trim();
+  const next = codeFromUrl || stored;
+
+  if (next) {
+    setAccessCode(next);
+    localStorage.setItem('gj_access_code', next);
+  }
+
+  // Legal hash auto-expand
+  const hash = window.location.hash.replace('#', '');
+  if (hash === 'terms' || hash === 'refund' || hash === 'privacy') {
+    setOpenLegal(hash);
+  }
+}, []);
+    // Paid pass: capture code from URL (?code=...) and persist it
+    const params = new URLSearchParams(window.location.search);
+    const codeFromUrl = (params.get('code') || '').trim();
+    const stored = (localStorage.getItem('gj_access_code') || '').trim();
+    const next = codeFromUrl || stored;
+
+    if (next) {
+      setAccessCode(next);
+      localStorage.setItem('gj_access_code', next);
+    }
+
+    // Legal hash auto-expand
     const hash = window.location.hash.replace('#', '');
     if (hash === 'terms' || hash === 'refund' || hash === 'privacy') {
-  setOpenLegal(hash);
-}
-
+      setOpenLegal(hash);
+    }
   }, []);
 
 
@@ -524,7 +599,10 @@ scheduleStep('detectedGoogleSnippet', 1900);
   mode: descValue ? 'deep' : 'basic',
   url: urlValue,
   jobDescription: descValue,
-  ...(postingDateValue ? { postingDate: postingDateValue } : {}),
+  ...(postingAgeRangeKey
+    ? { postingDate: postingAgeRangeKey === 'skip' ? 'skip' : postingDateValue }
+    : {}),
+  ...(accessCode.trim() ? { accessCode: accessCode.trim() } : {}),
 }),
 
       });
@@ -767,6 +845,30 @@ timeoutsRef.current.push(t4);
       <div className="postingdate-inline-hint">
         If the listing shows “Posted” or “Opening Date,” pick the closest range.
       </div>
+
+      {isPaidRoute && (
+        <div style={{ marginTop: 12 }}>
+          <div className="field-label">Access Code (Required)</div>
+
+          <div className="input-group">
+            <input
+              type="text"
+              placeholder="Paste your access code"
+              value={accessCode}
+              onChange={(e) => {
+                const next = e.target.value;
+                setAccessCode(next);
+                localStorage.setItem('gj_access_code', next);
+                if (formError) setFormError(null);
+              }}
+            />
+          </div>
+
+          <p className="microcopy muted" style={{ marginTop: 6 }}>
+            This pass expires automatically after 30 days.
+          </p>
+        </div>
+      )}
 
       <div className="deep-block" style={{ marginTop: 14 }}>
         <div className="deep-label-row">
@@ -1281,7 +1383,7 @@ setJobDescription('');
       </section>
 
             {/* PRICING */}
-      <Pricing />
+      {!isPaidRoute && <Pricing />}
 
       {/* NEWSLETTER */}
       <MailerLiteForm />
