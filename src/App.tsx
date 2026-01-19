@@ -4,7 +4,6 @@ import { useState, useEffect, useRef } from 'react';
 import './index.css';
 import Pricing from './components/Pricing';
 import MailerLiteForm from './components/MailerLiteForm';
-import ContactSection from './components/ContactSection';
 
 
 import Navbar from './components/Navbar';
@@ -1286,8 +1285,6 @@ setJobDescription('');
       {/* NEWSLETTER */}
       <MailerLiteForm />
 
-      {/* CONTACT */}
-      <ContactSection />
 
 
       {/* LEGAL SECTIONS */}
