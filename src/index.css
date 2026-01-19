@@ -1766,14 +1766,7 @@ select.postingage-cta-input {
 
 .newsletter {
   background: #ffffff;
-
-  /* Keep horizontal gutter, but control vertical spacing via centering */
-  padding: 0 24px;
-
-  /* Creates reliable equal top/bottom whitespace */
-  min-height: 520px;
-  display: flex;
-  align-items: center;
+  padding: 96px 24px; /* ✅ equal top & bottom */
 }
 
 
