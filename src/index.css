@@ -1765,10 +1765,8 @@ select.postingage-cta-input {
 /* ---------------- NEWSLETTER ---------------- */
 
 .newsletter {
-  background: #fff7ed !important; /* TEMP: obvious tint */
-  padding: 64px 24px 64px !important;
-  border-top: 2px solid #fb923c !important; /* TEMP */
-  border-bottom: 2px solid #fb923c !important; /* TEMP */
+  background: #ffffff;
+  padding: 144px 24px 144px; /* +80 top & bottom from 64px */
 }
 
 
