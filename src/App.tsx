@@ -55,7 +55,7 @@ const [lastAnalyzedUrl, setLastAnalyzedUrl] = useState('');
 
 
   const [formError, setFormError] = useState<string | null>(null);
-  const [entitlement, setEntitlement] = useState<{ plan: string; exp: number } | null>(null);
+  const [_entitlement, setEntitlement] = useState<{ plan: string; exp: number } | null>(null);
 
 
 
@@ -329,15 +329,6 @@ const [gaugeRunId, setGaugeRunId] = useState<number>(0);
   }
 }, []);
 
-    const params = new URLSearchParams(window.location.search);
-    const codeFromUrl = (params.get('code') || '').trim();
-    const stored = (localStorage.getItem('gj_access_code') || '').trim();
-    const next = codeFromUrl || stored;
-
-    if (next) {
-      setAccessCode(next);
-      localStorage.setItem('gj_access_code', next);
-    }
 
 
 
