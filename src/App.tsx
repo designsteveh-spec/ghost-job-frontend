@@ -1360,9 +1360,17 @@ setJobDescription('');
               </p>
 
               <p>
-                To request a refund, contact support@trusted-tools.com and include the email used at checkout, the date of purchase,
-                and a brief description of the issue.
-              </p>
+  To request a refund, contact{' '}
+  <a
+    href="mailto:support@trusted-tools.com"
+    style={{ color: '#2563eb', textDecoration: 'underline' }}
+  >
+    support@trusted-tools.com
+  </a>{' '}
+  and include the email used at checkout, the date of purchase,
+  and a brief description of the issue.
+</p>
+
             </div>
           )}
         </div>
