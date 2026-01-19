@@ -328,7 +328,7 @@ const [gaugeRunId, setGaugeRunId] = useState<number>(0);
     setOpenLegal(hash);
   }
 }, []);
-    // Paid pass: capture code from URL (?code=...) and persist it
+
     const params = new URLSearchParams(window.location.search);
     const codeFromUrl = (params.get('code') || '').trim();
     const stored = (localStorage.getItem('gj_access_code') || '').trim();
@@ -339,12 +339,6 @@ const [gaugeRunId, setGaugeRunId] = useState<number>(0);
       localStorage.setItem('gj_access_code', next);
     }
 
-    // Legal hash auto-expand
-    const hash = window.location.hash.replace('#', '');
-    if (hash === 'terms' || hash === 'refund' || hash === 'privacy') {
-      setOpenLegal(hash);
-    }
-  }, []);
 
 
   // Auto-scroll to Analysis summary AFTER results are complete (prevents early jump/flash)
