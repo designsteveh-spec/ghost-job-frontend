@@ -626,7 +626,7 @@ button {
 /* ---------------- PRICING ---------------- */
 
 .pricing {
-  padding: 96px 0 176px; /* +80px bottom (96 -> 176) */
+  padding: 96px 0 88px;
 }
 
 .pricing-inner {
@@ -816,7 +816,7 @@ button {
 /* ---------------- COMPARE PLANS TABLE ---------------- */
 
 .compare-plans {
-  margin-top: 124px; /* +80px spacing above Compare Plans */
+  margin-top: 44px;
   padding: 54px 0;
   background: #f8fafc; /* grey separator band like mock */
   border-top: 1px solid #e5e7eb;
@@ -1745,17 +1745,9 @@ select.postingage-cta-input {
 
 /* Success state */
 .newsletter .ml-form-successBody h4 {
-  text-align: center;
-  font-size: 32px;
-  font-weight: 700;
-  margin: 0 0 16px;
+  font-size: 24px;
+  margin-bottom: 6px;
 }
-
-.newsletter .ml-form-embedWrapper,
-.newsletter .ml-form-embedContainer {
-  margin: 0 !important;
-}
-
 
 .newsletter .ml-form-successBody p {
   font-size: 14px;
@@ -1766,50 +1758,19 @@ select.postingage-cta-input {
 
 .newsletter {
   background: #ffffff;
-
-  /* Make it a real “panel” section */
-  min-height: 100vh;
-
-  /* Side gutters only (no vertical padding bias) */
-  padding: 0 24px;
-
-  /* Force equal whitespace above and below the content */
-  display: grid;
-  grid-template-rows: 1fr auto 1fr;
-  align-items: stretch;
+  padding: 20px 24px 48px;
 }
-
-
 
 .newsletter-inner {
   max-width: 420px; /* ← KEY: controls form width */
   margin: 0 auto;
-  width: 100%;
-  grid-row: 2;
 }
-
-/* Put the content into the middle row */
-.newsletter-inner {
-  grid-row: 2;
-}
-
 
 /* Optional: soften MailerLite box to match site */
 .newsletter .ml-form-embedWrapper {
   background: #ffffff !important;
   border-radius: 16px !important;
   box-shadow: none !important;
-}
-
-/* Newsletter heading: match Contact title */
-.newsletter h1,
-.newsletter h2,
-.newsletter h3,
-.newsletter h4 {
-  text-align: center !important;
-  font-size: 32px !important;
-  font-weight: 700 !important;
-  margin: 0 0 16px !important;
 }
 
 
@@ -1966,4 +1927,3 @@ select.postingage-cta-input {
 .contact-status-error {
   color: #b91c1c;
 }
-
