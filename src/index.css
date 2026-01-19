@@ -626,7 +626,7 @@ button {
 /* ---------------- PRICING ---------------- */
 
 .pricing {
-  padding: 96px 0 96px; /* +80px bottom (32 -> 112) */
+  padding: 96px 0 176px; /* +80px bottom (96 -> 176) */
 }
 
 .pricing-inner {
