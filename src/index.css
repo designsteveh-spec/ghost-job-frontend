@@ -1766,13 +1766,22 @@ select.postingage-cta-input {
 
 .newsletter {
   background: #ffffff;
-  padding: 120px 24px; /* equal top/bottom */
+
+  /* Keep horizontal gutter, but control vertical spacing via centering */
+  padding: 0 24px;
+
+  /* Creates reliable equal top/bottom whitespace */
+  min-height: 520px;
+  display: flex;
+  align-items: center;
 }
+
 
 
 .newsletter-inner {
   max-width: 420px; /* ← KEY: controls form width */
   margin: 0 auto;
+  width: 100%;
 }
 
 /* Optional: soften MailerLite box to match site */
