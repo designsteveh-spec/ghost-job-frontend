@@ -626,7 +626,7 @@ button {
 /* ---------------- PRICING ---------------- */
 
 .pricing {
-  padding: 96px 0 32px; /* tighten bottom so newsletter sits closer */
+  padding: 96px 0 96px; /* +80px bottom (32 -> 112) */
 }
 
 .pricing-inner {
