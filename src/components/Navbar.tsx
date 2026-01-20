@@ -132,7 +132,6 @@ export default function Navbar({
 
           {menuOpen && (
             <div id="nav-menu-panel" className="nav-menu-panel" role="menu">
-              <div className="nav-menu-section-label">Pricing</div>
               <a
                 role="menuitem"
                 href="#pricing"
@@ -142,7 +141,6 @@ export default function Navbar({
                 Pricing
               </a>
 
-              <div className="nav-menu-section-label">Newsletter</div>
               <a
                 role="menuitem"
                 href="#newsletter"
