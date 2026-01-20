@@ -1161,6 +1161,21 @@ button {
   z-index: 50;
 }
 
+/* Mobile menu: section divider + label (match mock) */
+.nav-menu-divider {
+  height: 1px;
+  background: #e5e7eb;
+  margin: 10px 6px;
+  border-radius: 999px;
+}
+
+.nav-menu-section-label {
+  padding: 6px 12px 10px;
+  font-size: 14px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
 .nav-menu-item {
   display: block;
   padding: 12px 12px;
