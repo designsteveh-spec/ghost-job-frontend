@@ -1196,7 +1196,7 @@ button {
 
 .nav-menu-item {
   display: block;
-  padding: 12px 12px;
+  padding: 10px 12px; /* slightly tighter */
   border-radius: 12px;
   text-decoration: none;
   color: #0f172a;
