@@ -75,28 +75,23 @@ body {
 
 /* ✅ MATCH YOUR OTHER INPUTS (NOT CTA PILLS) */
 .nav-access-input input {
-  height: 44px;
   width: 230px;
 
-  border-radius: 10px;       /* match url + textarea */
-  border: 1px solid #cbd5e1; /* match url + textarea */
+  padding: 14px 44px 14px 16px; /* match URL input + room for icon */
+  border-radius: 10px;
+  border: 1px solid #cbd5e1;
+  font-size: 15px;
+
   background: #ffffff;
   color: #0f172a;
-
-  padding: 14px 44px 14px 16px; /* leave room for enter icon */
-  font-size: 15px;
-  font-weight: 500;
   outline: none;
 }
 
 .nav-access-input input::placeholder {
-  color: #64748b; /* match other placeholders */
-  font-weight: 500;
+  color: #64748b;
 }
 
 .nav-access-input input:focus {
-  border-color: #4040FF; /* same blue you use elsewhere */
-  box-shadow: 0 0 0 4px rgba(64, 64, 255, 0.12);
 }
 
 /* Enter icon button inside input */
