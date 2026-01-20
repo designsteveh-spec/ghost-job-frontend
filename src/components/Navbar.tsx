@@ -2,9 +2,18 @@ import { useEffect, useRef, useState } from 'react';
 import logoLeft from '../assets/ghostchecker-logoLeft.svg';
 import logoRight from '../assets/ghostchecker-logoRight.svg';
 import burgerIcon from '../assets/burger-menu.svg';
+import enterIcon from '../assets/input-enterIcon.svg';
 
 
-export default function Navbar() {
+export default function Navbar({
+  accessCode,
+  onAccessCodeChange,
+  onAccessCodeSubmit,
+}: {
+  accessCode: string;
+  onAccessCodeChange: (next: string) => void;
+  onAccessCodeSubmit: (code: string) => void;
+}) {
   const [menuOpen, setMenuOpen] = useState(false);
   const menuWrapRef = useRef<HTMLDivElement | null>(null);
 
@@ -68,6 +77,28 @@ export default function Navbar() {
             <span className="cta-desktop">Get More Link Checks</span>
             <span className="cta-mobile">Upgrade</span>
           </a>
+
+          {/* Access Code input (always available) */}
+          <form
+            className="nav-access"
+            onSubmit={(e) => {
+              e.preventDefault();
+              onAccessCodeSubmit(accessCode);
+            }}
+          >
+            <div className="nav-access-input">
+              <input
+                type="text"
+                value={accessCode}
+                onChange={(e) => onAccessCodeChange(e.target.value)}
+                placeholder="Insert Access Code"
+                aria-label="Access code"
+              />
+              <button type="submit" className="nav-access-enter" aria-label="Submit access code">
+                <img src={enterIcon} alt="" aria-hidden="true" />
+              </button>
+            </div>
+          </form>
         </div>
 
         {/* Mobile hamburger */}
@@ -102,6 +133,33 @@ export default function Navbar() {
               >
                 Newsletter
               </a>
+
+              {/* Access Code (last item in mobile menu) */}
+              <div className="nav-menu-access" role="none">
+                <div className="nav-menu-access-label">Access Code</div>
+
+                <form
+                  className="nav-menu-access-form"
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    setMenuOpen(false);
+                    onAccessCodeSubmit(accessCode);
+                  }}
+                >
+                  <div className="nav-access-input nav-access-input--menu">
+                    <input
+                      type="text"
+                      value={accessCode}
+                      onChange={(e) => onAccessCodeChange(e.target.value)}
+                      placeholder="Insert Access Code"
+                      aria-label="Access code"
+                    />
+                    <button type="submit" className="nav-access-enter" aria-label="Submit access code">
+                      <img src={enterIcon} alt="" aria-hidden="true" />
+                    </button>
+                  </div>
+                </form>
+              </div>
             </div>
           )}
         </div>

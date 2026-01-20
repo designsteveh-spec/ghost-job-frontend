@@ -30,6 +30,30 @@ import tiktokIcon from './assets/socialTikTok.svg';
 
 
 
+function safeDecodePlanFromAccessCode(code: string): { plan: 'casual' | 'active'; exp?: number } | null {
+  try {
+    const parts = (code || '').trim().split('.');
+    if (parts.length < 2) return null;
+
+    // JWT payload is the 2nd segment
+    const payload = parts[1]
+      .replace(/-/g, '+')
+      .replace(/_/g, '/')
+      .padEnd(Math.ceil(parts[1].length / 4) * 4, '=');
+
+    const json = JSON.parse(atob(payload));
+
+    const rawPlan = String(json?.plan || json?.tier || '').toLowerCase();
+    const plan: 'casual' | 'active' = rawPlan === 'active' ? 'active' : 'casual';
+
+    const exp = Number(json?.exp || 0) || undefined;
+
+    return { plan, exp };
+  } catch {
+    return null;
+  }
+}
+
 export default function App() {
   const API_BASE =
     import.meta.env.VITE_API_BASE || 'https://ghost-job-api.onrender.com';
@@ -734,7 +758,28 @@ timeoutsRef.current.push(t4);
 
   return (
     <>
-      <Navbar />
+      <Navbar
+  accessCode={accessCode}
+  onAccessCodeChange={(next: string) => {
+    setAccessCode(next);
+    localStorage.setItem('gj_access_code', next);
+  }}
+  onAccessCodeSubmit={(raw: string) => {
+    const code = (raw || '').trim();
+    if (!code) return;
+
+    // Persist
+    setAccessCode(code);
+    localStorage.setItem('gj_access_code', code);
+
+    // Route based on the code contents (no API call needed)
+    const decoded = safeDecodePlanFromAccessCode(code);
+    const planPath = decoded?.plan === 'active' ? '/active' : '/casual';
+
+    // Move them to the correct paid page immediately
+    window.location.assign(`${planPath}?code=${encodeURIComponent(code)}`);
+  }}
+/>
 
       {/* HERO */}
       <section id="hero" className="hero">
@@ -831,29 +876,6 @@ timeoutsRef.current.push(t4);
         If the listing shows “Posted” or “Opening Date,” pick the closest range.
       </div>
 
-      {isPaidRoute && (
-        <div style={{ marginTop: 12 }}>
-          <div className="field-label">Access Code (Required)</div>
-
-          <div className="input-group">
-            <input
-              type="text"
-              placeholder="Paste your access code"
-              value={accessCode}
-              onChange={(e) => {
-                const next = e.target.value;
-                setAccessCode(next);
-                localStorage.setItem('gj_access_code', next);
-                if (formError) setFormError(null);
-              }}
-            />
-          </div>
-
-          <p className="microcopy muted" style={{ marginTop: 6 }}>
-            This pass expires automatically after 30 days.
-          </p>
-        </div>
-      )}
 
       <div className="deep-block" style={{ marginTop: 14 }}>
         <div className="deep-label-row">
