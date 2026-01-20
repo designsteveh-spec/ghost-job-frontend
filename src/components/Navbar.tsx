@@ -132,6 +132,7 @@ export default function Navbar({
 
           {menuOpen && (
             <div id="nav-menu-panel" className="nav-menu-panel" role="menu">
+              <div className="nav-menu-section-label">Pricing</div>
               <a
                 role="menuitem"
                 href="#pricing"
@@ -140,6 +141,8 @@ export default function Navbar({
               >
                 Pricing
               </a>
+
+              <div className="nav-menu-section-label">Newsletter</div>
               <a
                 role="menuitem"
                 href="#newsletter"
@@ -149,40 +152,39 @@ export default function Navbar({
                 Newsletter
               </a>
 
-              {/* Access Code (last item in mobile menu) */}
-              <div className="nav-menu-access" role="none">
-                <div className="nav-menu-access-label">Access Code</div>
+              <div className="nav-menu-divider" />
 
-                <form
-                  className="nav-menu-access-form"
-                  onSubmit={(e) => {
-                    e.preventDefault();
-                    submitAccessCode();
-                  }}
-                >
-                  <div className="accesscode-wrap accesscode-wrap-menu">
-                    <input
-                      className="accesscode-input"
-                      type="text"
-                      value={accessCode}
-                      onChange={(e) => onAccessCodeChange(e.target.value)}
-                      onKeyDown={onAccessKeyDown}
-                      placeholder="Insert Access Code"
-                      aria-label="Access code"
-                    />
-                    <button
-                      type="button"
-                      className="accesscode-submit"
-                      onClick={() => {
-                        submitAccessCode();
-                      }}
-                      aria-label="Submit access code"
-                    >
-                      <img src={enterIcon} alt="" aria-hidden="true" />
-                    </button>
-                  </div>
-                </form>
-              </div>
+              <div className="nav-menu-section-label">Access Code</div>
+
+              <form
+                className="nav-menu-access-form"
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  submitAccessCode();
+                }}
+              >
+                <div className="accesscode-wrap accesscode-wrap-menu">
+                  <input
+                    className="accesscode-input"
+                    type="text"
+                    value={accessCode}
+                    onChange={(e) => onAccessCodeChange(e.target.value)}
+                    onKeyDown={onAccessKeyDown}
+                    placeholder="Insert Access Code"
+                    aria-label="Access code"
+                  />
+                  <button
+                    type="button"
+                    className="accesscode-submit"
+                    onClick={() => {
+                      submitAccessCode();
+                    }}
+                    aria-label="Submit access code"
+                  >
+                    <img src={enterIcon} alt="" aria-hidden="true" />
+                  </button>
+                </div>
+              </form>
             </div>
           )}
         </div>
