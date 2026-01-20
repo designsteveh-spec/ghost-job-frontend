@@ -58,7 +58,7 @@ body {
   align-items: center;
 }
 
-/* ---------------- NAVBAR ACCESS CODE (v1.0.access) ---------------- */
+/* ---------------- NAVBAR ACCESS CODE (v1.0.access.ui) ---------------- */
 
 .nav-access {
   display: flex;
@@ -66,46 +66,58 @@ body {
   flex: 0 0 auto;
 }
 
+/* Shared wrapper: matches your normal input look */
 .nav-access-input {
   position: relative;
   display: flex;
   align-items: center;
 }
 
+/* ✅ MATCH YOUR OTHER INPUTS (NOT CTA PILLS) */
 .nav-access-input input {
   height: 44px;
-  border-radius: 999px;       /* match CTA pill style */
-  border: 2px solid #1e40ff;  /* match CTA outline */
-  padding: 10px 44px 10px 14px;
-  font-size: 14px;
-  font-weight: 600;
-  outline: none;
+  width: 230px;
+
+  border-radius: 10px;       /* match url + textarea */
+  border: 1px solid #cbd5e1; /* match url + textarea */
   background: #ffffff;
   color: #0f172a;
-  width: 230px;
+
+  padding: 14px 44px 14px 16px; /* leave room for enter icon */
+  font-size: 15px;
+  font-weight: 500;
+  outline: none;
 }
 
 .nav-access-input input::placeholder {
-  color: #64748b;
-  font-weight: 600;
+  color: #64748b; /* match other placeholders */
+  font-weight: 500;
 }
 
 .nav-access-input input:focus {
-  box-shadow: 0 0 0 4px rgba(30, 64, 255, 0.12);
+  border-color: #4040FF; /* same blue you use elsewhere */
+  box-shadow: 0 0 0 4px rgba(64, 64, 255, 0.12);
 }
 
+/* Enter icon button inside input */
 .nav-access-enter {
   position: absolute;
   right: 12px;
-  width: 30px;
-  height: 30px;
+  top: 50%;
+  transform: translateY(-50%);
+
+  width: 28px;
+  height: 28px;
   padding: 0;
-  border-radius: 999px;
+
   border: none;
   background: transparent;
+  border-radius: 10px;
+
   display: inline-flex;
   align-items: center;
   justify-content: center;
+
   cursor: pointer;
 }
 
@@ -113,6 +125,12 @@ body {
   width: 18px;
   height: 18px;
   display: block;
+  opacity: 0.9;
+}
+
+/* Slight hover affordance without looking like a button */
+.nav-access-enter:hover {
+  background: rgba(15, 23, 42, 0.04);
 }
 
 /* Make buttons collapse first: keep input visible longer */
@@ -149,13 +167,11 @@ body {
   padding: 6px 6px 10px;
 }
 
+/* Menu version should be full width */
 .nav-access-input--menu input {
   width: 100%;
-  border-radius: 12px;         /* menu style */
-  border: 1px solid #cbd5e1;   /* match your other inputs */
-  padding: 12px 44px 12px 12px;
-  font-weight: 600;
 }
+
 
 
 .cta {

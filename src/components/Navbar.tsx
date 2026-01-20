@@ -17,6 +17,20 @@ export default function Navbar({
   const [menuOpen, setMenuOpen] = useState(false);
   const menuWrapRef = useRef<HTMLDivElement | null>(null);
 
+  const submitAccessCode = () => {
+    const code = (accessCode || '').trim();
+    if (!code) return;
+    onAccessCodeSubmit(code);
+    setMenuOpen(false);
+  };
+
+  const onAccessKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      submitAccessCode();
+    }
+  };
+
     useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') setMenuOpen(false);
@@ -79,26 +93,27 @@ export default function Navbar({
           </a>
 
           {/* Access Code input (always available) */}
-          <form
-            className="nav-access"
-            onSubmit={(e) => {
-              e.preventDefault();
-              onAccessCodeSubmit(accessCode);
-            }}
-          >
-            <div className="nav-access-input">
+          <div className="nav-access">
+            <div className="accesscode-wrap">
               <input
+                className="accesscode-input"
                 type="text"
                 value={accessCode}
                 onChange={(e) => onAccessCodeChange(e.target.value)}
+                onKeyDown={onAccessKeyDown}
                 placeholder="Insert Access Code"
                 aria-label="Access code"
               />
-              <button type="submit" className="nav-access-enter" aria-label="Submit access code">
+              <button
+                type="button"
+                className="accesscode-submit"
+                onClick={submitAccessCode}
+                aria-label="Submit access code"
+              >
                 <img src={enterIcon} alt="" aria-hidden="true" />
               </button>
             </div>
-          </form>
+          </div>
         </div>
 
         {/* Mobile hamburger */}
@@ -142,19 +157,27 @@ export default function Navbar({
                   className="nav-menu-access-form"
                   onSubmit={(e) => {
                     e.preventDefault();
-                    setMenuOpen(false);
-                    onAccessCodeSubmit(accessCode);
+                    submitAccessCode();
                   }}
                 >
-                  <div className="nav-access-input nav-access-input--menu">
+                  <div className="accesscode-wrap accesscode-wrap-menu">
                     <input
+                      className="accesscode-input"
                       type="text"
                       value={accessCode}
                       onChange={(e) => onAccessCodeChange(e.target.value)}
+                      onKeyDown={onAccessKeyDown}
                       placeholder="Insert Access Code"
                       aria-label="Access code"
                     />
-                    <button type="submit" className="nav-access-enter" aria-label="Submit access code">
+                    <button
+                      type="button"
+                      className="accesscode-submit"
+                      onClick={() => {
+                        submitAccessCode();
+                      }}
+                      aria-label="Submit access code"
+                    >
                       <img src={enterIcon} alt="" aria-hidden="true" />
                     </button>
                   </div>
