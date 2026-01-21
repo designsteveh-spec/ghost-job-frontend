@@ -64,6 +64,8 @@ export default function App() {
   const isPaidRoute = isCasualRoute || isActiveRoute;
 
   const [accessCode, setAccessCode] = useState('');
+  const [showPassUnlocked, setShowPassUnlocked] = useState(false);
+  const [unlockedPlanLabel, setUnlockedPlanLabel] = useState<'Casual' | 'Active'>('Casual');
 
   const [url, setUrl] = useState('');
 
@@ -147,6 +149,7 @@ const [scoreBreakdown, setScoreBreakdown] = useState<{
   const [detectedGoogleSnippetValue, setDetectedGoogleSnippetValue] = useState<string | null>(null);
   const [detectedGoogleTopLinkValue, setDetectedGoogleTopLinkValue] = useState<string | null>(null);
 
+const [lastUpdatedAt, setLastUpdatedAt] = useState<string | null>(null);
 
 
 
@@ -276,6 +279,14 @@ const [gaugeRunId, setGaugeRunId] = useState<number>(0);
     }
   };
 
+  useEffect(() => {
+  return () => {
+    clearAllTimeouts();
+    stopGaugeFlutter();
+  };
+}, []);
+
+
   const startGaugeFlutter = () => {
     stopGaugeFlutter();
 
@@ -326,7 +337,7 @@ const [gaugeRunId, setGaugeRunId] = useState<number>(0);
 
         // Redirect to plan route with code in URL, and remove session_id from the address bar
         const planPath = String(data.plan).toLowerCase() === 'active' ? '/active' : '/casual';
-        window.location.replace(`${planPath}?code=${encodeURIComponent(String(data.code))}`);
+        window.location.replace(`${planPath}?code=${encodeURIComponent(String(data.code))}&welcome=1`);
       } catch {
         setFormError('Could not activate your pass due to a network error. Please retry or contact support@trusted-tools.com.');
       }
@@ -346,12 +357,45 @@ const [gaugeRunId, setGaugeRunId] = useState<number>(0);
     localStorage.setItem('gj_access_code', next);
   }
 
+  // ✅ Stripe return clarity: show "Pass Unlocked" modal once, then clean URL
+  const welcome = (params.get('welcome') || '').trim();
+  if (welcome === '1') {
+    const decoded = safeDecodePlanFromAccessCode(next);
+    const planLabel: 'Casual' | 'Active' = decoded?.plan === 'active' ? 'Active' : 'Casual';
+    setUnlockedPlanLabel(planLabel);
+    setShowPassUnlocked(true);
+
+    // Remove welcome=1 (keep code=... if present)
+    const cleaned = new URL(window.location.href);
+    cleaned.searchParams.delete('welcome');
+    window.history.replaceState({}, '', cleaned.pathname + cleaned.search + cleaned.hash);
+  }
+
   // Legal hash auto-expand
   const hash = window.location.hash.replace('#', '');
   if (hash === 'terms' || hash === 'refund' || hash === 'privacy') {
     setOpenLegal(hash);
   }
-}, []);
+  }, []);
+
+  useEffect(() => {
+    if (!showPassUnlocked) return;
+
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setShowPassUnlocked(false);
+    };
+
+    window.addEventListener('keydown', onKeyDown);
+
+    return () => {
+      document.body.style.overflow = prevOverflow;
+      window.removeEventListener('keydown', onKeyDown);
+    };
+  }, [showPassUnlocked]);
+
 
 
 
@@ -398,6 +442,8 @@ setDetectedGoogleIndexedValue(null);
 setDetectedGoogleTopResultValue(null);
 setDetectedGoogleSnippetValue(null);
 setDetectedGoogleTopLinkValue(null);
+setLastUpdatedAt(null);
+
 setPostingDateOverride('');
 setLastAnalyzedUrl('');
 
@@ -447,6 +493,26 @@ setGaugeRunId((n) => n + 1);
 
 
   // Posting Age dropdown: convert selected range → midpoint ISO date (YYYY-MM-DD)
+
+const postingAgeLabel = (rangeKey: string): string => {
+  const labels: Record<string, string> = {
+    '': '—',
+    skip: 'Not listed / I don’t know',
+    today_yesterday: 'Today / yesterday',
+    last_3_days: 'Within the last 3 days',
+    within_week: '4–7 days ago (within a week)',
+    weeks_1_2: '1–2 weeks ago',
+    weeks_2_4: '2–4 weeks ago',
+    months_1_2: '1–2 months ago',
+    months_2_3: '2–3 months ago',
+    months_3_6: '3–6 months ago',
+    months_6_12: '6–12 months ago',
+    over_1_year: 'Over 1 year ago',
+  };
+  return labels[rangeKey] ?? rangeKey;
+};
+
+
     const postingAgeRangeToIsoDate = (rangeKey: string): string => {
     if (!rangeKey || rangeKey === 'skip') return '';
 
@@ -646,6 +712,8 @@ scheduleStep('detectedGoogleSnippet', 1900);
 
             const data = await res.json();
 setScoreBreakdown(data?.breakdown ?? null);
+setLastUpdatedAt(new Date().toLocaleString());
+
 
 
       // Fill "What we detected" values:
@@ -759,6 +827,7 @@ timeoutsRef.current.push(t4);
   return (
     <>
       <Navbar
+  isPaidRoute={isPaidRoute}
   accessCode={accessCode}
   onAccessCodeChange={(next: string) => {
     setAccessCode(next);
@@ -780,6 +849,46 @@ timeoutsRef.current.push(t4);
     window.location.assign(`${planPath}?code=${encodeURIComponent(code)}`);
   }}
 />
+
+
+      {showPassUnlocked && (
+        <div
+          className="pass-unlocked-overlay"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Pass unlocked"
+          onMouseDown={(e) => {
+            if (e.target === e.currentTarget) setShowPassUnlocked(false);
+          }}
+        >
+          <div className="pass-unlocked-modal">
+            <div className="pass-unlocked-title">
+              <span className="pass-unlocked-plan">{unlockedPlanLabel} Pass</span>{' '}
+              <span className="pass-unlocked-word">Unlocked</span>
+            </div>
+
+            <div className="pass-unlocked-subtitle">Thank you for your purchase.</div>
+
+            <div className="pass-unlocked-body">
+              Ghost Job Link is now active for you to use for 30 days.
+            </div>
+
+            <div className="pass-unlocked-note">
+              <strong>NOTE:</strong> Please save the unique access code we just emailed you.
+              If you ever switch devices, paste it into the Access Code field in the top-right
+              corner to unlock your pass again.
+            </div>
+
+            <button
+              className="pass-unlocked-btn"
+              onClick={() => setShowPassUnlocked(false)}
+            >
+              Start Checking Jobs
+            </button>
+          </div>
+        </div>
+      )}
+
 
       {/* HERO */}
       <section id="hero" className="hero">
@@ -822,7 +931,7 @@ timeoutsRef.current.push(t4);
       <div className="input-group">
         <input
           type="url"
-          placeholder="Paste job link (or use description below)"
+          placeholder="Paste job link"
           value={url}
           onChange={(e) => {
             const next = e.target.value;
@@ -1113,7 +1222,7 @@ setJobDescription('');
                         <div className="analysis-tag-text">
                           <div className="analysis-tag-title">Posting Age</div>
                           <div className="analysis-tag-value">
-  {detectedPostingAgeValue ?? (postingDateOverride === 'skip' ? 'Not listed / I don’t know' : postingDateOverride) ?? '—'}
+  {detectedPostingAgeValue ?? postingAgeLabel(postingDateOverride)}
 
 </div>
                           {/* (removed) posting age source — unused */}
@@ -1210,7 +1319,7 @@ setJobDescription('');
                         <img src={checkComplete} alt="" className="analysis-tag-icon" />
                         <div className="analysis-tag-text">
                           <div className="analysis-tag-title">Last updated</div>
-                          <div className="analysis-tag-value">{new Date().toLocaleString()}</div>
+                          <div className="analysis-tag-value">{lastUpdatedAt ?? '—'}</div>
                         </div>
                       </div>
                     )}

@@ -6,10 +6,12 @@ import enterIcon from '../assets/input-enterIcon.svg';
 
 
 export default function Navbar({
+  isPaidRoute,
   accessCode,
   onAccessCodeChange,
   onAccessCodeSubmit,
 }: {
+  isPaidRoute: boolean;
   accessCode: string;
   onAccessCodeChange: (next: string) => void;
   onAccessCodeSubmit: (code: string) => void;
@@ -49,11 +51,11 @@ export default function Navbar({
     };
 
     document.addEventListener('keydown', onKeyDown);
-    document.addEventListener('click', onDocClick);
+    document.addEventListener('mousedown', onDocClick);
 
     return () => {
       document.removeEventListener('keydown', onKeyDown);
-      document.removeEventListener('click', onDocClick);
+      document.removeEventListener('mousedown', onDocClick);
     };
   }, [menuOpen]);
 
@@ -63,7 +65,7 @@ export default function Navbar({
       <div className="nav-inner">
         {/* Brand / Logo */}
         <a
-          href="#pricing"
+          href={isPaidRoute ? '#hero' : '#pricing'}
           className="brand"
           onClick={() => setMenuOpen(false)}
         >
@@ -87,7 +89,7 @@ export default function Navbar({
             <span className="cta-mobile">Subscribe</span>
           </a>
 
-          <a href="#pricing" className="cta cta-primary">
+          <a href={isPaidRoute ? '#hero' : '#pricing'} className="cta cta-primary">
             <span className="cta-desktop">Get More Link Checks</span>
             <span className="cta-mobile">Upgrade</span>
           </a>
@@ -131,9 +133,8 @@ export default function Navbar({
 
 
           {menuOpen && (
-            <div id="nav-menu-panel" className="nav-menu-panel" role="menu">
+            <div id="nav-menu-panel" className="nav-menu-panel">
               <a
-                role="menuitem"
                 href="#pricing"
                 className="nav-menu-item"
                 onClick={() => setMenuOpen(false)}
