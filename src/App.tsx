@@ -112,7 +112,14 @@ const [lastAnalyzedUrl, setLastAnalyzedUrl] = useState('');
     !!postingDateOverride.trim();
 
 
-  const canAnalyzeNow = hasUrl && hasPostingAge && (!isPaidRoute || !!accessCode.trim());
+  const decodedAccess = safeDecodePlanFromAccessCode(accessCode.trim());
+const isAccessExpired =
+  !!decodedAccess?.exp && decodedAccess.exp * 1000 <= Date.now();
+
+const canAnalyzeNow =
+  hasUrl &&
+  hasPostingAge &&
+  (!isPaidRoute || (!!accessCode.trim() && !isAccessExpired));
 
 
 
@@ -548,6 +555,16 @@ const postingAgeLabel = (rangeKey: string): string => {
     setFormError(null);
 
     const urlValue = (override?.url ?? url).trim();
+
+    if (isPaidRoute) {
+  const decoded = safeDecodePlanFromAccessCode(accessCode.trim());
+  if (decoded?.exp && decoded.exp * 1000 <= Date.now()) {
+    setFormError('This pass has expired. Please purchase a new pass or paste a valid access code.');
+    setStatus('idle');
+    return;
+  }
+}
+
 
 const descValue = (override?.jobDescription ?? jobDescription).trim();
 
