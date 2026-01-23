@@ -56,7 +56,8 @@ function safeDecodePlanFromAccessCode(code: string): { plan: 'casual' | 'active'
 
 export default function App() {
   const API_BASE =
-    import.meta.env.VITE_API_BASE || 'https://ghost-job-api.onrender.com';
+  import.meta.env.VITE_API_BASE_URL || 'https://ghost-job-api.onrender.com';
+
 
   const path = window.location.pathname || '/';
   const isCasualRoute = path === '/casual';
