@@ -134,8 +134,6 @@ const canAnalyzeNow =
 
     const [score, setScore] = useState<number | null>(null);
 
-// UI-only rotating placeholder while running
-const [scorePlaceholder, setScorePlaceholder] = useState<string>('—');
 
 // Score Breakdown (from backend)
 const [scoreBreakdown, setScoreBreakdown] = useState<{
@@ -161,6 +159,22 @@ const [scoreBreakdown, setScoreBreakdown] = useState<{
   const [detectedGoogleTopLinkValue, setDetectedGoogleTopLinkValue] = useState<string | null>(null);
 
 const [lastUpdatedAt, setLastUpdatedAt] = useState<string | null>(null);
+
+// Processing strings that rotate where the dash/— appears
+const processingSteps = [
+  'Loading page…',
+  'Checking reachability…',
+  'Detecting posting age…',
+  'Parsing content blocks…',
+  'Extracting employer/source…',
+  'Extracting canonical job ID…',
+  'Scanning freshness patterns…',
+  'Checking recycled language…',
+  'Scanning activity indicators…',
+  'Finalizing probability score…',
+];
+
+const [processingIdx, setProcessingIdx] = useState(0);
 
 
 
@@ -297,23 +311,18 @@ const [gaugeRunId, setGaugeRunId] = useState<number>(0);
   };
 }, []);
 
-// Rotate placeholder ONLY while running
+// Rotate processing strings while running (no dots, no animation)
 useEffect(() => {
-  if (status !== 'running') {
-    setScorePlaceholder('—');
-    return;
-  }
+  if (status !== 'running') return;
 
-  const frames = ['—', '•', '••', '•••'];
-  let i = 0;
-
+  setProcessingIdx(0);
   const id = window.setInterval(() => {
-    i = (i + 1) % frames.length;
-    setScorePlaceholder(frames[i]);
-  }, 320);
+    setProcessingIdx((i) => (i + 1) % processingSteps.length);
+  }, 1300);
 
   return () => window.clearInterval(id);
 }, [status]);
+
 
 
   const startGaugeFlutter = () => {
@@ -1076,10 +1085,14 @@ timeoutsRef.current.push(t4);
                 <p>
   Probability Score:{' '}
   {score === null ? (
-  status === 'running' ? <span className="score-loading">{scorePlaceholder}</span> : '—'
-) : (
-  <strong>{score}%</strong>
-)}
+    status === 'running' ? (
+      <strong>{processingSteps[processingIdx]}</strong>
+    ) : (
+      '—'
+    )
+  ) : (
+    <strong>{score}%</strong>
+  )}
 </p>
 
 
@@ -1180,7 +1193,15 @@ setJobDescription('');
     <div className="analysis-results-meta">
       <span>
   Probability Score:{' '}
-  {score === null ? (status === 'running' ? scorePlaceholder : '—') : <strong>{score}%</strong>}
+  {score === null ? (
+    status === 'running' ? (
+      <strong>{processingSteps[processingIdx]}</strong>
+    ) : (
+      '—'
+    )
+  ) : (
+    <strong>{score}%</strong>
+  )}
 </span>
 
 
