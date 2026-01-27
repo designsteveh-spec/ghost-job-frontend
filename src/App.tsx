@@ -160,6 +160,7 @@ const [scoreBreakdown, setScoreBreakdown] = useState<{
 
 const [lastUpdatedAt, setLastUpdatedAt] = useState<string | null>(null);
 const [confidenceLabel, setConfidenceLabel] = useState<'High' | 'Medium' | 'Low'>('Medium');
+const [confidenceLocation, setConfidenceLocation] = useState<string>('—');
 
 // Processing strings that rotate where the dash/— appears
 const processingSteps = [
@@ -590,6 +591,13 @@ const postingAgeLabel = (rangeKey: string): string => {
     setFormError(null);
 
     const urlValue = (override?.url ?? url).trim();
+
+try {
+  const u = new URL(urlValue);
+  setConfidenceLocation(u.hostname || '—');
+} catch {
+  setConfidenceLocation('—');
+}
 
     if (isPaidRoute) {
   const decoded = safeDecodePlanFromAccessCode(accessCode.trim());
@@ -1434,18 +1442,29 @@ setJobDescription('');
 
                   {/* 3) CONFIDENCE */}
                   <div className="analysis-card">
-                    <div className="analysis-card-title">CONFIDENCE</div>
+  <div className="analysis-card-title">CONFIDENCE</div>
 
-                    {analysisSteps.confidenceDataQuality === 'complete' && (
-                      <div className="analysis-tag analysis-tag-highlight" data-tip="Confidence reflects input quality and page accessibility.">
-                        <img src={checkComplete} alt="" className="analysis-tag-icon" />
-                        <div className="analysis-tag-text">
-                          <div className="analysis-tag-title">Data Quality</div>
-                          <div className="analysis-tag-value">{confidenceLabel}</div>
-                        </div>
-                      </div>
-                    )}
-                  </div>
+  {analysisSteps.confidenceDataQuality === 'complete' && (
+    <>
+      <div className="analysis-tag analysis-tag-highlight" data-tip="Confidence reflects input quality and page accessibility.">
+        <img src={checkComplete} alt="" className="analysis-tag-icon" />
+        <div className="analysis-tag-text">
+          <div className="analysis-tag-title">Data Quality</div>
+          <div className="analysis-tag-value">{confidenceLabel}</div>
+        </div>
+      </div>
+
+      <div className="analysis-tag" data-tip="Where the job link was checked.">
+        <img src={checkComplete} alt="" className="analysis-tag-icon" />
+        <div className="analysis-tag-text">
+          <div className="analysis-tag-title">Location</div>
+          <div className="analysis-tag-value">{confidenceLocation}</div>
+        </div>
+      </div>
+    </>
+  )}
+</div>
+
 
                   {/* 4) SCORE SUMMARY */}
                   <div className="analysis-card">
@@ -1479,7 +1498,7 @@ setJobDescription('');
                     )}
 
                     {analysisSteps.scoreContentUniqueness === 'complete' && (
-                      <div className="analysiss-tag" data-tip="Content uniqueness (non-recycled language cues).">
+                      <div className="analysis-tag" data-tip="Content uniqueness (non-recycled language cues).">
                         <img src={checkComplete} alt="" className="analysis-tag-icon" />
                         <div className="analysis-tag-text">
                           <div className="analysis-tag-title">Content Uniqueness</div>
