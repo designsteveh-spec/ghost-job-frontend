@@ -311,9 +311,12 @@ const [gaugeRunId, setGaugeRunId] = useState<number>(0);
   };
 }, []);
 
-// Rotate processing strings while running (no dots, no animation)
+// Rotate processing strings ONLY while running
 useEffect(() => {
-  if (status !== 'running') return;
+  if (status !== 'running') {
+    setProcessingIdx(0);
+    return;
+  }
 
   setProcessingIdx(0);
   const id = window.setInterval(() => {
@@ -321,7 +324,7 @@ useEffect(() => {
   }, 1300);
 
   return () => window.clearInterval(id);
-}, [status]);
+}, [status, processingSteps.length]);
 
 
 
