@@ -159,6 +159,7 @@ const [scoreBreakdown, setScoreBreakdown] = useState<{
   const [detectedGoogleTopLinkValue, setDetectedGoogleTopLinkValue] = useState<string | null>(null);
 
 const [lastUpdatedAt, setLastUpdatedAt] = useState<string | null>(null);
+const [confidenceLabel, setConfidenceLabel] = useState<'High' | 'Medium' | 'Low'>('Medium');
 
 // Processing strings that rotate where the dash/— appears
 const processingSteps = [
@@ -603,6 +604,13 @@ const postingAgeLabel = (rangeKey: string): string => {
 const descValue = (override?.jobDescription ?? jobDescription).trim();
 
 const postingAgeRangeKey = (override?.postingDate ?? postingDateOverride ?? '').trim();
+
+const quality =
+  !urlValue ? 'Low'
+  : (postingAgeRangeKey && postingAgeRangeKey !== 'skip') ? (descValue ? 'High' : 'Medium')
+  : (descValue ? 'Medium' : 'Low');
+
+setConfidenceLabel(quality);
 
 // Convert the selected range into a concrete ISO date (YYYY-MM-DD) midpoint.
 // If an ISO date is ever passed in directly, allow it.
@@ -1194,22 +1202,25 @@ setJobDescription('');
     </div>
 
     <div className="analysis-results-meta">
-      <span>
-  Probability Score:{' '}
-  {score === null ? (
-    status === 'running' ? (
-      <strong>{processingSteps[processingIdx]}</strong>
+  <span>
+    Probability Score:{' '}
+    {score === null ? (
+      status === 'running' ? (
+        <strong>{processingSteps[processingIdx]}</strong>
+      ) : (
+        '—'
+      )
     ) : (
-      '—'
-    )
-  ) : (
-    <strong>{score}%</strong>
-  )}
-</span>
+      <strong>{score}%</strong>
+    )}
+  </span>
 
+  <span className="analysis-results-sep">|</span>
 
-      
-    </div>
+  <span>
+    Confidence: <strong>{confidenceLabel}</strong>
+  </span>
+</div>
   </div>
 </div>
 
@@ -1430,7 +1441,7 @@ setJobDescription('');
                         <img src={checkComplete} alt="" className="analysis-tag-icon" />
                         <div className="analysis-tag-text">
                           <div className="analysis-tag-title">Data Quality</div>
-                          <div className="analysis-tag-value">Medium</div>
+                          <div className="analysis-tag-value">{confidenceLabel}</div>
                         </div>
                       </div>
                     )}
@@ -1468,7 +1479,7 @@ setJobDescription('');
                     )}
 
                     {analysisSteps.scoreContentUniqueness === 'complete' && (
-                      <div className="analysis-tag" data-tip="Content uniqueness (non-recycled language cues).">
+                      <div className="analysiss-tag" data-tip="Content uniqueness (non-recycled language cues).">
                         <img src={checkComplete} alt="" className="analysis-tag-icon" />
                         <div className="analysis-tag-text">
                           <div className="analysis-tag-title">Content Uniqueness</div>
