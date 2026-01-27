@@ -320,8 +320,21 @@ body {
   background-color: #ffd84d;
 }
 
+/* ---------------- LOAD PULSE ---------------- */
 
+/* Subtle loading pulse for score placeholder */
+.score-loading {
+  display: inline-block;
+  min-width: 18px; /* prevents jitter as the dots change */
+  text-align: center;
+  animation: scorePulse 900ms ease-in-out infinite;
+}
 
+@keyframes scorePulse {
+  0%   { opacity: 0.35; transform: translateY(0); }
+  50%  { opacity: 0.95; transform: translateY(-1px); }
+  100% { opacity: 0.35; transform: translateY(0); }
+}
 
 
 /* ---------------- HERO ---------------- */

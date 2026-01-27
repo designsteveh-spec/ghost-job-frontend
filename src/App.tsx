@@ -134,6 +134,9 @@ const canAnalyzeNow =
 
     const [score, setScore] = useState<number | null>(null);
 
+// UI-only rotating placeholder while running
+const [scorePlaceholder, setScorePlaceholder] = useState<string>('—');
+
 // Score Breakdown (from backend)
 const [scoreBreakdown, setScoreBreakdown] = useState<{
   postingAge?: number;
@@ -293,6 +296,24 @@ const [gaugeRunId, setGaugeRunId] = useState<number>(0);
     stopGaugeFlutter();
   };
 }, []);
+
+// Rotate placeholder ONLY while running
+useEffect(() => {
+  if (status !== 'running') {
+    setScorePlaceholder('—');
+    return;
+  }
+
+  const frames = ['—', '•', '••', '•••'];
+  let i = 0;
+
+  const id = window.setInterval(() => {
+    i = (i + 1) % frames.length;
+    setScorePlaceholder(frames[i]);
+  }, 320);
+
+  return () => window.clearInterval(id);
+}, [status]);
 
 
   const startGaugeFlutter = () => {
@@ -1053,9 +1074,14 @@ timeoutsRef.current.push(t4);
 
 
                 <p>
-                  Probability Score:{' '}
-                  {score === null ? '—' : <strong>{score}%</strong>}
-                </p>
+  Probability Score:{' '}
+  {score === null ? (
+  status === 'running' ? <span className="score-loading">{scorePlaceholder}</span> : '—'
+) : (
+  <strong>{score}%</strong>
+)}
+</p>
+
 
                 <p>
                   Checking posting freshness, content patterns, and activity
@@ -1153,9 +1179,10 @@ setJobDescription('');
 
     <div className="analysis-results-meta">
       <span>
-        Probability Score:{' '}
-        {score === null ? '—' : <strong>{score}%</strong>}
-      </span>
+  Probability Score:{' '}
+  {score === null ? (status === 'running' ? scorePlaceholder : '—') : <strong>{score}%</strong>}
+</span>
+
 
       
     </div>
