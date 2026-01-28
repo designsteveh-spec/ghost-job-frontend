@@ -221,19 +221,6 @@ body {
   font-weight: 700;
 }
 
-/* ---------------- SCAM / SAFETY STATES ---------------- */
-
-.result-scam-caution {
-  color: #b45309; /* amber */
-  font-weight: 800;
-}
-
-.result-scam-avoid {
-  color: #b91c1c; /* red */
-  font-weight: 900;
-}
-
-
 .result-very-active {
   color: #0f766e;
 }
@@ -1577,8 +1564,6 @@ button {
   font-weight: 500;
   color: #475569;
   line-height: 1.2;
-  word-break: break-word;
-  overflow-wrap: anywhere;
 }
 
 /* Posting Age blocked CTA (RIGHT mock) */
@@ -1739,24 +1724,13 @@ select.postingage-cta-input {
   background: #FFCD2E;
 }
 
-.analysis-tag-warn {
-  background: #fff7ed;
-  border-color: #f59e0b;
-}
-
-.analysis-tag-danger {
-  background: #fef2f2;
-  border-color: #dc2626;
-}
-
-
 /* simple CSS tooltip */
 .analysis-tag[data-tip]::after {
   content: attr(data-tip);
   position: absolute;
   left: 10px;
   top: calc(100% + 10px);
-  max-width: 320px;
+  max-width: 260px;
   padding: 10px 10px;
   border-radius: 12px;
   border: 1px solid #e5e7eb;

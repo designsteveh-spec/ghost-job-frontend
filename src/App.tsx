@@ -980,7 +980,7 @@ timeoutsRef.current.push(t4);
           <div className="hero-content">
             {status === 'idle' ? (
               <>
-                <span className="eyebrow">Ghost Job Link Checker (STAGING)</span>
+                <span className="eyebrow">Ghost Job Link Checker</span>
 
                 <h1>
   Stop wasting time applying to ghost jobs with our{' '}
