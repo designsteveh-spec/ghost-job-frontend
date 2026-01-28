@@ -159,43 +159,6 @@ const [scoreBreakdown, setScoreBreakdown] = useState<{
 
 const [lastUpdatedAt, setLastUpdatedAt] = useState<string | null>(null);
 
-type ConfidenceCard = {
-  label?: string;
-  result?: string;
-  value?: string; // backward compat if backend still uses { value }
-  flagged?: boolean;
-};
-
-const [confidenceCards, setConfidenceCards] = useState<Record<string, ConfidenceCard> | null>(null);
-
-const CONFIDENCE_ORDER: { key: string; fallbackLabel: string; tip: string }[] = [
-  { key: 'dataQuality',        fallbackLabel: 'Data Quality',         tip: 'Confidence reflects input quality and page accessibility.' },
-  { key: 'jobLocation',        fallbackLabel: 'Job Location',         tip: 'Checks whether a job location is visible or clearly stated.' },
-  { key: 'emailContactAuth',   fallbackLabel: 'Email Contact Auth',   tip: 'Checks whether contact emails appear legitimate vs suspicious.' },
-  { key: 'scamKeywordsFound',  fallbackLabel: 'Scam Keywords Found',  tip: 'Scans for common scam phrasing or bait language.' },
-  { key: 'appContactFlagged',  fallbackLabel: 'App Contact Flagged',  tip: 'Flags when contact is routed through suspicious apps/channels.' },
-  { key: 'oddLinksFound',      fallbackLabel: 'Odd Links Found',      tip: 'Flags odd or shortened links that raise risk.' },
-  { key: 'oddFeesRequested',   fallbackLabel: 'Odd Fees Requested',   tip: 'Flags mentions of fees, deposits, equipment purchases, etc.' },
-];
-
-type ConfidenceCard = {
-  label?: string;
-  result?: string;
-  value?: string; // backward compat if backend still uses { value }
-  flagged?: boolean;
-};
-
-const [confidenceCards, setConfidenceCards] = useState<Record<string, ConfidenceCard> | null>(null);
-
-const CONFIDENCE_ORDER: { key: string; fallbackLabel: string; tip: string }[] = [
-  { key: 'dataQuality',        fallbackLabel: 'Data Quality',         tip: 'Confidence reflects input quality and page accessibility.' },
-  { key: 'jobLocation',        fallbackLabel: 'Job Location',         tip: 'Checks whether a job location is visible or clearly stated.' },
-  { key: 'emailContactAuth',   fallbackLabel: 'Email Contact Auth',   tip: 'Checks whether contact emails appear legitimate vs suspicious.' },
-  { key: 'scamKeywordsFound',  fallbackLabel: 'Scam Keywords Found',  tip: 'Scans for common scam phrasing or bait language.' },
-  { key: 'appContactFlagged',  fallbackLabel: 'App Contact Flagged',  tip: 'Flags when contact is routed through suspicious apps/channels.' },
-  { key: 'oddLinksFound',      fallbackLabel: 'Odd Links Found',      tip: 'Flags odd or shortened links that raise risk.' },
-  { key: 'oddFeesRequested',   fallbackLabel: 'Odd Fees Requested',   tip: 'Flags mentions of fees, deposits, equipment purchases, etc.' },
-];
 
 
 
@@ -543,7 +506,6 @@ setLastUpdatedAt(null);
 
 setPostingDateOverride('');
 setLastAnalyzedUrl('');
-setConfidenceCards(null);
 
 
 
@@ -821,7 +783,6 @@ scheduleStep('detectedGoogleSnippet', 1900);
             const data = await res.json();
 setScoreBreakdown(data?.breakdown ?? null);
 setLastUpdatedAt(new Date().toLocaleString());
-setConfidenceCards(data?.confidenceCards ?? data?.confidence ?? null);
 
 
 
@@ -1470,37 +1431,19 @@ setJobDescription('');
                   </div>
 
                   {/* 3) CONFIDENCE */}
-<div className="analysis-card">
-  <div className="analysis-card-title">CONFIDENCE</div>
+                  <div className="analysis-card">
+                    <div className="analysis-card-title">CONFIDENCE</div>
 
-  {analysisSteps.confidenceDataQuality === 'complete' && (
-    <div className="confidence-cards">
-      {CONFIDENCE_ORDER.map((item) => {
-        const c = confidenceCards?.[item.key];
-        if (!c) return null;
-
-        const label = c.label ?? item.fallbackLabel;
-        const result = c.result ?? c.value ?? '—';
-        const flagged = !!c.flagged;
-
-        return (
-          <div
-            key={item.key}
-            className={`analysis-tag confidence-card ${flagged ? 'confidence-flagged' : 'confidence-ok'}`}
-            data-tip={item.tip}
-          >
-            <img src={checkComplete} alt="" className="analysis-tag-icon" />
-            <div className="analysis-tag-text">
-              <div className="analysis-tag-title">{label}</div>
-              <div className="analysis-tag-value">{result}</div>
-            </div>
-          </div>
-        );
-      })}
-    </div>
-  )}
-</div>
-
+                    {analysisSteps.confidenceDataQuality === 'complete' && (
+                      <div className="analysis-tag analysis-tag-highlight" data-tip="Confidence reflects input quality and page accessibility.">
+                        <img src={checkComplete} alt="" className="analysis-tag-icon" />
+                        <div className="analysis-tag-text">
+                          <div className="analysis-tag-title">Data Quality</div>
+                          <div className="analysis-tag-value">Medium</div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
 
                   {/* 4) SCORE SUMMARY */}
                   <div className="analysis-card">
