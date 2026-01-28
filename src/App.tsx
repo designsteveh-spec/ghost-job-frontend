@@ -1115,11 +1115,6 @@ timeoutsRef.current.push(t4);
   )}
 </p>
 
-{status === 'running' && score === null && (
-  <p style={{ color: 'red', fontWeight: 700 }}>
-    DEBUG: {rollingLine || 'NO ROLLING LINE SET'}
-  </p>
-)}
 
 
                 <p>
