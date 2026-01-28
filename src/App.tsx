@@ -275,6 +275,11 @@ const [gaugeRunId, setGaugeRunId] = useState<number>(0);
   const flutterIntervalRef = useRef<number | null>(null);
   const gaugeDurationRef = useRef<number>(1400);
 
+  const rollingTextIntervalRef = useRef<number | null>(null);
+  const lastRollingTextRef = useRef<string>('');
+
+  const [rollingLine, setRollingLine] = useState<string>('');
+
   const clearAllTimeouts = () => {
     timeoutsRef.current.forEach((t) => window.clearTimeout(t));
     timeoutsRef.current = [];
@@ -287,12 +292,33 @@ const [gaugeRunId, setGaugeRunId] = useState<number>(0);
     }
   };
 
+  const stopRollingText = () => {
+    if (rollingTextIntervalRef.current !== null) {
+      window.clearInterval(rollingTextIntervalRef.current);
+      rollingTextIntervalRef.current = null;
+    }
+    lastRollingTextRef.current = '';
+    setRollingLine('');
+  };
+
+
   useEffect(() => {
   return () => {
     clearAllTimeouts();
     stopGaugeFlutter();
+    stopRollingText();
   };
 }, []);
+
+const stopRollingText = () => {
+  if (rollingTextIntervalRef.current !== null) {
+    window.clearInterval(rollingTextIntervalRef.current);
+    rollingTextIntervalRef.current = null;
+  }
+  lastRollingTextRef.current = '';
+  setRollingLine('');
+};
+
 
 
   const startGaugeFlutter = () => {
@@ -318,6 +344,38 @@ const [gaugeRunId, setGaugeRunId] = useState<number>(0);
   -------------------------------------------- */
 
 
+useEffect(() => {
+  // Only run while we are waiting for the score
+  if (!(status === 'running' && score === null)) {
+    stopRollingText();
+    return;
+  }
+
+  const lines = [
+    'Checking posting freshness…',
+    'Scanning content patterns…',
+    'Looking for apply link signals…',
+    'Detecting stale / evergreen cues…',
+    'Checking structure + metadata…',
+    'Cross-checking visible indicators…',
+    'Scoring confidence signals…',
+    'Finalizing probability score…',
+  ];
+
+  const pick = () => {
+    let next = lines[Math.floor(Math.random() * lines.length)];
+    if (lines.length > 1 && next === lastRollingTextRef.current) {
+      next = lines[(lines.indexOf(next) + 1) % lines.length];
+    }
+    lastRollingTextRef.current = next;
+    setRollingLine(next);
+  };
+
+  pick(); // immediate first line
+  rollingTextIntervalRef.current = window.setInterval(pick, 900);
+
+  return () => stopRollingText();
+}, [status, score]);
 
 
   useEffect(() => {
@@ -432,6 +490,7 @@ const [gaugeRunId, setGaugeRunId] = useState<number>(0);
       const resetAnalysis = () => {
     clearAllTimeouts();
     stopGaugeFlutter();
+    stopRollingText();
     setStatus('idle');
 setScore(null);
 setScoreBreakdown(null);
@@ -1053,9 +1112,16 @@ timeoutsRef.current.push(t4);
 
 
                 <p>
-                  Probability Score:{' '}
-                  {score === null ? '—' : <strong>{score}%</strong>}
-                </p>
+  Probability Score:{' '}
+  {score === null ? (
+    <>
+      — <span className="muted" style={{ marginLeft: 8 }}>{rollingLine}</span>
+    </>
+  ) : (
+    <strong>{score}%</strong>
+  )}
+</p>
+
 
                 <p>
                   Checking posting freshness, content patterns, and activity
