@@ -134,7 +134,6 @@ const canAnalyzeNow =
 
     const [score, setScore] = useState<number | null>(null);
 
-
 // Score Breakdown (from backend)
 const [scoreBreakdown, setScoreBreakdown] = useState<{
   postingAge?: number;
@@ -159,24 +158,6 @@ const [scoreBreakdown, setScoreBreakdown] = useState<{
   const [detectedGoogleTopLinkValue, setDetectedGoogleTopLinkValue] = useState<string | null>(null);
 
 const [lastUpdatedAt, setLastUpdatedAt] = useState<string | null>(null);
-const [confidenceLabel, setConfidenceLabel] = useState<'High' | 'Medium' | 'Low'>('Medium');
-const [confidenceLocation, setConfidenceLocation] = useState<string>('—');
-
-// Processing strings that rotate where the dash/— appears
-const processingSteps = [
-  'Loading page…',
-  'Checking reachability…',
-  'Detecting posting age…',
-  'Parsing content blocks…',
-  'Extracting employer/source…',
-  'Extracting canonical job ID…',
-  'Scanning freshness patterns…',
-  'Checking recycled language…',
-  'Scanning activity indicators…',
-  'Finalizing probability score…',
-];
-
-const [processingIdx, setProcessingIdx] = useState(0);
 
 
 
@@ -312,22 +293,6 @@ const [gaugeRunId, setGaugeRunId] = useState<number>(0);
     stopGaugeFlutter();
   };
 }, []);
-
-// Rotate processing strings ONLY while running
-useEffect(() => {
-  if (status !== 'running') {
-    setProcessingIdx(0);
-    return;
-  }
-
-  setProcessingIdx(0);
-  const id = window.setInterval(() => {
-    setProcessingIdx((i) => (i + 1) % processingSteps.length);
-  }, 1300);
-
-  return () => window.clearInterval(id);
-}, [status, processingSteps.length]);
-
 
 
   const startGaugeFlutter = () => {
@@ -592,13 +557,6 @@ const postingAgeLabel = (rangeKey: string): string => {
 
     const urlValue = (override?.url ?? url).trim();
 
-try {
-  const u = new URL(urlValue);
-  setConfidenceLocation(u.hostname || '—');
-} catch {
-  setConfidenceLocation('—');
-}
-
     if (isPaidRoute) {
   const decoded = safeDecodePlanFromAccessCode(accessCode.trim());
   if (decoded?.exp && decoded.exp * 1000 <= Date.now()) {
@@ -612,13 +570,6 @@ try {
 const descValue = (override?.jobDescription ?? jobDescription).trim();
 
 const postingAgeRangeKey = (override?.postingDate ?? postingDateOverride ?? '').trim();
-
-const quality =
-  !urlValue ? 'Low'
-  : (postingAgeRangeKey && postingAgeRangeKey !== 'skip') ? (descValue ? 'High' : 'Medium')
-  : (descValue ? 'Medium' : 'Low');
-
-setConfidenceLabel(quality);
 
 // Convert the selected range into a concrete ISO date (YYYY-MM-DD) midpoint.
 // If an ISO date is ever passed in directly, allow it.
@@ -1102,18 +1053,9 @@ timeoutsRef.current.push(t4);
 
 
                 <p>
-  Probability Score:{' '}
-  {score === null ? (
-    status === 'running' ? (
-      <strong>{processingSteps[processingIdx]}</strong>
-    ) : (
-      '—'
-    )
-  ) : (
-    <strong>{score}%</strong>
-  )}
-</p>
-
+                  Probability Score:{' '}
+                  {score === null ? '—' : <strong>{score}%</strong>}
+                </p>
 
                 <p>
                   Checking posting freshness, content patterns, and activity
@@ -1210,25 +1152,13 @@ setJobDescription('');
     </div>
 
     <div className="analysis-results-meta">
-  <span>
-    Probability Score:{' '}
-    {score === null ? (
-      status === 'running' ? (
-        <strong>{processingSteps[processingIdx]}</strong>
-      ) : (
-        '—'
-      )
-    ) : (
-      <strong>{score}%</strong>
-    )}
-  </span>
+      <span>
+        Probability Score:{' '}
+        {score === null ? '—' : <strong>{score}%</strong>}
+      </span>
 
-  <span className="analysis-results-sep">|</span>
-
-  <span>
-    Confidence: <strong>{confidenceLabel}</strong>
-  </span>
-</div>
+      
+    </div>
   </div>
 </div>
 
@@ -1442,29 +1372,18 @@ setJobDescription('');
 
                   {/* 3) CONFIDENCE */}
                   <div className="analysis-card">
-  <div className="analysis-card-title">CONFIDENCE</div>
+                    <div className="analysis-card-title">CONFIDENCE</div>
 
-  {analysisSteps.confidenceDataQuality === 'complete' && (
-    <>
-      <div className="analysis-tag analysis-tag-highlight" data-tip="Confidence reflects input quality and page accessibility.">
-        <img src={checkComplete} alt="" className="analysis-tag-icon" />
-        <div className="analysis-tag-text">
-          <div className="analysis-tag-title">Data Quality</div>
-          <div className="analysis-tag-value">{confidenceLabel}</div>
-        </div>
-      </div>
-
-      <div className="analysis-tag" data-tip="Where the job link was checked.">
-        <img src={checkComplete} alt="" className="analysis-tag-icon" />
-        <div className="analysis-tag-text">
-          <div className="analysis-tag-title">Location</div>
-          <div className="analysis-tag-value">{confidenceLocation}</div>
-        </div>
-      </div>
-    </>
-  )}
-</div>
-
+                    {analysisSteps.confidenceDataQuality === 'complete' && (
+                      <div className="analysis-tag analysis-tag-highlight" data-tip="Confidence reflects input quality and page accessibility.">
+                        <img src={checkComplete} alt="" className="analysis-tag-icon" />
+                        <div className="analysis-tag-text">
+                          <div className="analysis-tag-title">Data Quality</div>
+                          <div className="analysis-tag-value">Medium</div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
 
                   {/* 4) SCORE SUMMARY */}
                   <div className="analysis-card">
