@@ -310,15 +310,6 @@ const [gaugeRunId, setGaugeRunId] = useState<number>(0);
   };
 }, []);
 
-const stopRollingText = () => {
-  if (rollingTextIntervalRef.current !== null) {
-    window.clearInterval(rollingTextIntervalRef.current);
-    rollingTextIntervalRef.current = null;
-  }
-  lastRollingTextRef.current = '';
-  setRollingLine('');
-};
-
 
 
   const startGaugeFlutter = () => {
@@ -345,8 +336,8 @@ const stopRollingText = () => {
 
 
 useEffect(() => {
-  // Only run while we are waiting for the score
-  if (!(status === 'running' && score === null)) {
+  // Only run while we are waiting
+  if (status !== 'running') {
     stopRollingText();
     return;
   }
@@ -359,6 +350,8 @@ useEffect(() => {
     'Checking structure + metadata…',
     'Cross-checking visible indicators…',
     'Scoring confidence signals…',
+
+
     'Finalizing probability score…',
   ];
 
@@ -1121,6 +1114,12 @@ timeoutsRef.current.push(t4);
     <strong>{score}%</strong>
   )}
 </p>
+
+{status === 'running' && score === null && (
+  <p style={{ color: 'red', fontWeight: 700 }}>
+    DEBUG: {rollingLine || 'NO ROLLING LINE SET'}
+  </p>
+)}
 
 
                 <p>
