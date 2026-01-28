@@ -158,6 +158,7 @@ const [scoreBreakdown, setScoreBreakdown] = useState<{
   const [detectedGoogleTopLinkValue, setDetectedGoogleTopLinkValue] = useState<string | null>(null);
 
 const [lastUpdatedAt, setLastUpdatedAt] = useState<string | null>(null);
+const [closedStateHit, setClosedStateHit] = useState<boolean>(false);
 
 
 
@@ -503,6 +504,7 @@ setDetectedGoogleTopResultValue(null);
 setDetectedGoogleSnippetValue(null);
 setDetectedGoogleTopLinkValue(null);
 setLastUpdatedAt(null);
+setClosedStateHit(false);
 
 setPostingDateOverride('');
 setLastAnalyzedUrl('');
@@ -530,7 +532,12 @@ setGaugeRunId((n) => n + 1);
   };
 
   const getResultBucket = (pct: number) => {
-    const s = Math.max(5, Math.min(95, Math.round(pct)));
+  if (closedStateHit) {
+    return { label: 'Job States Not Hiring Anymore', className: 'result-inactive' };
+  }
+
+  const s = Math.max(5, Math.min(95, Math.round(pct)));
+
 
     // 75–95
     if (s >= 75) {
@@ -678,6 +685,7 @@ setDetectedGoogleIndexedValue(null);
 setDetectedGoogleTopResultValue(null);
 setDetectedGoogleSnippetValue(null);
 setDetectedGoogleTopLinkValue(null);
+setClosedStateHit(false);
 
 
 setSignals({
@@ -783,6 +791,17 @@ scheduleStep('detectedGoogleSnippet', 1900);
             const data = await res.json();
 setScoreBreakdown(data?.breakdown ?? null);
 setLastUpdatedAt(new Date().toLocaleString());
+
+// Result override: job explicitly says expired/removed/closed
+setClosedStateHit(
+  !!(
+    data?.detected?.closedStateHit ||
+    data?.detected?.closedOrExpired ||
+    data?.detected?.isClosed ||
+    data?.detected?.closed ||
+    data?.detected?.expiredOrRemoved
+  )
+);
 
 
 
