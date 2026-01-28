@@ -2037,3 +2037,33 @@ select.postingage-cta-input {
 }
 
 /* ---------------- STAGING SETUP ---------------- */
+
+/* ---------------- SCAM FLAG (v1.0.scamflag) ---------------- */
+
+.result-scam-flag {
+  margin-top: 10px;
+  display: inline-block;
+  padding: 8px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.02em;
+
+  background: rgba(185, 28, 28, 0.10);
+  border: 2px solid #b91c1c;
+  color: #b91c1c;
+}
+
+.analysis-scam-flag {
+  margin-top: 10px;
+  display: inline-block;
+  padding: 8px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.02em;
+
+  background: rgba(185, 28, 28, 0.10);
+  border: 2px solid #b91c1c;
+  color: #b91c1c;
+}

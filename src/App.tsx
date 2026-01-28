@@ -149,7 +149,19 @@ const [scoreBreakdown, setScoreBreakdown] = useState<{
   const [detectedPostingAgeValue, setDetectedPostingAgeValue] = useState<string | null>(null);
   // (removed) detectedPostingAgeStatusValue — unused (TS6133)
   const [detectedEmployerSourceValue, setDetectedEmployerSourceValue] = useState<string | null>(null);
+
+  // ✅ Separate from Employer/Source: city/region/country only
+  const [detectedJobLocationValue, setDetectedJobLocationValue] = useState<string | null>(null);
+
   const [detectedCanonicalJobIdValue, setDetectedCanonicalJobIdValue] = useState<string | null>(null);
+
+  // ✅ Optional scam flag (backend-driven)
+  const [scamFlagged, setScamFlagged] = useState<boolean>(false);
+
+  type ConfidenceLevel = 'Low' | 'Medium' | 'High';
+  const [confidenceLevel, setConfidenceLevel] = useState<ConfidenceLevel>('Medium');
+  const [pageAccessLevel, setPageAccessLevel] = useState<'Accessible' | 'Blocked' | 'JS Required' | 'Unknown'>('Unknown');
+  const [confidenceCoverage, setConfidenceCoverage] = useState<string>('—');
 
   // Google snippet “What we detected”
   const [detectedGoogleIndexedValue, setDetectedGoogleIndexedValue] = useState<string | null>(null);
@@ -208,6 +220,7 @@ const [gaugeRunId, setGaugeRunId] = useState<number>(0);
     | 'scoreContentUniqueness'
     | 'scoreActivityIndicators'
     | 'scoreFreshness2'
+    | 'detectedJobLocation'
     | 'scoreSiteReliability'
     | 'detectedGoogleIndexed'
     | 'detectedGoogleTopResult'
@@ -225,6 +238,7 @@ const [gaugeRunId, setGaugeRunId] = useState<number>(0);
 
     detectedPostingAge: 'pending',
     detectedEmployerSource: 'pending',
+    detectedJobLocation: 'pending',
     detectedCanonicalJobId: 'pending',
     detectedActivityScan: 'pending',
     detectedLastUpdated: 'pending',
@@ -496,6 +510,12 @@ setDetectedPostingAgeValue(null);
 
 
 setDetectedEmployerSourceValue(null);
+setDetectedJobLocationValue(null);
+setScamFlagged(false);
+
+setConfidenceLevel('Medium');
+setPageAccessLevel('Unknown');
+setConfidenceCoverage('—');
 setDetectedCanonicalJobIdValue(null);
 
 setDetectedGoogleIndexedValue(null);
@@ -709,6 +729,7 @@ scheduleStep('activityIndicatorsScan', 2000);
 
 scheduleStep('detectedPostingAge', 560);
 scheduleStep('detectedEmployerSource', 900);
+scheduleStep('detectedJobLocation', 1040);
 scheduleStep('detectedCanonicalJobId', 1240);
 scheduleStep('detectedActivityScan', 1680);
 scheduleStep('detectedLastUpdated', 2080);
@@ -784,6 +805,32 @@ scheduleStep('detectedGoogleSnippet', 1900);
 setScoreBreakdown(data?.breakdown ?? null);
 setLastUpdatedAt(new Date().toLocaleString());
 
+// ✅ Scam flag (optional, backend-driven)
+setScamFlagged(
+  !!(
+    data?.flags?.scam ||
+    data?.flags?.scamRisk ||
+    data?.detected?.scam ||
+    data?.detected?.scamRisk
+  )
+);
+
+// ✅ Confidence (optional backend; safe fallbacks)
+const rawConf = String(data?.confidence?.level || '').toLowerCase();
+setConfidenceLevel(rawConf === 'high' ? 'High' : rawConf === 'low' ? 'Low' : 'Medium');
+
+if (data?.meta?.blocked === true) setPageAccessLevel('Blocked');
+else if (data?.meta?.jsRequired === true) setPageAccessLevel('JS Required');
+else if (data?.meta?.blocked === false || data?.meta?.jsRequired === false) setPageAccessLevel('Accessible');
+else setPageAccessLevel('Unknown');
+
+// Coverage summary (simple + deterministic)
+const coverageParts: string[] = [];
+coverageParts.push(descValue ? 'Description: Yes' : 'Description: No');
+coverageParts.push(postingAgeRangeKey === 'skip' ? 'Posting Age: Unknown' : 'Posting Age: Provided');
+coverageParts.push(data?.google?.enabled === false ? 'Google: Off' : 'Google: On');
+setConfidenceCoverage(coverageParts.join(' • '));
+
 
 
       // Fill "What we detected" values:
@@ -815,7 +862,17 @@ setLastUpdatedAt(new Date().toLocaleString());
      // (removed) detectedPostingAgeStatusValue — unused
 
       setDetectedEmployerSourceValue(data?.detected?.employerSource ?? fallbackHost ?? null);
-      setDetectedCanonicalJobIdValue(data?.detected?.canonicalJobId ?? fallbackJobId ?? null);
+
+// ✅ City/region/country (never the hostname)
+setDetectedJobLocationValue(
+  data?.detected?.jobLocation ??
+  data?.detected?.location ??
+  data?.detected?.geo ??
+  null
+);
+
+setDetectedCanonicalJobIdValue(data?.detected?.canonicalJobId ?? fallbackJobId ?? null);
+
 
 
             // Google snippet values (from API if available)
@@ -1216,9 +1273,11 @@ setJobDescription('');
         Probability Score:{' '}
         {score === null ? '—' : <strong>{score}%</strong>}
       </span>
-
-      
     </div>
+
+    {status === 'complete' && scamFlagged && (
+      <div className="analysis-scam-flag">Potential Scam Signals Detected</div>
+    )}
   </div>
 </div>
 
@@ -1319,6 +1378,16 @@ setJobDescription('');
                         <div className="analysis-tag-text">
                           <div className="analysis-tag-title">Employer / Source</div>
                           <div className="analysis-tag-value">{detectedEmployerSourceValue ?? '—'}</div>
+                        </div>
+                      </div>
+                    )}
+
+{analysisSteps.detectedJobLocation === 'complete' && (
+                      <div className="analysis-tag" data-tip="City/region/country related to the job (not the hosting site).">
+                        <img src={checkComplete} alt="" className="analysis-tag-icon" />
+                        <div className="analysis-tag-text">
+                          <div className="analysis-tag-title">Job Location</div>
+                          <div className="analysis-tag-value">{detectedJobLocationValue ?? '—'}</div>
                         </div>
                       </div>
                     )}
@@ -1435,13 +1504,41 @@ setJobDescription('');
                     <div className="analysis-card-title">CONFIDENCE</div>
 
                     {analysisSteps.confidenceDataQuality === 'complete' && (
-                      <div className="analysis-tag analysis-tag-highlight" data-tip="Confidence reflects input quality and page accessibility.">
-                        <img src={checkComplete} alt="" className="analysis-tag-icon" />
-                        <div className="analysis-tag-text">
-                          <div className="analysis-tag-title">Data Quality</div>
-                          <div className="analysis-tag-value">Medium</div>
+                      <>
+                        <div className="analysis-tag analysis-tag-highlight" data-tip="Confidence reflects input quality and page accessibility.">
+                          <img src={checkComplete} alt="" className="analysis-tag-icon" />
+                          <div className="analysis-tag-text">
+                            <div className="analysis-tag-title">Data Quality</div>
+                            <div className="analysis-tag-value">{confidenceLevel}</div>
+                          </div>
                         </div>
-                      </div>
+
+                        <div className="analysis-tag" data-tip="Whether the job page was reachable without blocking or JS walls.">
+                          <img src={checkComplete} alt="" className="analysis-tag-icon" />
+                          <div className="analysis-tag-text">
+                            <div className="analysis-tag-title">Page Access</div>
+                            <div className="analysis-tag-value">{pageAccessLevel}</div>
+                          </div>
+                        </div>
+
+                        <div className="analysis-tag" data-tip="Inputs used in scoring for this run.">
+                          <img src={checkComplete} alt="" className="analysis-tag-icon" />
+                          <div className="analysis-tag-text">
+                            <div className="analysis-tag-title">Inputs</div>
+                            <div className="analysis-tag-value">
+                              Link: Yes • Posting Age: {postingDateOverride === 'skip' ? 'Unknown' : 'Provided'}
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="analysis-tag" data-tip="Coverage summary (description + posting age + Google assist).">
+                          <img src={checkComplete} alt="" className="analysis-tag-icon" />
+                          <div className="analysis-tag-text">
+                            <div className="analysis-tag-title">Coverage</div>
+                            <div className="analysis-tag-value">{confidenceCoverage}</div>
+                          </div>
+                        </div>
+                      </>
                     )}
                   </div>
 
@@ -1540,6 +1637,10 @@ setJobDescription('');
             <h2>
               Why <span className="accent">ghost jobs</span> matter
             </h2>
+
+{status === 'complete' && scamFlagged && (
+  <div className="result-scam-flag">Potential Scam Signals Detected</div>
+)}
 
             <p className="education-text">
               Some job postings remain open long after hiring has paused. Others
