@@ -55,8 +55,10 @@ function safeDecodePlanFromAccessCode(code: string): { plan: 'casual' | 'active'
 }
 
 export default function App() {
-  const API_BASE =
-  import.meta.env.VITE_API_BASE_URL || 'https://ghost-job-api.onrender.com';
+  useEffect(() => {
+  // Warm up API (Render may cold-start after inactivity)
+  fetch(`${API_BASE}/api/health`).catch(() => {});
+}, []);
 
 
   const path = window.location.pathname || '/';
@@ -725,7 +727,7 @@ scheduleStep('detectedGoogleSnippet', 1900);
     try {
                   // Hard timeout so UI never flutters forever
       const controller = new AbortController();
-      const REQUEST_TIMEOUT_MS = 25000;
+      const REQUEST_TIMEOUT_MS = 45000;
       const timeoutId = window.setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
 
       const res = await fetch(`${API_BASE}/api/analyze`, {
@@ -875,7 +877,8 @@ timeoutsRef.current.push(t4);
 
       const name = (err as any)?.name;
       if (name === 'AbortError') {
-        setFormError('Request timed out. Try a smaller capture (crop the page) and retry.');
+        setError('Request timed out. If this is your first check in a while, the server may be waking up — wait 10 seconds and retry.');
+
       } else {
         setFormError('Network error. Please try again.');
       }
