@@ -30,6 +30,36 @@ import tiktokIcon from './assets/socialTikTok.svg';
 
 const API_BASE = (import.meta.env.VITE_API_BASE || '').trim();
 
+const WARMUP_TOTAL_MS = 45000;      // total time we’re willing to wait for Render to wake
+const WARMUP_PING_TIMEOUT_MS = 4000; // each ping attempt timeout
+const WARMUP_RETRY_DELAY_MS = 2500;
+
+async function ensureApiAwake(): Promise<boolean> {
+  const started = Date.now();
+
+  while (Date.now() - started < WARMUP_TOTAL_MS) {
+    try {
+      const c = new AbortController();
+      const t = window.setTimeout(() => c.abort(), WARMUP_PING_TIMEOUT_MS);
+
+      // Any response (even 404) means the server is awake.
+      await fetch(`${API_BASE}/api/health`, {
+        method: 'GET',
+        signal: c.signal,
+        cache: 'no-store',
+      });
+
+      window.clearTimeout(t);
+      return true;
+    } catch {
+      // keep trying
+      await new Promise((r) => setTimeout(r, WARMUP_RETRY_DELAY_MS));
+    }
+  }
+
+  return false;
+}
+
 
 
 function safeDecodePlanFromAccessCode(code: string): { plan: 'casual' | 'active'; exp?: number } | null {
@@ -727,29 +757,51 @@ scheduleStep('detectedGoogleSnippet', 1900);
 
 
     try {
-                  // Hard timeout so UI never flutters forever
-      const controller = new AbortController();
-      const REQUEST_TIMEOUT_MS = 45000;
-      const timeoutId = window.setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+      // Wake the API (Render cold start) + then run analyze.
+// If it aborts, warm again and retry once.
+await ensureApiAwake();
 
-      const res = await fetch(`${API_BASE}/api/analyze`, {
-        method: 'POST',
-        signal: controller.signal,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-  mode: descValue ? 'deep' : 'basic',
-  url: urlValue,
-  jobDescription: descValue,
-  ...(postingAgeRangeKey
-    ? { postingDate: postingAgeRangeKey === 'skip' ? 'skip' : postingDateValue }
-    : {}),
-  ...(accessCode.trim() ? { accessCode: accessCode.trim() } : {}),
-}),
+const makeRequest = async () => {
+  const controller = new AbortController();
+  const REQUEST_TIMEOUT_MS = 65000; // give Render enough time to wake + run
+  const timeoutId = window.setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
 
-      });
+  try {
+    const res = await fetch(`${API_BASE}/api/analyze`, {
+      method: 'POST',
+      signal: controller.signal,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        mode: descValue ? 'deep' : 'basic',
+        url: urlValue,
+        jobDescription: descValue,
+        ...(postingAgeRangeKey
+          ? { postingDate: postingAgeRangeKey === 'skip' ? 'skip' : postingDateValue }
+          : {}),
+        ...(accessCode.trim() ? { accessCode: accessCode.trim() } : {}),
+      }),
+    });
 
+    return res;
+  } finally {
+    window.clearTimeout(timeoutId);
+  }
+};
 
-      window.clearTimeout(timeoutId);
+let res: Response;
+
+try {
+  res = await makeRequest();
+} catch (e: any) {
+  const isAbort = e?.name === 'AbortError' || String(e).includes('AbortError');
+
+  if (!isAbort) throw e;
+
+  // Retry once after another warm attempt
+  await ensureApiAwake();
+  res = await makeRequest();
+}
+
 
 
 
