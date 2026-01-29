@@ -107,10 +107,8 @@ const [lastAnalyzedUrl, setLastAnalyzedUrl] = useState('');
 
   // Analyze rules (Unified):
   // - Link is required
-  // - Posting Age is required
+  // - Posting Age is optional (used if provided)
   // - Description is optional
-  const hasPostingAge =
-    !!postingDateOverride.trim();
 
 
   const decodedAccess = safeDecodePlanFromAccessCode(accessCode.trim());
@@ -119,7 +117,6 @@ const isAccessExpired =
 
 const canAnalyzeNow =
   hasUrl &&
-  hasPostingAge &&
   (!isPaidRoute || (!!accessCode.trim() && !isAccessExpired));
 
 
@@ -647,11 +644,6 @@ setLastAnalyzedUrl(urlValue);
 
     
 
-    if (!postingAgeRangeKey) {
-
-      setFormError('Select a posting age to analyze.');
-      return;
-    }
 
 
 
@@ -1024,7 +1016,7 @@ timeoutsRef.current.push(t4);
       {formError && <p className="form-error">{formError}</p>}
 
       <div className="field-label" style={{ marginTop: 14 }}>
-        Select Posting Age (Required)
+        Select Posting Age (Optional)
       </div>
 
       <select
@@ -1052,7 +1044,7 @@ timeoutsRef.current.push(t4);
       </select>
 
       <div className="postingdate-inline-hint">
-        If the listing shows “Posted” or “Opening Date,” pick the closest range.
+        If the listing shows a date (Posted / Opening / Closing), pick the closest range. If not, leave blank.
       </div>
 
 
