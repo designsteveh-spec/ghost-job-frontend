@@ -35,11 +35,11 @@ function safeDecodePlanFromAccessCode(code: string): { plan: 'casual' | 'active'
     const parts = (code || '').trim().split('.');
     if (parts.length < 2) return null;
 
-    // Access code payload is the 1st segment (payload.sig)
-    const payload = parts[0]
+    // JWT payload is the 2nd segment
+    const payload = parts[1]
       .replace(/-/g, '+')
       .replace(/_/g, '/')
-      .padEnd(Math.ceil(parts[0].length / 4) * 4, '=');
+      .padEnd(Math.ceil(parts[1].length / 4) * 4, '=');
 
     const json = JSON.parse(atob(payload));
 
@@ -115,7 +115,7 @@ const [lastAnalyzedUrl, setLastAnalyzedUrl] = useState('');
 
   const decodedAccess = safeDecodePlanFromAccessCode(accessCode.trim());
 const isAccessExpired =
-  !!decodedAccess?.exp && decodedAccess.exp <= Date.now();
+  !!decodedAccess?.exp && decodedAccess.exp * 1000 <= Date.now();
 
 const canAnalyzeNow =
   hasUrl &&
@@ -158,7 +158,6 @@ const [scoreBreakdown, setScoreBreakdown] = useState<{
   const [detectedGoogleTopLinkValue, setDetectedGoogleTopLinkValue] = useState<string | null>(null);
 
 const [lastUpdatedAt, setLastUpdatedAt] = useState<string | null>(null);
-const [closedStateHit, setClosedStateHit] = useState<boolean>(false);
 
 
 
@@ -504,7 +503,6 @@ setDetectedGoogleTopResultValue(null);
 setDetectedGoogleSnippetValue(null);
 setDetectedGoogleTopLinkValue(null);
 setLastUpdatedAt(null);
-setClosedStateHit(false);
 
 setPostingDateOverride('');
 setLastAnalyzedUrl('');
@@ -532,12 +530,7 @@ setGaugeRunId((n) => n + 1);
   };
 
   const getResultBucket = (pct: number) => {
-  if (closedStateHit) {
-    return { label: 'Job States Not Hiring Anymore', className: 'result-inactive' };
-  }
-
-  const s = Math.max(5, Math.min(95, Math.round(pct)));
-
+    const s = Math.max(5, Math.min(95, Math.round(pct)));
 
     // 75–95
     if (s >= 75) {
@@ -618,7 +611,7 @@ const postingAgeLabel = (rangeKey: string): string => {
 
     if (isPaidRoute) {
   const decoded = safeDecodePlanFromAccessCode(accessCode.trim());
-  if (decoded?.exp && decoded.exp <= Date.now()) {
+  if (decoded?.exp && decoded.exp * 1000 <= Date.now()) {
     setFormError('This pass has expired. Please purchase a new pass or paste a valid access code.');
     setStatus('idle');
     return;
@@ -685,7 +678,6 @@ setDetectedGoogleIndexedValue(null);
 setDetectedGoogleTopResultValue(null);
 setDetectedGoogleSnippetValue(null);
 setDetectedGoogleTopLinkValue(null);
-setClosedStateHit(false);
 
 
 setSignals({
@@ -791,17 +783,6 @@ scheduleStep('detectedGoogleSnippet', 1900);
             const data = await res.json();
 setScoreBreakdown(data?.breakdown ?? null);
 setLastUpdatedAt(new Date().toLocaleString());
-
-// Result override: job explicitly says expired/removed/closed
-setClosedStateHit(
-  !!(
-    data?.detected?.closedStateHit ||
-    data?.detected?.closedOrExpired ||
-    data?.detected?.isClosed ||
-    data?.detected?.closed ||
-    data?.detected?.expiredOrRemoved
-  )
-);
 
 
 
