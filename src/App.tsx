@@ -28,6 +28,8 @@ import facebookIcon from './assets/socialFacebook.svg';
 import twitterIcon from './assets/socialTwitter.svg';
 import tiktokIcon from './assets/socialTikTok.svg';
 
+const API_BASE = (import.meta.env.VITE_API_BASE || '').trim();
+
 
 
 function safeDecodePlanFromAccessCode(code: string): { plan: 'casual' | 'active'; exp?: number } | null {
@@ -877,7 +879,7 @@ timeoutsRef.current.push(t4);
 
       const name = (err as any)?.name;
       if (name === 'AbortError') {
-        setError('Request timed out. If this is your first check in a while, the server may be waking up — wait 10 seconds and retry.');
+        setFormError('Request timed out. If this is your first check in a while, the server may be waking up — wait 10 seconds and retry.');
 
       } else {
         setFormError('Network error. Please try again.');
