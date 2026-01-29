@@ -1566,6 +1566,17 @@ button {
   line-height: 1.2;
 }
 
+.analysis-tag-value {
+  font-weight: 700;
+  color: #0f172a;
+  white-space: nowrap; /* Prevents 'Incomplete' from wrapping weirdly */
+}
+
+/* Optional: Make 'Incomplete' red or orange to show it's a failed load */
+.analysis-tag-value:contains('Incomplete') {
+  color: #e11d48; 
+}
+
 /* Posting Age blocked CTA (RIGHT mock) */
 /* This REPLACES the normal analysis-tag layout (no icon, no left title/value rows) */
 .postingage-cta {
@@ -2037,3 +2048,4 @@ select.postingage-cta-input {
 }
 
 /* ---------------- STAGING SETUP ---------------- */
+

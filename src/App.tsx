@@ -1233,7 +1233,12 @@ setJobDescription('');
                         <img src={checkComplete} alt="" className="analysis-tag-icon" />
                         <div className="analysis-tag-text">
                           <div className="analysis-tag-title">Page Loads</div>
-                          <div className="analysis-tag-value">Complete</div>
+                          <div className="analysis-tag-value">
+                            {/* Check if the stale signal (which handles the load) returned 'Incomplete' */}
+                            {scoreBreakdown?.siteReliability === 0 && signals.stale === 'complete' && score === 0 
+                              ? 'Incomplete' 
+                              : 'Complete'}
+                          </div>
                         </div>
                       </div>
                     )}
