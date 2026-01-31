@@ -29,6 +29,7 @@ import twitterIcon from './assets/socialTwitter.svg';
 import tiktokIcon from './assets/socialTikTok.svg';
 
 const API_BASE = (import.meta.env.VITE_API_BASE || '').trim();
+console.log('[API_BASE]', API_BASE);
 
 const WARMUP_TOTAL_MS = 45000;      // total time we’re willing to wait for Render to wake
 const WARMUP_PING_TIMEOUT_MS = 4000; // each ping attempt timeout
