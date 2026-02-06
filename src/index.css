@@ -2091,3 +2091,77 @@ select.postingage-cta-input {
     margin-top: 8px;
   }
 }
+
+/* --- EDUCATION section spacing controls --- */
+.education {
+  padding-top: 200px;     /* space above the whole section */
+  padding-bottom: 200px;  /* space below the whole section */
+}
+
+.education-media {
+  margin-top: 28px;      /* pushes the image block down inside the section */
+}
+
+/* Smaller screens */
+@media (max-width: 720px) {
+  .education {
+    padding-top: 56px;
+    padding-bottom: 56px;
+  }
+
+  .education-media {
+    margin-top: 18px;
+  }
+}
+
+
+/* --- Pricing spacing controls (cards vs table) --- */
+.pricing-cards-wrap {
+  padding-top: 72px;      /* space above pricing cards */
+  padding-bottom: 56px;   /* ✅ space below cards+disclaimer */
+}
+
+/* ✅ Controls how close the disclaimer sits to the cards */
+.pricing-grid {
+  margin-bottom: 12px;
+}
+
+.pricing-disclaimer {
+  margin-top: 0px;
+}
+
+/* Gap between cards and the disclaimer text below */
+.pricing-grid {
+  margin-bottom: 14px;
+}
+
+.pricing-disclaimer {
+  margin-top: 0px;
+}
+
+
+.pricing-table-wrap {
+  padding-top: 48px;     /* space above pricing table */
+  padding-bottom: 72px;  /* space below pricing table */
+}
+
+/* Smaller screens */
+@media (max-width: 720px) {
+  .pricing-cards-wrap {
+    padding-top: 56px;
+    padding-bottom: 0px; /* keep disclaimer close on mobile too */
+  }
+
+  .pricing-grid {
+    margin-bottom: 12px;
+  }
+
+  .pricing-disclaimer {
+    margin-top: 0px;
+  }
+
+  .pricing-table-wrap {
+    padding-top: 34px;
+    padding-bottom: 56px;
+  }
+}

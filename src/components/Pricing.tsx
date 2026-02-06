@@ -43,7 +43,8 @@ export default function Pricing() {
 </p>
 
 
-        <div className="pricing-grid">
+        <div className="pricing-cards-wrap">
+          <div className="pricing-grid">
           {/* FREE */}
           <div className="pricing-card">
             <div className="pricing-card-header free">FREE</div>
@@ -149,13 +150,14 @@ export default function Pricing() {
 </button>
             </div>
           </div>
-        </div>
-
+          </div>
         <p className="pricing-disclaimer">
           All results are probability-based assessments using observable signals. This tool does not verify hiring intent or make claims about employers.
         </p>
+        </div>
 
-        <section className="compare-plans">
+        <div className="pricing-table-wrap">
+          <section className="compare-plans">
           <h3 className="compare-title">Compare Plans</h3>
 
           <div className="compare-table-wrap">
@@ -227,7 +229,8 @@ export default function Pricing() {
               </tbody>
             </table>
           </div>
-        </section>
+          </section>
+        </div>
       </div>
     </section>
   );
