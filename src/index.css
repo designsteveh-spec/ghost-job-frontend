@@ -58,6 +58,21 @@ body {
   align-items: center;
 }
 
+/* Desktop navbar text link (replaces CTA buttons) */
+.nav-upgrade-link {
+  color: #1e40ff;
+  font-weight: 700;
+  text-decoration: none;
+  white-space: nowrap;
+  padding: 10px 6px; /* keeps alignment with the access field */
+}
+
+.nav-upgrade-link:hover {
+  text-decoration: none;
+  opacity: 0.9;
+}
+
+
 /* ---------------- NAVBAR ACCESS CODE (v1.0.access.ui) ---------------- */
 
 .site-header .nav-access {
