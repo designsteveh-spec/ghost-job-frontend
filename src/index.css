@@ -162,6 +162,24 @@ body {
 
 
 
+/* Navbar text link (replaces desktop CTA buttons) */
+.nav-upgrade-link {
+  color: #1E40FF;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500; /* ✅ medium/regular (not bold) */
+  white-space: nowrap;
+}
+
+.nav-upgrade-link:hover {
+  color: #1e3ae8;
+  text-decoration: none;
+}
+
+.nav-upgrade-link:visited {
+  color: #1E40FF;
+}
+
 .cta {
   padding: 10px 16px;
   border-radius: 999px;
