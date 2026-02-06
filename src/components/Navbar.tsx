@@ -84,12 +84,14 @@ export default function Navbar({
 
         {/* Desktop actions */}
         <div className="nav-actions nav-actions-desktop">
-          <a
-            href="#pricing"
-            className="nav-upgrade-link"
-            onClick={() => setMenuOpen(false)}
-          >
-            Get More Link Checks
+          <a href="#newsletter" className="cta cta-secondary">
+            <span className="cta-desktop">Subscribe to Newsletter</span>
+            <span className="cta-mobile">Subscribe</span>
+          </a>
+
+          <a href={isPaidRoute ? '#hero' : '#pricing'} className="cta cta-primary">
+            <span className="cta-desktop">Get More Link Checks</span>
+            <span className="cta-mobile">Upgrade</span>
           </a>
 
           {/* Access Code input (always available) */}
