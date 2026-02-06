@@ -58,6 +58,22 @@ body {
   align-items: center;
 }
 
+
+/* NAVBAR: text link replacing CTAs */
+.nav-link-pricing,
+.nav-link-pricing:visited {
+  color: #1e40ff;
+  text-decoration: none;
+  font-weight: 500; /* ✅ medium/regular, not bold */
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.nav-link-pricing:hover {
+  text-decoration: none;
+  color: #1e3ae8;
+}
+
 /* ---------------- NAVBAR ACCESS CODE (v1.0.access.ui) ---------------- */
 
 .site-header .nav-access {
