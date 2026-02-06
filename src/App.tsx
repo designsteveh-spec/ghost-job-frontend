@@ -1030,11 +1030,10 @@ timeoutsRef.current.push(t4);
           <div className="hero-content">
             {status === 'idle' ? (
               <>
-                <span className="eyebrow">Ghost Job Link Checker</span>
+                {/* (removed) eyebrow label */}
 
                 <h1>
-  Stop wasting time applying to ghost jobs with our{' '}
-  <span className="accent">link checking tool</span>.
+  Check jobs <span style={{ color: '#1E40FF' }}>before applying.</span>
 </h1>
 
 
