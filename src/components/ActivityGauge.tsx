@@ -180,7 +180,7 @@ const arcEnd = 405;    // lower-right (45 + 360) so the sweep goes over the top
         <defs>
           <linearGradient id="gArc" x1="40" y1="220" x2="216" y2="60">
             <stop offset="0%" stopColor="#1e40ff" />
-            <stop offset="100%" stopColor="#6ee7b7" />
+            <stop offset="100%" stopColor="#1e40ff" />
           </linearGradient>
 
           <filter id="gShadow" x="-50%" y="-50%" width="200%" height="200%">

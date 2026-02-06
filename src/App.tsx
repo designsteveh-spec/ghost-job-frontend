@@ -1032,8 +1032,8 @@ timeoutsRef.current.push(t4);
               <>
                 {/* (removed) eyebrow label */}
 
-                <h1>
-  Check jobs <span style={{ color: '#1E40FF' }}>before applying.</span>
+                <h1 style={{ marginTop: 100, marginBottom: 50, fontSize: 56, lineHeight: 1.05 }}>
+  Check Jobs <span style={{ color: '#1E40FF' }}>Before Applying.</span>
 </h1>
 
 
