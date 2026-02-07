@@ -51,8 +51,12 @@ export default function MailerLiteForm() {
 
       <div class="ml-form-embedBody row-form">
         <div class="ml-form-embedContent">
-          <h4>Stay Informed</h4>
-          <p>Occasional updates about improvements. <strong>No spam.</strong></p>
+          <h4 class="newsletter-title">
+  <span class="newsletter-title-accent">Get Informed</span> About Job Hunting and Avoiding Ghost Jobs
+</h4>
+          <p style="text-align:center;">
+  <strong>No spam.</strong> We never sell your information.
+</p>
         </div>
 
         <form

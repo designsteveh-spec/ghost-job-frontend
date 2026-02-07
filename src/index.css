@@ -2064,6 +2064,40 @@ select.postingage-cta-input {
 
 /* ---------------- NEWSLETTER ---------------- */
 
+.newsletter-title {
+  font-size: 40px;     /* matches .compare-title */
+  font-weight: 800;
+  margin: 0 0 14px;
+  text-align: center;
+  color: #0f172a;
+}
+
+.newsletter-title-accent {
+  color: #1e40ff;      /* your blue */
+}
+
+.newsletter-title-rest {
+  color: #0f172a;
+}
+
+/* Control: mobile sizing */
+@media (max-width: 720px) {
+  .newsletter-title {
+    font-size: 34px;
+  }
+}
+
+@media (max-width: 420px) {
+  .newsletter-title {
+    font-size: 26px;
+  }
+}
+
+.newsletter {
+  background: #ffffff;
+  padding: 20px 24px 48px;
+}
+
 .newsletter {
   background: #ffffff;
   padding: 20px 24px 48px;
@@ -2300,5 +2334,18 @@ select.postingage-cta-input {
   .pricing-table-wrap {
     padding-top: 48px;
     padding-bottom: 56px;
+  }
+}
+
+/* Newsletter spacing control */
+.newsletter-section {
+  margin-top: 64px;     /* desktop spacing ABOVE newsletter */
+  margin-bottom: 196px;  /* desktop spacing BELOW newsletter */
+}
+
+@media (max-width: 700px) {
+  .newsletter-section {
+    margin-top: 40px;    /* mobile spacing ABOVE newsletter */
+    margin-bottom: 56px; /* mobile spacing BELOW newsletter */
   }
 }

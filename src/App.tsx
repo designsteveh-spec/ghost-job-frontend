@@ -1658,7 +1658,9 @@ setJobDescription('');
       {!isPaidRoute && <Pricing />}
 
       {/* NEWSLETTER */}
-      <MailerLiteForm />
+      <section className="newsletter-section">
+        <MailerLiteForm />
+      </section>
 
 
 
