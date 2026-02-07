@@ -14,6 +14,10 @@ import ActivityGauge from './components/ActivityGauge';
 
 // Hero + education images
 import educationImage from './assets/ghostPic-1.png';
+import ghostPhoneAppLeft from './assets/ghostPhoneAppLeft.png';
+import ghostPhoneAppRight from './assets/ghostPhoneAppRight.png';
+
+
 
 // Education icons
 import staleIcon from './assets/marker3-data.svg';
@@ -1030,11 +1034,10 @@ timeoutsRef.current.push(t4);
           <div className="hero-content">
             {status === 'idle' ? (
               <>
-                <span className="eyebrow">Ghost Job Link Checker</span>
+                {/* (removed) eyebrow label */}
 
-                <h1>
-  Stop wasting time applying to ghost jobs with our{' '}
-  <span className="accent">link checking tool</span>.
+                <h1 style={{ marginTop: 100, marginBottom: 50, fontSize: 56, lineHeight: 1.05 }}>
+  Check Jobs <span style={{ color: '#1E40FF' }}>Before Applying.</span>
 </h1>
 
 
@@ -1566,8 +1569,8 @@ setJobDescription('');
                       <div className="analysis-tag" data-tip="Site reliability cues (major platforms vs unknown).">
                         <img src={checkComplete} alt="" className="analysis-tag-icon" />
                         <div className="analysis-tag-text">
-                          <div className="analysis-tag-title">Site Reliability Indicators</div>
-                          <div className="analysis-tag-value">
+                            <div className="analysis-tag-title">Site Reliability Indicators</div>
+                            <div className="analysis-tag-value">
   {scoreBreakdown?.siteReliability ?? 0}
 </div>
 
@@ -1581,6 +1584,31 @@ setJobDescription('');
           </div>
         </section>
       )}
+
+      {/* MARKETING SPLIT (between HERO and EDUCATION) */}
+      <section className="marketing-split">
+        <div className="marketing-split-inner">
+          <h2 className="marketing-split-title">
+            <span className="marketing-split-easy">It’s easy!</span>{' '}
+            <span className="marketing-split-rest">
+              Paste a job link, select posting age, and optionally paste the job description.
+            </span>
+          </h2>
+
+          <div className="marketing-split-images" aria-hidden="true">
+            <img
+              src={ghostPhoneAppLeft}
+              alt=""
+              className="marketing-split-img"
+            />
+            <img
+              src={ghostPhoneAppRight}
+              alt=""
+              className="marketing-split-img"
+            />
+          </div>
+        </div>
+      </section>
 
       {/* EDUCATION */}
 
@@ -1630,7 +1658,9 @@ setJobDescription('');
       {!isPaidRoute && <Pricing />}
 
       {/* NEWSLETTER */}
-      <MailerLiteForm />
+      <section className="newsletter-section">
+        <MailerLiteForm />
+      </section>
 
 
 
