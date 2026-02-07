@@ -195,6 +195,35 @@ const [scoreBreakdown, setScoreBreakdown] = useState<{
 
 const [lastUpdatedAt, setLastUpdatedAt] = useState<string | null>(null);
 
+/* ---------------- OFFICIAL SOURCE CHECK (UI payload) ---------------- */
+type OfficialSourceStatus = 'PASS' | 'MISMATCH' | 'UNCONFIRMED' | 'NOT_APPLICABLE';
+
+const [officialSourceCheck, setOfficialSourceCheck] = useState<{
+  status: OfficialSourceStatus;
+  delta?: number;
+  reason?: string;
+} | null>(null);
+
+const officialSourceLine = (p: { status: OfficialSourceStatus; reason?: string } | null): string => {
+  if (!p) return 'Official source not confirmed';
+
+  if (p.reason === 'BLOCKED') {
+    return 'Some companies block automated checks; this increases uncertainty';
+  }
+
+  switch (p.status) {
+    case 'PASS':
+      return 'Official source confirmed';
+    case 'MISMATCH':
+      return 'Source mismatch detected';
+    case 'NOT_APPLICABLE':
+      return 'Official source not confirmed';
+    case 'UNCONFIRMED':
+    default:
+      return 'Official source not confirmed';
+  }
+};
+
 
 
 
@@ -238,6 +267,7 @@ const [gaugeRunId, setGaugeRunId] = useState<number>(0);
     | 'detectedActivityScan'
     | 'detectedLastUpdated'
     | 'detectedApplyLinkBehavior'
+    | 'officialSourceCheck'
     | 'confidenceDataQuality'
     | 'scorePostingAge'
     | 'scoreFreshness1'
@@ -248,6 +278,7 @@ const [gaugeRunId, setGaugeRunId] = useState<number>(0);
     | 'detectedGoogleIndexed'
     | 'detectedGoogleTopResult'
     | 'detectedGoogleSnippet';
+
 
 
 
@@ -265,6 +296,7 @@ const [gaugeRunId, setGaugeRunId] = useState<number>(0);
     detectedActivityScan: 'pending',
     detectedLastUpdated: 'pending',
     detectedApplyLinkBehavior: 'pending',
+    officialSourceCheck: 'pending',
 
     confidenceDataQuality: 'pending',
 
@@ -539,6 +571,7 @@ setDetectedGoogleTopResultValue(null);
 setDetectedGoogleSnippetValue(null);
 setDetectedGoogleTopLinkValue(null);
 setLastUpdatedAt(null);
+setOfficialSourceCheck(null);
 
 setPostingDateOverride('');
 setLastAnalyzedUrl('');
@@ -709,6 +742,7 @@ setDetectedGoogleIndexedValue(null);
 setDetectedGoogleTopResultValue(null);
 setDetectedGoogleSnippetValue(null);
 setDetectedGoogleTopLinkValue(null);
+setOfficialSourceCheck(null);
 
 
 setSignals({
@@ -744,6 +778,7 @@ scheduleStep('detectedCanonicalJobId', 1240);
 scheduleStep('detectedActivityScan', 1680);
 scheduleStep('detectedLastUpdated', 2080);
 scheduleStep('detectedApplyLinkBehavior', 2400);
+scheduleStep('officialSourceCheck', 1800);
 
 scheduleStep('confidenceDataQuality', 1480);
 
@@ -836,6 +871,32 @@ try {
             const data = await res.json();
 setScoreBreakdown(data?.breakdown ?? null);
 setLastUpdatedAt(new Date().toLocaleString());
+
+// Official source check (strictly additive)
+// Accept a few possible backend keys to reduce fragility.
+const osc =
+  data?.officialSourceCheck ??
+  data?.official_source_check ??
+  data?.validator ??
+  data?.officialSource ??
+  null;
+
+if (osc && typeof osc === 'object') {
+  const statusRaw = String(osc.status || '').toUpperCase();
+  const status: OfficialSourceStatus =
+    statusRaw === 'PASS' || statusRaw === 'MISMATCH' || statusRaw === 'UNCONFIRMED' || statusRaw === 'NOT_APPLICABLE'
+      ? (statusRaw as OfficialSourceStatus)
+      : 'UNCONFIRMED';
+
+  setOfficialSourceCheck({
+    status,
+    delta: typeof osc.delta === 'number' ? osc.delta : undefined,
+    reason: osc.reason ? String(osc.reason) : undefined,
+  });
+} else {
+  // If backend doesn't send it yet, still show a deterministic, non-accusatory result
+  setOfficialSourceCheck({ status: 'UNCONFIRMED' });
+}
 
 
 
@@ -1482,6 +1543,29 @@ setJobDescription('');
                       )
                     )}
                   </div>
+
+{/* 3) OFFICIAL SOURCE CHECK */}
+<div className="analysis-card">
+  <div className="analysis-card-title">OFFICIAL SOURCE CHECK</div>
+
+  {analysisSteps.officialSourceCheck === 'complete' && (
+    <div
+      className="analysis-tag"
+      data-tip="Checks whether the listing appears to match an official employer source (best-effort)."
+    >
+      <img src={checkComplete} alt="" className="analysis-tag-icon" />
+      <div className="analysis-tag-text">
+        <div className="analysis-tag-title">Official source check</div>
+        <div className="analysis-tag-value">
+          {officialSourceLine(officialSourceCheck)}
+
+        </div>
+      </div>
+    </div>
+  )}
+</div>
+
+
 
                   {/* 3) CONFIDENCE */}
                   <div className="analysis-card">
