@@ -14,6 +14,10 @@ import ActivityGauge from './components/ActivityGauge';
 
 // Hero + education images
 import educationImage from './assets/ghostPic-1.png';
+import ghostPhoneAppLeft from './assets/ghostPhoneAppLeft.png';
+import ghostPhoneAppRight from './assets/ghostPhoneAppRight.png';
+
+
 
 // Education icons
 import staleIcon from './assets/marker3-data.svg';
@@ -1224,6 +1228,32 @@ setJobDescription('');
           </div>
         </div>
       </section>
+
+      {/* MARKETING SPLIT (between HERO and EDUCATION) */}
+      <section className="marketing-split">
+        <div className="marketing-split-inner">
+          <h2 className="marketing-split-title">
+            <span className="marketing-split-easy">It’s easy!</span>{' '}
+            <span className="marketing-split-rest">
+              Paste a job link, select posting age, and optionally paste the job description.
+            </span>
+          </h2>
+
+          <div className="marketing-split-images" aria-hidden="true">
+            <img
+              src={ghostPhoneAppLeft}
+              alt=""
+              className="marketing-split-img"
+            />
+            <img
+              src={ghostPhoneAppRight}
+              alt=""
+              className="marketing-split-img"
+            />
+          </div>
+        </div>
+      </section>
+
 
             {/* ANALYSIS (accordion like Legal) */}
       {(status !== 'idle' || import.meta.env.DEV) && (

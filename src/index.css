@@ -663,6 +663,74 @@ button {
 }
 
 
+/* ---------------- MARKETING SPLIT (between HERO and EDUCATION) ---------------- */
+
+.marketing-split {
+  background: #F8FAFC;
+  padding: 96px 0;
+}
+
+.marketing-split-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px;
+  text-align: center;
+}
+
+.marketing-split-title {
+  font-size: 44px;
+  line-height: 1.15;
+  margin: 0 0 46px;
+  font-weight: 900;
+}
+
+.marketing-split-easy {
+  color: #4040FF;
+}
+
+.marketing-split-rest {
+  color: #000000;
+  font-weight: 900;
+}
+
+.marketing-split-images {
+  display: flex;
+  gap: 0;              /* ✅ no space between images */
+  justify-content: center;
+  align-items: stretch;
+}
+
+.marketing-split-img {
+  width: 50%;
+  height: auto;
+  display: block;
+}
+
+/* Mobile: stack in order (Text, Left, Right) */
+@media (max-width: 768px) {
+  .marketing-split {
+    padding: 64px 0;
+  }
+
+  .marketing-split-title {
+    font-size: 34px;
+    margin-bottom: 28px;
+  }
+
+  .marketing-split-images {
+    flex-direction: column;
+  }
+
+  .marketing-split-img {
+    width: 100%;
+  }
+}
+
+@media (max-width: 420px) {
+  .marketing-split-title {
+    font-size: 26px;
+  }
+}
 
 
 /* ---------------- EDUCATION ---------------- */
@@ -937,23 +1005,36 @@ button {
 /* ---------------- COMPARE PLANS TABLE ---------------- */
 
 .compare-plans {
+  /* space ABOVE the grey band (outside) */
   margin-top: 44px;
-  padding: 54px 0;
-  background: #f8fafc; /* grey separator band like mock */
+
+  /* space INSIDE the grey band (this controls your arrows) */
+  padding-top: 72px;
+  padding-bottom: 72px;
+
+  background: #f8fafc;
   border-top: 1px solid #e5e7eb;
   border-bottom: 1px solid #e5e7eb;
 
-  /* ✅ full-bleed band even inside max-width containers */
   width: 100vw;
   margin-left: calc(50% - 50vw);
   margin-right: calc(50% - 50vw);
+}
+
+/* Smaller screens */
+@media (max-width: 720px) {
+  .compare-plans {
+    margin-top: 34px;
+    padding-top: 56px;
+    padding-bottom: 56px;
+  }
 }
 
 
 .compare-title {
   font-size: 40px;
   font-weight: 800;
-  margin: 0 0 20px;
+  margin: 0 0 28px; /* tweak this for title→table gap */
   text-align: center;
   color: #0f172a;
 }
@@ -1023,9 +1104,18 @@ button {
   background: #f1f5f9;
 }
 
-/* bottom grey bar row */
-.compare-row-footer td {
-  background: #d1d5db;
+/* bottom grey bar row (desktop only) */
+@media (min-width: 769px) {
+  .compare-row-footer td {
+    background: #d1d5db;
+  }
+}
+
+/* mobile/cards: make it look like the other rows */
+@media (max-width: 768px) {
+  .compare-row-footer td {
+    background: #ffffff;
+  }
 }
 
 .compare-check {
@@ -1042,15 +1132,76 @@ button {
   opacity: 0.75;
 }
 
-/* mobile: prevent squish */
+/* Mobile: use stacked compare cards (no horizontal scroll) */
+.compare-cards {
+  display: none; /* desktop hidden */
+}
+
 @media (max-width: 768px) {
   .compare-table-wrap {
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
+    display: none; /* hide table on mobile */
   }
 
-  .compare-table {
-    min-width: 760px;
+  .compare-cards {
+    display: grid;
+    gap: 16px;
+    max-width: 520px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  .compare-card {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 18px;
+    overflow: hidden;
+    box-shadow: 0 10px 28px rgba(15, 23, 42, 0.06);
+    text-align: left;
+  }
+
+  .compare-card-head {
+    padding: 14px 16px;
+    border-bottom: 1px solid #e5e7eb;
+    background: #ffffff;
+  }
+
+  .compare-card-plan {
+    font-size: 16px;
+    font-weight: 900;
+    color: #1e40ff;
+  }
+
+  .compare-card-rows {
+    padding: 6px 0;
+  }
+
+  .compare-card-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    padding: 12px 16px;
+    border-top: 1px solid #e5e7eb;
+    font-size: 14px;
+  }
+
+  .compare-card-row:first-child {
+    border-top: 0;
+  }
+
+  .compare-card-label {
+    font-weight: 700;
+    color: #0f172a;
+  }
+
+  .compare-card-value {
+    text-align: right;
+    color: #0f172a;
+    font-weight: 600;
+  }
+
+  .compare-card-row-footer {
+    background: #ffffff;
   }
 }
 
@@ -2094,15 +2245,14 @@ select.postingage-cta-input {
 
 /* --- EDUCATION section spacing controls --- */
 .education {
-  padding-top: 200px;     /* space above the whole section */
-  padding-bottom: 200px;  /* space below the whole section */
+  padding-top: 200px;
+  padding-bottom: 200px;
 }
 
 .education-media {
-  margin-top: 28px;      /* pushes the image block down inside the section */
+  margin-top: 28px;
 }
 
-/* Smaller screens */
 @media (max-width: 720px) {
   .education {
     padding-top: 56px;
@@ -2114,14 +2264,13 @@ select.postingage-cta-input {
   }
 }
 
-
-/* --- Pricing spacing controls (cards vs table) --- */
+/* --- Pricing spacing controls (cards+disclaimer vs table) --- */
 .pricing-cards-wrap {
-  padding-top: 72px;      /* space above pricing cards */
-  padding-bottom: 56px;   /* ✅ space below cards+disclaimer */
+  padding-top: 72px;      /* space above cards */
+  padding-bottom: 56px;   /* space below cards+disclaimer */
 }
 
-/* ✅ Controls how close the disclaimer sits to the cards */
+/* Controls how close disclaimer sits to cards */
 .pricing-grid {
   margin-bottom: 12px;
 }
@@ -2130,38 +2279,23 @@ select.postingage-cta-input {
   margin-top: 0px;
 }
 
-/* Gap between cards and the disclaimer text below */
-.pricing-grid {
-  margin-bottom: 14px;
-}
-
-.pricing-disclaimer {
-  margin-top: 0px;
-}
-
-
 .pricing-table-wrap {
-  padding-top: 48px;     /* space above pricing table */
-  padding-bottom: 72px;  /* space below pricing table */
+  padding-top: 0;
+  padding-bottom: 0;
 }
 
-/* Smaller screens */
 @media (max-width: 720px) {
   .pricing-cards-wrap {
     padding-top: 56px;
-    padding-bottom: 0px; /* keep disclaimer close on mobile too */
+    padding-bottom: 40px; /* mobile space below cards+disclaimer */
   }
 
   .pricing-grid {
-    margin-bottom: 12px;
-  }
-
-  .pricing-disclaimer {
-    margin-top: 0px;
+    margin-bottom: 10px;  /* keep disclaimer close */
   }
 
   .pricing-table-wrap {
-    padding-top: 34px;
+    padding-top: 48px;
     padding-bottom: 56px;
   }
 }

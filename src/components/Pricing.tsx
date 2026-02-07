@@ -158,77 +158,187 @@ export default function Pricing() {
 
         <div className="pricing-table-wrap">
           <section className="compare-plans">
-          <h3 className="compare-title">Compare Plans</h3>
+            <h3 className="compare-title">Compare Plans</h3>
 
-          <div className="compare-table-wrap">
-            <table className="compare-table">
-              <thead>
-                <tr>
-                  <th className="compare-col-label">Plans</th>
-                  <th className="compare-col-plan">Free Check</th>
-                  <th className="compare-col-plan">Casual Job Hunt Pass</th>
-                  <th className="compare-col-plan">Active Job Hunt Pass</th>
-                </tr>
-              </thead>
+            {/* Mobile: stacked compare cards (no horizontal scroll) */}
+            <div className="compare-cards" aria-label="Compare plans (mobile)">
+              {/* Free */}
+              <div className="compare-card">
+                <div className="compare-card-head">
+                  <div className="compare-card-plan">Free Check</div>
+                </div>
+                <div className="compare-card-rows">
+                  <div className="compare-card-row">
+                    <div className="compare-card-label">Daily Usage</div>
+                    <div className="compare-card-value compare-accent">3 checks</div>
+                  </div>
+                  <div className="compare-card-row">
+                    <div className="compare-card-label">Analysis Engine Used</div>
+                    <div className="compare-card-value"><span className="compare-check">✓</span></div>
+                  </div>
+                  <div className="compare-card-row">
+                    <div className="compare-card-label">Full Analysis Included</div>
+                    <div className="compare-card-value"><span className="compare-check">✓</span></div>
+                  </div>
+                  <div className="compare-card-row">
+                    <div className="compare-card-label">Priority Processing</div>
+                    <div className="compare-card-value">
+                      <img className="compare-x" src={xIcon} alt="Not included" />
+                    </div>
+                  </div>
+                  <div className="compare-card-row">
+                    <div className="compare-card-label">Subscription Length</div>
+                    <div className="compare-card-value">-</div>
+                  </div>
+                  <div className="compare-card-row compare-card-row-footer">
+                    <div className="compare-card-label">Monthly Renewal</div>
+                    <div className="compare-card-value">
+                      <img className="compare-x" src={xIcon} alt="No" />
+                    </div>
+                  </div>
+                </div>
+              </div>
 
-              <tbody>
-                <tr>
-                  <td className="compare-row-label">Daily Usage</td>
-                  <td className="compare-accent">3 checks</td>
-                  <td className="compare-accent">10 checks</td>
-                  <td className="compare-accent">30 checks</td>
-                </tr>
+              {/* Casual */}
+              <div className="compare-card">
+                <div className="compare-card-head">
+                  <div className="compare-card-plan">Casual Job Hunt Pass</div>
+                </div>
+                <div className="compare-card-rows">
+                  <div className="compare-card-row">
+                    <div className="compare-card-label">Daily Usage</div>
+                    <div className="compare-card-value compare-accent">10 checks</div>
+                  </div>
+                  <div className="compare-card-row">
+                    <div className="compare-card-label">Analysis Engine Used</div>
+                    <div className="compare-card-value"><span className="compare-check">✓</span></div>
+                  </div>
+                  <div className="compare-card-row">
+                    <div className="compare-card-label">Full Analysis Included</div>
+                    <div className="compare-card-value"><span className="compare-check">✓</span></div>
+                  </div>
+                  <div className="compare-card-row">
+                    <div className="compare-card-label">Priority Processing</div>
+                    <div className="compare-card-value">
+                      <img className="compare-x" src={xIcon} alt="Not included" />
+                    </div>
+                  </div>
+                  <div className="compare-card-row">
+                    <div className="compare-card-label">Subscription Length</div>
+                    <div className="compare-card-value compare-accent">30 days</div>
+                  </div>
+                  <div className="compare-card-row compare-card-row-footer">
+                    <div className="compare-card-label">Monthly Renewal</div>
+                    <div className="compare-card-value">
+                      <img className="compare-x" src={xIcon} alt="No" />
+                    </div>
+                  </div>
+                </div>
+              </div>
 
-                <tr>
-                  <td className="compare-row-label">Analysis Engine Used</td>
-                  <td className="compare-center"><span className="compare-check">✓</span></td>
-                  <td className="compare-center"><span className="compare-check">✓</span></td>
-                  <td className="compare-center"><span className="compare-check">✓</span></td>
-                </tr>
+              {/* Active */}
+              <div className="compare-card">
+                <div className="compare-card-head">
+                  <div className="compare-card-plan">Active Job Hunt Pass</div>
+                </div>
+                <div className="compare-card-rows">
+                  <div className="compare-card-row">
+                    <div className="compare-card-label">Daily Usage</div>
+                    <div className="compare-card-value compare-accent">30 checks</div>
+                  </div>
+                  <div className="compare-card-row">
+                    <div className="compare-card-label">Analysis Engine Used</div>
+                    <div className="compare-card-value"><span className="compare-check">✓</span></div>
+                  </div>
+                  <div className="compare-card-row">
+                    <div className="compare-card-label">Full Analysis Included</div>
+                    <div className="compare-card-value"><span className="compare-check">✓</span></div>
+                  </div>
+                  <div className="compare-card-row">
+                    <div className="compare-card-label">Priority Processing</div>
+                    <div className="compare-card-value"><span className="compare-check">✓</span></div>
+                  </div>
+                  <div className="compare-card-row">
+                    <div className="compare-card-label">Subscription Length</div>
+                    <div className="compare-card-value compare-accent">30 days</div>
+                  </div>
+                  <div className="compare-card-row compare-card-row-footer">
+                    <div className="compare-card-label">Monthly Renewal</div>
+                    <div className="compare-card-value">
+                      <img className="compare-x" src={xIcon} alt="No" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
 
-                <tr>
-                  <td className="compare-row-label">Full Analysis Included</td>
-                  <td className="compare-center"><span className="compare-check">✓</span></td>
-                  <td className="compare-center"><span className="compare-check">✓</span></td>
-                  <td className="compare-center"><span className="compare-check">✓</span></td>
-                </tr>
+            {/* Desktop/tablet: keep table */}
+            <div className="compare-table-wrap">
+              <table className="compare-table">
+                <thead>
+                  <tr>
+                    <th className="compare-col-label">Plans</th>
+                    <th className="compare-col-plan">Free Check</th>
+                    <th className="compare-col-plan">Casual Job Hunt Pass</th>
+                    <th className="compare-col-plan">Active Job Hunt Pass</th>
+                  </tr>
+                </thead>
 
-                
+                <tbody>
+                  <tr>
+                    <td className="compare-row-label">Daily Usage</td>
+                    <td className="compare-accent">3 checks</td>
+                    <td className="compare-accent">10 checks</td>
+                    <td className="compare-accent">30 checks</td>
+                  </tr>
 
+                  <tr>
+                    <td className="compare-row-label">Analysis Engine Used</td>
+                    <td className="compare-center"><span className="compare-check">✓</span></td>
+                    <td className="compare-center"><span className="compare-check">✓</span></td>
+                    <td className="compare-center"><span className="compare-check">✓</span></td>
+                  </tr>
 
-                <tr>
-                  <td className="compare-row-label">Priority Processing</td>
-                  <td className="compare-center">
-                    <img className="compare-x" src={xIcon} alt="Not included" />
-                  </td>
-                  <td className="compare-center">
-                    <img className="compare-x" src={xIcon} alt="Not included" />
-                  </td>
-                  <td className="compare-center"><span className="compare-check">✓</span></td>
-                </tr>
+                  <tr>
+                    <td className="compare-row-label">Full Analysis Included</td>
+                    <td className="compare-center"><span className="compare-check">✓</span></td>
+                    <td className="compare-center"><span className="compare-check">✓</span></td>
+                    <td className="compare-center"><span className="compare-check">✓</span></td>
+                  </tr>
 
-                <tr>
-                  <td className="compare-row-label">Subscription Length</td>
-                  <td className="compare-center">-</td>
-                  <td className="compare-accent">30 days</td>
-                  <td className="compare-accent">30 days</td>
-                </tr>
+                  <tr>
+                    <td className="compare-row-label">Priority Processing</td>
+                    <td className="compare-center">
+                      <img className="compare-x" src={xIcon} alt="Not included" />
+                    </td>
+                    <td className="compare-center">
+                      <img className="compare-x" src={xIcon} alt="Not included" />
+                    </td>
+                    <td className="compare-center"><span className="compare-check">✓</span></td>
+                  </tr>
 
-                <tr className="compare-row-footer">
-                  <td className="compare-row-label">Monthly Renewal</td>
-                  <td className="compare-center">
-                    <img className="compare-x" src={xIcon} alt="No" />
-                  </td>
-                  <td className="compare-center">
-                    <img className="compare-x" src={xIcon} alt="No" />
-                  </td>
-                  <td className="compare-center">
-                    <img className="compare-x" src={xIcon} alt="No" />
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+                  <tr>
+                    <td className="compare-row-label">Subscription Length</td>
+                    <td className="compare-center">-</td>
+                    <td className="compare-accent">30 days</td>
+                    <td className="compare-accent">30 days</td>
+                  </tr>
+
+                  <tr className="compare-row-footer">
+                    <td className="compare-row-label">Monthly Renewal</td>
+                    <td className="compare-center">
+                      <img className="compare-x" src={xIcon} alt="No" />
+                    </td>
+                    <td className="compare-center">
+                      <img className="compare-x" src={xIcon} alt="No" />
+                    </td>
+                    <td className="compare-center">
+                      <img className="compare-x" src={xIcon} alt="No" />
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </section>
         </div>
       </div>
