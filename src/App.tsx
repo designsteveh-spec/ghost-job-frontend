@@ -205,22 +205,19 @@ const [officialSourceCheck, setOfficialSourceCheck] = useState<{
 } | null>(null);
 
 const officialSourceLine = (p: { status: OfficialSourceStatus; reason?: string } | null): string => {
-  if (!p) return 'Official source not confirmed';
+  if (!p) return 'Not confirmed';
 
-  if (p.reason === 'BLOCKED') {
-    return 'Some companies block automated checks; this increases uncertainty';
-  }
+  if (p.reason === 'BLOCKED') return 'Blocked';
 
   switch (p.status) {
     case 'PASS':
-      return 'Official source confirmed';
+      return 'Confirmed';
     case 'MISMATCH':
-      return 'Source mismatch detected';
+      return 'Mismatch';
     case 'NOT_APPLICABLE':
-      return 'Official source not confirmed';
     case 'UNCONFIRMED':
     default:
-      return 'Official source not confirmed';
+      return 'Not confirmed';
   }
 };
 
@@ -1544,43 +1541,34 @@ setJobDescription('');
                     )}
                   </div>
 
-{/* 3) OFFICIAL SOURCE CHECK */}
-<div className="analysis-card">
-  <div className="analysis-card-title">OFFICIAL SOURCE CHECK</div>
 
-  {analysisSteps.officialSourceCheck === 'complete' && (
-    <div
-      className="analysis-tag"
-      data-tip="Checks whether the listing appears to match an official employer source (best-effort)."
-    >
+
+
+                  {/* 3) CONFIDENCE */}
+<div className="analysis-card">
+  <div className="analysis-card-title">CONFIDENCE</div>
+
+  {analysisSteps.confidenceDataQuality === 'complete' && (
+    <div className="analysis-tag analysis-tag-highlight" data-tip="Confidence reflects input quality and page accessibility.">
       <img src={checkComplete} alt="" className="analysis-tag-icon" />
       <div className="analysis-tag-text">
-        <div className="analysis-tag-title">Official source check</div>
-        <div className="analysis-tag-value">
-          {officialSourceLine(officialSourceCheck)}
+        <div className="analysis-tag-title">Data Quality</div>
+        <div className="analysis-tag-value">Medium</div>
+      </div>
+    </div>
+  )}
 
-        </div>
+  {analysisSteps.officialSourceCheck === 'complete' && (
+    <div className="analysis-tag" data-tip="Best-effort check against an official employer source.">
+      <img src={checkComplete} alt="" className="analysis-tag-icon" />
+      <div className="analysis-tag-text">
+        <div className="analysis-tag-title">Official Source Check</div>
+        <div className="analysis-tag-value">{officialSourceLine(officialSourceCheck)}</div>
       </div>
     </div>
   )}
 </div>
 
-
-
-                  {/* 3) CONFIDENCE */}
-                  <div className="analysis-card">
-                    <div className="analysis-card-title">CONFIDENCE</div>
-
-                    {analysisSteps.confidenceDataQuality === 'complete' && (
-                      <div className="analysis-tag analysis-tag-highlight" data-tip="Confidence reflects input quality and page accessibility.">
-                        <img src={checkComplete} alt="" className="analysis-tag-icon" />
-                        <div className="analysis-tag-text">
-                          <div className="analysis-tag-title">Data Quality</div>
-                          <div className="analysis-tag-value">Medium</div>
-                        </div>
-                      </div>
-                    )}
-                  </div>
 
                   {/* 4) SCORE SUMMARY */}
                   <div className="analysis-card">
