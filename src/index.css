@@ -1005,16 +1005,19 @@ button {
 /* ---------------- COMPARE PLANS TABLE ---------------- */
 
 .compare-plans {
-  /* space ABOVE the grey band (outside) */
+  /* space ABOVE the section */
   margin-top: 44px;
 
-  /* space INSIDE the grey band (this controls your arrows) */
+  /* space INSIDE the section */
   padding-top: 72px;
   padding-bottom: 72px;
 
-  background: #f8fafc;
-  border-top: 1px solid #e5e7eb;
-  border-bottom: 1px solid #e5e7eb;
+  /* ✅ white background */
+  background: #ffffff;
+
+  /* ✅ remove thin divider lines */
+  border-top: 0;
+  border-bottom: 0;
 
   width: 100vw;
   margin-left: calc(50% - 50vw);

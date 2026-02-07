@@ -1229,32 +1229,6 @@ setJobDescription('');
         </div>
       </section>
 
-      {/* MARKETING SPLIT (between HERO and EDUCATION) */}
-      <section className="marketing-split">
-        <div className="marketing-split-inner">
-          <h2 className="marketing-split-title">
-            <span className="marketing-split-easy">It’s easy!</span>{' '}
-            <span className="marketing-split-rest">
-              Paste a job link, select posting age, and optionally paste the job description.
-            </span>
-          </h2>
-
-          <div className="marketing-split-images" aria-hidden="true">
-            <img
-              src={ghostPhoneAppLeft}
-              alt=""
-              className="marketing-split-img"
-            />
-            <img
-              src={ghostPhoneAppRight}
-              alt=""
-              className="marketing-split-img"
-            />
-          </div>
-        </div>
-      </section>
-
-
             {/* ANALYSIS (accordion like Legal) */}
       {(status !== 'idle' || import.meta.env.DEV) && (
 
@@ -1595,8 +1569,8 @@ setJobDescription('');
                       <div className="analysis-tag" data-tip="Site reliability cues (major platforms vs unknown).">
                         <img src={checkComplete} alt="" className="analysis-tag-icon" />
                         <div className="analysis-tag-text">
-                          <div className="analysis-tag-title">Site Reliability Indicators</div>
-                          <div className="analysis-tag-value">
+                            <div className="analysis-tag-title">Site Reliability Indicators</div>
+                            <div className="analysis-tag-value">
   {scoreBreakdown?.siteReliability ?? 0}
 </div>
 
@@ -1610,6 +1584,31 @@ setJobDescription('');
           </div>
         </section>
       )}
+
+      {/* MARKETING SPLIT (between HERO and EDUCATION) */}
+      <section className="marketing-split">
+        <div className="marketing-split-inner">
+          <h2 className="marketing-split-title">
+            <span className="marketing-split-easy">It’s easy!</span>{' '}
+            <span className="marketing-split-rest">
+              Paste a job link, select posting age, and optionally paste the job description.
+            </span>
+          </h2>
+
+          <div className="marketing-split-images" aria-hidden="true">
+            <img
+              src={ghostPhoneAppLeft}
+              alt=""
+              className="marketing-split-img"
+            />
+            <img
+              src={ghostPhoneAppRight}
+              alt=""
+              className="marketing-split-img"
+            />
+          </div>
+        </div>
+      </section>
 
       {/* EDUCATION */}
 
