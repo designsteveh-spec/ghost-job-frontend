@@ -10,12 +10,15 @@ export default function Navbar({
   accessCode,
   onAccessCodeChange,
   onAccessCodeSubmit,
+  onPricingClick,
 }: {
   isPaidRoute: boolean;
   accessCode: string;
   onAccessCodeChange: (next: string) => void;
   onAccessCodeSubmit: (code: string) => void;
+  onPricingClick?: () => void;
 }) {
+
   const [menuOpen, setMenuOpen] = useState(false);
   const menuWrapRef = useRef<HTMLDivElement | null>(null);
 
@@ -85,12 +88,20 @@ export default function Navbar({
         {/* Desktop actions */}
         <div className="nav-actions nav-actions-desktop">
           <a
-            href="#pricing"
-            className="nav-link-pricing"
-            onClick={() => setMenuOpen(false)}
-          >
-            Get More Link Checks
-          </a>
+  href="#pricing"
+  className="nav-link-pricing"
+  onClick={(e) => {
+    setMenuOpen(false);
+
+    if (isPaidRoute && onPricingClick) {
+      e.preventDefault();
+      onPricingClick();
+    }
+  }}
+>
+  Get More Link Checks
+</a>
+
 
           {/* Access Code input (always available) */}
           <div className="nav-access">

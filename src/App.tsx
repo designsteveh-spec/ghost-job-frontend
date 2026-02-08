@@ -108,7 +108,12 @@ export default function App() {
   const [showPassUnlocked, setShowPassUnlocked] = useState(false);
   const [unlockedPlanLabel, setUnlockedPlanLabel] = useState<'Casual' | 'Active'>('Casual');
 
+  const [showPricingOnPaid, setShowPricingOnPaid] = useState(false);
+
   const [url, setUrl] = useState('');
+
+// Paid routes: allow “Get More Link Checks” to reveal pricing + scroll
+const [showPricingOnPaid, setShowPricingOnPaid] = useState(() => window.location.hash === '#pricing');
 
 
   const [jobDescription, setJobDescription] = useState('');
@@ -973,7 +978,18 @@ timeoutsRef.current.push(t4);
     // Move them to the correct paid page immediately
     window.location.assign(`${planPath}?code=${encodeURIComponent(code)}`);
   }}
+  onPricingClick={() => {
+    // Reveal pricing on paid routes, then scroll to it
+    if (isPaidRoute) setShowPricingOnPaid(true);
+
+    window.setTimeout(() => {
+      const el = document.getElementById('pricing');
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      else window.location.hash = '#pricing';
+    }, 0);
+  }}
 />
+
 
 
       {showPassUnlocked && (
@@ -1656,7 +1672,7 @@ setJobDescription('');
       </section>
 
             {/* PRICING */}
-      {!isPaidRoute && <Pricing />}
+      {(!isPaidRoute || showPricingOnPaid) && <Pricing />}
 
       {/* NEWSLETTER */}
       <section className="newsletter-section">
