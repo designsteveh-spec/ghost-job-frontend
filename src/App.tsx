@@ -67,7 +67,7 @@ async function ensureApiAwake(): Promise<boolean> {
 
 
 
-function safeDecodePlanFromAccessCode(code: string): { plan: 'casual' | 'active'; exp?: number } | null {
+function safeDecodePlanFromAccessCode(code: string): { plan: 'day' | 'casual' | 'active'; exp?: number } | null {
   try {
     const parts = (code || '').trim().split('.');
     if (parts.length < 2) return null;
@@ -82,7 +82,8 @@ function safeDecodePlanFromAccessCode(code: string): { plan: 'casual' | 'active'
     const json = JSON.parse(atob(payload));
 
     const rawPlan = String(json?.plan || json?.tier || '').toLowerCase();
-    const plan: 'casual' | 'active' = rawPlan === 'active' ? 'active' : 'casual';
+    const plan: 'day' | 'casual' | 'active' =
+      rawPlan === 'day' ? 'day' : rawPlan === 'active' ? 'active' : 'casual';
 
     const exp = Number(json?.exp || 0) || undefined;
 
@@ -90,6 +91,23 @@ function safeDecodePlanFromAccessCode(code: string): { plan: 'casual' | 'active'
   } catch {
     return null;
   }
+}
+
+function planPathFrom(plan?: string) {
+  return plan === 'day' ? '/day' : plan === 'active' ? '/active' : '/casual';
+}
+
+function planLabelFrom(plan?: string): 'Day' | 'Casual' | 'Active' {
+  return plan === 'day' ? 'Day' : plan === 'active' ? 'Active' : 'Casual';
+}
+
+function planDurationLabelFrom(plan?: string) {
+  return plan === 'day' ? '24 hours' : '30 days';
+}
+
+function expToMs(exp?: number) {
+  if (!exp) return 0;
+  return exp > 1e12 ? exp : exp * 1000;
 }
 
 export default function App() {
@@ -102,11 +120,12 @@ export default function App() {
   const path = window.location.pathname || '/';
   const isCasualRoute = path === '/casual';
   const isActiveRoute = path === '/active';
-  const isPaidRoute = isCasualRoute || isActiveRoute;
+  const isDayRoute = path === '/day';
+  const isPaidRoute = isCasualRoute || isActiveRoute || isDayRoute;
 
   const [accessCode, setAccessCode] = useState('');
   const [showPassUnlocked, setShowPassUnlocked] = useState(false);
-  const [unlockedPlanLabel, setUnlockedPlanLabel] = useState<'Casual' | 'Active'>('Casual');
+  const [unlockedPlanLabel, setUnlockedPlanLabel] = useState<'Day' | 'Casual' | 'Active'>('Casual');
 
   // Paid routes: allow “Get More Link Checks” to reveal pricing + scroll
   const [showPricingOnPaid, setShowPricingOnPaid] = useState(() => {
@@ -159,7 +178,7 @@ const [lastAnalyzedUrl, setLastAnalyzedUrl] = useState('');
 
   const decodedAccess = safeDecodePlanFromAccessCode(accessCode.trim());
 const isAccessExpired =
-  !!decodedAccess?.exp && decodedAccess.exp * 1000 <= Date.now();
+  !!decodedAccess?.exp && expToMs(decodedAccess.exp) <= Date.now();
 
 const canAnalyzeNow =
   hasUrl &&
@@ -416,7 +435,7 @@ useEffect(() => {
 
   useEffect(() => {
   // Stripe success flow:
-  // If we have ?paid=1&session_id=..., mint an access code and redirect to /casual?code=... or /active?code=...
+  // If we have ?paid=1&session_id=..., mint an access code and redirect to /day, /casual, or /active.
   const params = new URLSearchParams(window.location.search);
   const paid = (params.get('paid') || '').trim();
   const sessionId = (params.get('session_id') || '').trim();
@@ -438,7 +457,7 @@ useEffect(() => {
         setEntitlement({ plan: String(data.plan), exp: Number(data.exp || 0) });
 
         // Redirect to plan route with code in URL, and remove session_id from the address bar
-        const planPath = String(data.plan).toLowerCase() === 'active' ? '/active' : '/casual';
+        const planPath = planPathFrom(String(data.plan).toLowerCase());
         window.location.replace(`${planPath}?code=${encodeURIComponent(String(data.code))}&welcome=1`);
       } catch {
         setFormError('Could not activate your pass due to a network error. Please retry or contact support@trusted-tools.com.');
@@ -463,8 +482,7 @@ useEffect(() => {
   const welcome = (params.get('welcome') || '').trim();
   if (welcome === '1') {
     const decoded = safeDecodePlanFromAccessCode(next);
-    const planLabel: 'Casual' | 'Active' = decoded?.plan === 'active' ? 'Active' : 'Casual';
-    setUnlockedPlanLabel(planLabel);
+    setUnlockedPlanLabel(planLabelFrom(decoded?.plan));
     setShowPassUnlocked(true);
 
     // Remove welcome=1 (keep code=... if present)
@@ -654,7 +672,7 @@ const postingAgeLabel = (rangeKey: string): string => {
 
     if (isPaidRoute) {
   const decoded = safeDecodePlanFromAccessCode(accessCode.trim());
-  if (decoded?.exp && decoded.exp * 1000 <= Date.now()) {
+  if (decoded?.exp && expToMs(decoded.exp) <= Date.now()) {
     setFormError('This pass has expired. Please purchase a new pass or paste a valid access code.');
     setStatus('idle');
     return;
@@ -974,7 +992,7 @@ timeoutsRef.current.push(t4);
 
     // Route based on the code contents (no API call needed)
     const decoded = safeDecodePlanFromAccessCode(code);
-    const planPath = decoded?.plan === 'active' ? '/active' : '/casual';
+    const planPath = planPathFrom(decoded?.plan);
 
     // Move them to the correct paid page immediately
     window.location.assign(`${planPath}?code=${encodeURIComponent(code)}`);
@@ -1012,7 +1030,8 @@ timeoutsRef.current.push(t4);
             <div className="pass-unlocked-subtitle">Thank you for your purchase.</div>
 
             <div className="pass-unlocked-body">
-              Ghost Job Link is now active for you to use for 30 days.
+              Ghost Job Link is now active for you to use for{' '}
+              {planDurationLabelFrom(unlockedPlanLabel.toLowerCase())}.
             </div>
 
             <div className="pass-unlocked-note">
