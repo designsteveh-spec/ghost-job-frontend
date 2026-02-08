@@ -108,12 +108,13 @@ export default function App() {
   const [showPassUnlocked, setShowPassUnlocked] = useState(false);
   const [unlockedPlanLabel, setUnlockedPlanLabel] = useState<'Casual' | 'Active'>('Casual');
 
-  const [showPricingOnPaid, setShowPricingOnPaid] = useState(false);
+  // Paid routes: allow “Get More Link Checks” to reveal pricing + scroll
+  const [showPricingOnPaid, setShowPricingOnPaid] = useState(() => {
+    if (!isPaidRoute) return false;
+    return window.location.hash === '#pricing';
+  });
 
   const [url, setUrl] = useState('');
-
-// Paid routes: allow “Get More Link Checks” to reveal pricing + scroll
-const [showPricingOnPaid, setShowPricingOnPaid] = useState(() => window.location.hash === '#pricing');
 
 
   const [jobDescription, setJobDescription] = useState('');

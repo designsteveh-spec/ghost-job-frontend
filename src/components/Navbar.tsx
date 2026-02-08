@@ -146,7 +146,14 @@ export default function Navbar({
               <a
                 href="#pricing"
                 className="nav-menu-item"
-                onClick={() => setMenuOpen(false)}
+                onClick={(e) => {
+                  setMenuOpen(false);
+
+                  if (isPaidRoute && onPricingClick) {
+                    e.preventDefault();
+                    onPricingClick();
+                  }
+                }}
               >
                 Pricing
               </a>
