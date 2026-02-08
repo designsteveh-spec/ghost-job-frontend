@@ -72,11 +72,12 @@ function safeDecodePlanFromAccessCode(code: string): { plan: 'casual' | 'active'
     const parts = (code || '').trim().split('.');
     if (parts.length < 2) return null;
 
-    // JWT payload is the 2nd segment
-    const payload = parts[1]
+    // Access code format is: payloadB64url.signatureB64url
+    // The JSON payload is the 1st segment.
+    const payload = parts[0]
       .replace(/-/g, '+')
       .replace(/_/g, '/')
-      .padEnd(Math.ceil(parts[1].length / 4) * 4, '=');
+      .padEnd(Math.ceil(parts[0].length / 4) * 4, '=');
 
     const json = JSON.parse(atob(payload));
 
