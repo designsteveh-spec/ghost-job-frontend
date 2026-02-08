@@ -2339,13 +2339,15 @@ select.postingage-cta-input {
 
 /* Newsletter spacing control */
 .newsletter-section {
-  margin-top: 64px;     /* desktop spacing ABOVE newsletter */
-  margin-bottom: 196px;  /* desktop spacing BELOW newsletter */
+  margin: 0;            /* avoid margin-collapsing differences across builds */
+  padding-top: 64px;    /* desktop spacing ABOVE newsletter */
+  padding-bottom: 196px; /* desktop spacing BELOW newsletter */
 }
 
 @media (max-width: 700px) {
   .newsletter-section {
-    margin-top: 40px;    /* mobile spacing ABOVE newsletter */
-    margin-bottom: 56px; /* mobile spacing BELOW newsletter */
+    margin: 0;
+    padding-top: 40px;   /* mobile spacing ABOVE newsletter */
+    padding-bottom: 56px; /* mobile spacing BELOW newsletter */
   }
 }
