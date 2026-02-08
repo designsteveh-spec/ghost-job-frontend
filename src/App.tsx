@@ -59,7 +59,8 @@ window.clearTimeout(t);
 // Only treat as awake if we got a real response from the API route
 if (resp.ok) return true;
 
-// keep trying
+// keep trying (but don’t spin)
+await new Promise((r) => setTimeout(r, WARMUP_RETRY_DELAY_MS));
 
     } catch {
       // keep trying
@@ -99,6 +100,7 @@ function safeDecodePlanFromAccessCode(code: string): { plan: 'casual' | 'active'
 export default function App() {
   useEffect(() => {
   // Warm up API (Render may cold-start after inactivity)
+  if (!API_BASE) return;
   fetch(`${API_BASE}/api/health`).catch(() => {});
 }, []);
 
@@ -962,7 +964,7 @@ const isEstimated =
     false
   );
 
-const hasUserSelection = !!postingDateOverride && postingDateOverride !== 'skip';
+const hasUserSelection = !!postingAgeRangeKey && postingAgeRangeKey !== 'skip';
 
 if (detectedAge) {
   // If we detected something on-page, we treat it as more accurate than the dropdown
