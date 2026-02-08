@@ -48,20 +48,14 @@ async function ensureApiAwake(): Promise<boolean> {
       const t = window.setTimeout(() => c.abort(), WARMUP_PING_TIMEOUT_MS);
 
       // Any response (even 404) means the server is awake.
-      const resp = await fetch(`${API_BASE}/api/health`, {
-  method: 'GET',
-  signal: c.signal,
-  cache: 'no-store',
-});
+      await fetch(`${API_BASE}/api/health`, {
+        method: 'GET',
+        signal: c.signal,
+        cache: 'no-store',
+      });
 
-window.clearTimeout(t);
-
-// Only treat as awake if we got a real response from the API route
-if (resp.ok) return true;
-
-// keep trying (but don’t spin)
-await new Promise((r) => setTimeout(r, WARMUP_RETRY_DELAY_MS));
-
+      window.clearTimeout(t);
+      return true;
     } catch {
       // keep trying
       await new Promise((r) => setTimeout(r, WARMUP_RETRY_DELAY_MS));
@@ -100,7 +94,6 @@ function safeDecodePlanFromAccessCode(code: string): { plan: 'casual' | 'active'
 export default function App() {
   useEffect(() => {
   // Warm up API (Render may cold-start after inactivity)
-  if (!API_BASE) return;
   fetch(`${API_BASE}/api/health`).catch(() => {});
 }, []);
 
@@ -190,8 +183,6 @@ const [scoreBreakdown, setScoreBreakdown] = useState<{
 
   // "What we detected" values (UI only)
   const [detectedPostingAgeValue, setDetectedPostingAgeValue] = useState<string | null>(null);
-  const [postingAgeDecisionNote, setPostingAgeDecisionNote] = useState<string | null>(null);
-
   // (removed) detectedPostingAgeStatusValue — unused (TS6133)
   const [detectedEmployerSourceValue, setDetectedEmployerSourceValue] = useState<string | null>(null);
   const [detectedCanonicalJobIdValue, setDetectedCanonicalJobIdValue] = useState<string | null>(null);
@@ -203,34 +194,6 @@ const [scoreBreakdown, setScoreBreakdown] = useState<{
   const [detectedGoogleTopLinkValue, setDetectedGoogleTopLinkValue] = useState<string | null>(null);
 
 const [lastUpdatedAt, setLastUpdatedAt] = useState<string | null>(null);
-
-/* ---------------- OFFICIAL SOURCE CHECK (UI payload) ---------------- */
-type OfficialSourceStatus = 'PASS' | 'MISMATCH' | 'UNCONFIRMED' | 'NOT_APPLICABLE';
-
-const [officialSourceCheck, setOfficialSourceCheck] = useState<{
-  status: OfficialSourceStatus;
-  delta?: number;
-  reason?: string;
-} | null>(null);
-
-const officialSourceLine = (p: { status: OfficialSourceStatus; reason?: string } | null): string => {
-  if (!p) return 'Not confirmed';
-
-  if (p.reason === 'BLOCKED') return 'Blocked';
-
-  switch (p.status) {
-    case 'PASS':
-      return 'Confirmed';
-    case 'MISMATCH':
-      return 'Mismatch';
-    case 'NOT_APPLICABLE':
-      return 'Not confirmed';
-    case 'UNCONFIRMED':
-    default:
-      return 'Not confirmed';
-  }
-};
-
 
 
 
@@ -275,7 +238,6 @@ const [gaugeRunId, setGaugeRunId] = useState<number>(0);
     | 'detectedActivityScan'
     | 'detectedLastUpdated'
     | 'detectedApplyLinkBehavior'
-    | 'officialSourceCheck'
     | 'confidenceDataQuality'
     | 'scorePostingAge'
     | 'scoreFreshness1'
@@ -286,7 +248,6 @@ const [gaugeRunId, setGaugeRunId] = useState<number>(0);
     | 'detectedGoogleIndexed'
     | 'detectedGoogleTopResult'
     | 'detectedGoogleSnippet';
-
 
 
 
@@ -304,7 +265,6 @@ const [gaugeRunId, setGaugeRunId] = useState<number>(0);
     detectedActivityScan: 'pending',
     detectedLastUpdated: 'pending',
     detectedApplyLinkBehavior: 'pending',
-    officialSourceCheck: 'pending',
 
     confidenceDataQuality: 'pending',
 
@@ -568,8 +528,6 @@ setFormError(null);
 
 // Reset "What we detected" values
 setDetectedPostingAgeValue(null);
-setPostingAgeDecisionNote(null);
-
 // (removed) detectedPostingAgeStatusValue reset — unused
 
 
@@ -581,7 +539,6 @@ setDetectedGoogleTopResultValue(null);
 setDetectedGoogleSnippetValue(null);
 setDetectedGoogleTopLinkValue(null);
 setLastUpdatedAt(null);
-setOfficialSourceCheck(null);
 
 setPostingDateOverride('');
 setLastAnalyzedUrl('');
@@ -688,12 +645,6 @@ const postingAgeLabel = (rangeKey: string): string => {
 
     const urlValue = (override?.url ?? url).trim();
 
-if (!API_BASE) {
-  setFormError('API is not configured (VITE_API_BASE).');
-  setStatus('idle');
-  return;
-}
-
     if (isPaidRoute) {
   const decoded = safeDecodePlanFromAccessCode(accessCode.trim());
   if (decoded?.exp && decoded.exp * 1000 <= Date.now()) {
@@ -758,7 +709,6 @@ setDetectedGoogleIndexedValue(null);
 setDetectedGoogleTopResultValue(null);
 setDetectedGoogleSnippetValue(null);
 setDetectedGoogleTopLinkValue(null);
-setOfficialSourceCheck(null);
 
 
 setSignals({
@@ -794,7 +744,6 @@ scheduleStep('detectedCanonicalJobId', 1240);
 scheduleStep('detectedActivityScan', 1680);
 scheduleStep('detectedLastUpdated', 2080);
 scheduleStep('detectedApplyLinkBehavior', 2400);
-scheduleStep('officialSourceCheck', 1800);
 
 scheduleStep('confidenceDataQuality', 1480);
 
@@ -888,32 +837,6 @@ try {
 setScoreBreakdown(data?.breakdown ?? null);
 setLastUpdatedAt(new Date().toLocaleString());
 
-// Official source check (strictly additive)
-// Accept a few possible backend keys to reduce fragility.
-const osc =
-  data?.officialSourceCheck ??
-  data?.official_source_check ??
-  data?.validator ??
-  data?.officialSource ??
-  null;
-
-if (osc && typeof osc === 'object') {
-  const statusRaw = String(osc.status || '').toUpperCase();
-  const status: OfficialSourceStatus =
-    statusRaw === 'PASS' || statusRaw === 'MISMATCH' || statusRaw === 'UNCONFIRMED' || statusRaw === 'NOT_APPLICABLE'
-      ? (statusRaw as OfficialSourceStatus)
-      : 'UNCONFIRMED';
-
-  setOfficialSourceCheck({
-    status,
-    delta: typeof osc.delta === 'number' ? osc.delta : undefined,
-    reason: osc.reason ? String(osc.reason) : undefined,
-  });
-} else {
-  // If backend doesn't send it yet, still show a deterministic, non-accusatory result
-  setOfficialSourceCheck({ status: 'UNCONFIRMED' });
-}
-
 
 
       // Fill "What we detected" values:
@@ -942,50 +865,6 @@ if (osc && typeof osc === 'object') {
       } catch {}
 
       setDetectedPostingAgeValue(data?.detected?.postingAge ?? null);
-
-// Decide what to tell the user (robust to backend key changes)
-const detectedAge = data?.detected?.postingAge ?? null;
-
-// Optional backend fields (add later, UI will automatically use them when present)
-const sourceRaw = String(
-  data?.detected?.postingAgeSource ??
-  data?.detected?.postingAge_source ??
-  data?.detected?.postingAgeMethod ??
-  data?.detected?.postingAge_method ??
-  ''
-).toLowerCase();
-
-const isEstimated =
-  Boolean(
-    data?.detected?.postingAgeIsEstimated ??
-    data?.detected?.postingAgeEstimated ??
-    data?.detected?.postingAge_is_estimated ??
-    data?.detected?.postingAge_estimated ??
-    false
-  );
-
-const hasUserSelection = !!postingAgeRangeKey && postingAgeRangeKey !== 'skip';
-
-if (detectedAge) {
-  // If we detected something on-page, we treat it as more accurate than the dropdown
-  if (isEstimated) {
-    // Example: closing date fallback, “apply by”, “deadline”, etc.
-    const label =
-      sourceRaw.includes('closing') ? 'Closing date' :
-      sourceRaw.includes('deadline') ? 'Deadline' :
-      sourceRaw.includes('apply') ? 'Apply-by date' :
-      'On-page date cue';
-
-    setPostingAgeDecisionNote(`Estimated from ${label} (best-effort).`);
-  } else if (hasUserSelection) {
-    setPostingAgeDecisionNote('Detected a more precise posting age on the page — used detected value instead of your selection.');
-  } else {
-    setPostingAgeDecisionNote('Detected posting age on the page.');
-  }
-} else {
-  // No detected age; we only have the user dropdown (or nothing)
-  setPostingAgeDecisionNote(null);
-}
      // (removed) detectedPostingAgeStatusValue — unused
 
       setDetectedEmployerSourceValue(data?.detected?.employerSource ?? fallbackHost ?? null);
@@ -1475,14 +1354,8 @@ setJobDescription('');
                           <div className="analysis-tag-title">Posting Age</div>
                           <div className="analysis-tag-value">
   {detectedPostingAgeValue ?? postingAgeLabel(postingDateOverride)}
+
 </div>
-
-{postingAgeDecisionNote && (
-  <div className="analysis-tag-subvalue" style={{ marginTop: 4, fontSize: 12, opacity: 0.75 }}>
-    {postingAgeDecisionNote}
-  </div>
-)}
-
                           {/* (removed) posting age source — unused */}
 
 
@@ -1610,34 +1483,20 @@ setJobDescription('');
                     )}
                   </div>
 
-
-
-
                   {/* 3) CONFIDENCE */}
-<div className="analysis-card">
-  <div className="analysis-card-title">CONFIDENCE</div>
+                  <div className="analysis-card">
+                    <div className="analysis-card-title">CONFIDENCE</div>
 
-  {analysisSteps.confidenceDataQuality === 'complete' && (
-    <div className="analysis-tag analysis-tag-highlight" data-tip="Confidence reflects input quality and page accessibility.">
-      <img src={checkComplete} alt="" className="analysis-tag-icon" />
-      <div className="analysis-tag-text">
-        <div className="analysis-tag-title">Data Quality</div>
-        <div className="analysis-tag-value">Medium</div>
-      </div>
-    </div>
-  )}
-
-  {analysisSteps.officialSourceCheck === 'complete' && (
-    <div className="analysis-tag" data-tip="Best-effort check against an official employer source.">
-      <img src={checkComplete} alt="" className="analysis-tag-icon" />
-      <div className="analysis-tag-text">
-        <div className="analysis-tag-title">Official Source Check</div>
-        <div className="analysis-tag-value">{officialSourceLine(officialSourceCheck)}</div>
-      </div>
-    </div>
-  )}
-</div>
-
+                    {analysisSteps.confidenceDataQuality === 'complete' && (
+                      <div className="analysis-tag analysis-tag-highlight" data-tip="Confidence reflects input quality and page accessibility.">
+                        <img src={checkComplete} alt="" className="analysis-tag-icon" />
+                        <div className="analysis-tag-text">
+                          <div className="analysis-tag-title">Data Quality</div>
+                          <div className="analysis-tag-value">Medium</div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
 
                   {/* 4) SCORE SUMMARY */}
                   <div className="analysis-card">
