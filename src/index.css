@@ -482,6 +482,17 @@ body {
   max-width: 520px;
 }
 
+.hero-qualifier {
+  font-size: 15px;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0 0 14px;
+}
+
+.hero-qualifier-accent {
+  color: #1e40ff;
+}
+
 /* ---------------- UNIFIED FORM (v1.0.y) ---------------- */
 
 .unified-form {

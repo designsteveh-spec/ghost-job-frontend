@@ -1073,12 +1073,15 @@ timeoutsRef.current.push(t4);
               <>
                 {/* (removed) eyebrow label */}
 
-                <h1 style={{ marginTop: 100, marginBottom: 50, fontSize: 56, lineHeight: 1.05 }}>
+                <h1 style={{ marginTop: 80, marginBottom: 18, fontSize: 56, lineHeight: 1.05 }}>
   Check Jobs <span style={{ color: '#1E40FF' }}>Before Applying.</span>
 </h1>
 
+                <p className="hero-qualifier">
+                  Using the best <span className="hero-qualifier-accent">AI built</span> algorithms to check jobs.
+                </p>
 
-                              <p className="subtitle">
+                <p className="subtitle">
   Paste any public job posting link to receive a probability-based assessment using observable signals.
   This tool provides insight — not accusations — to help you decide where to focus your time.
 </p>
