@@ -48,14 +48,19 @@ async function ensureApiAwake(): Promise<boolean> {
       const t = window.setTimeout(() => c.abort(), WARMUP_PING_TIMEOUT_MS);
 
       // Any response (even 404) means the server is awake.
-      await fetch(`${API_BASE}/api/health`, {
-        method: 'GET',
-        signal: c.signal,
-        cache: 'no-store',
-      });
+      const resp = await fetch(`${API_BASE}/api/health`, {
+  method: 'GET',
+  signal: c.signal,
+  cache: 'no-store',
+});
 
-      window.clearTimeout(t);
-      return true;
+window.clearTimeout(t);
+
+// Only treat as awake if we got a real response from the API route
+if (resp.ok) return true;
+
+// keep trying
+
     } catch {
       // keep trying
       await new Promise((r) => setTimeout(r, WARMUP_RETRY_DELAY_MS));
@@ -183,6 +188,8 @@ const [scoreBreakdown, setScoreBreakdown] = useState<{
 
   // "What we detected" values (UI only)
   const [detectedPostingAgeValue, setDetectedPostingAgeValue] = useState<string | null>(null);
+  const [postingAgeDecisionNote, setPostingAgeDecisionNote] = useState<string | null>(null);
+
   // (removed) detectedPostingAgeStatusValue — unused (TS6133)
   const [detectedEmployerSourceValue, setDetectedEmployerSourceValue] = useState<string | null>(null);
   const [detectedCanonicalJobIdValue, setDetectedCanonicalJobIdValue] = useState<string | null>(null);
@@ -215,11 +222,13 @@ const officialSourceLine = (p: { status: OfficialSourceStatus; reason?: string }
     case 'MISMATCH':
       return 'Mismatch';
     case 'NOT_APPLICABLE':
+      return 'Not confirmed';
     case 'UNCONFIRMED':
     default:
       return 'Not confirmed';
   }
 };
+
 
 
 
@@ -557,6 +566,8 @@ setFormError(null);
 
 // Reset "What we detected" values
 setDetectedPostingAgeValue(null);
+setPostingAgeDecisionNote(null);
+
 // (removed) detectedPostingAgeStatusValue reset — unused
 
 
@@ -674,6 +685,12 @@ const postingAgeLabel = (rangeKey: string): string => {
     setFormError(null);
 
     const urlValue = (override?.url ?? url).trim();
+
+if (!API_BASE) {
+  setFormError('API is not configured (VITE_API_BASE).');
+  setStatus('idle');
+  return;
+}
 
     if (isPaidRoute) {
   const decoded = safeDecodePlanFromAccessCode(accessCode.trim());
@@ -923,6 +940,50 @@ if (osc && typeof osc === 'object') {
       } catch {}
 
       setDetectedPostingAgeValue(data?.detected?.postingAge ?? null);
+
+// Decide what to tell the user (robust to backend key changes)
+const detectedAge = data?.detected?.postingAge ?? null;
+
+// Optional backend fields (add later, UI will automatically use them when present)
+const sourceRaw = String(
+  data?.detected?.postingAgeSource ??
+  data?.detected?.postingAge_source ??
+  data?.detected?.postingAgeMethod ??
+  data?.detected?.postingAge_method ??
+  ''
+).toLowerCase();
+
+const isEstimated =
+  Boolean(
+    data?.detected?.postingAgeIsEstimated ??
+    data?.detected?.postingAgeEstimated ??
+    data?.detected?.postingAge_is_estimated ??
+    data?.detected?.postingAge_estimated ??
+    false
+  );
+
+const hasUserSelection = !!postingDateOverride && postingDateOverride !== 'skip';
+
+if (detectedAge) {
+  // If we detected something on-page, we treat it as more accurate than the dropdown
+  if (isEstimated) {
+    // Example: closing date fallback, “apply by”, “deadline”, etc.
+    const label =
+      sourceRaw.includes('closing') ? 'Closing date' :
+      sourceRaw.includes('deadline') ? 'Deadline' :
+      sourceRaw.includes('apply') ? 'Apply-by date' :
+      'On-page date cue';
+
+    setPostingAgeDecisionNote(`Estimated from ${label} (best-effort).`);
+  } else if (hasUserSelection) {
+    setPostingAgeDecisionNote('Detected a more precise posting age on the page — used detected value instead of your selection.');
+  } else {
+    setPostingAgeDecisionNote('Detected posting age on the page.');
+  }
+} else {
+  // No detected age; we only have the user dropdown (or nothing)
+  setPostingAgeDecisionNote(null);
+}
      // (removed) detectedPostingAgeStatusValue — unused
 
       setDetectedEmployerSourceValue(data?.detected?.employerSource ?? fallbackHost ?? null);
@@ -1412,8 +1473,14 @@ setJobDescription('');
                           <div className="analysis-tag-title">Posting Age</div>
                           <div className="analysis-tag-value">
   {detectedPostingAgeValue ?? postingAgeLabel(postingDateOverride)}
-
 </div>
+
+{postingAgeDecisionNote && (
+  <div className="analysis-tag-subvalue" style={{ marginTop: 4, fontSize: 12, opacity: 0.75 }}>
+    {postingAgeDecisionNote}
+  </div>
+)}
+
                           {/* (removed) posting age source — unused */}
 
 
