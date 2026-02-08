@@ -2344,10 +2344,19 @@ select.postingage-cta-input {
   padding-bottom: 196px; /* desktop spacing BELOW newsletter */
 }
 
+/* When pricing is hidden on paid routes, add back vertical balance */
+.newsletter-section--paid {
+  padding-top: 180px;
+}
+
 @media (max-width: 700px) {
   .newsletter-section {
     margin: 0;
     padding-top: 40px;   /* mobile spacing ABOVE newsletter */
     padding-bottom: 56px; /* mobile spacing BELOW newsletter */
+  }
+
+  .newsletter-section--paid {
+    padding-top: 120px;
   }
 }

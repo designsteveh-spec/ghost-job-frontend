@@ -1695,7 +1695,11 @@ setJobDescription('');
       {(!isPaidRoute || showPricingOnPaid) && <Pricing />}
 
       {/* NEWSLETTER */}
-      <section className="newsletter-section">
+      <section
+        className={`newsletter-section${
+          isPaidRoute && !showPricingOnPaid ? ' newsletter-section--paid' : ''
+        }`}
+      >
         <MailerLiteForm />
       </section>
 
