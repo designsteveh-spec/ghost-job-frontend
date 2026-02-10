@@ -54,9 +54,7 @@ export default function MailerLiteForm() {
           <h4 class="newsletter-title">
   <span class="newsletter-title-accent">Get Informed</span> About Job Hunting and Avoiding Ghost Jobs
 </h4>
-          <p style="text-align:center;">
-  <strong>No spam.</strong> We never sell your information.
-</p>
+          <p>Occasional updates about improvements. <strong>No spam.</strong></p>
         </div>
 
         <form
