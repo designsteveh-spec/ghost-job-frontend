@@ -187,21 +187,37 @@ export default function App() {
     const scrollToPricing = () => {
       const el = document.getElementById('pricing');
       if (!el) return false;
+      const top = Math.max(0, window.scrollY + el.getBoundingClientRect().top - 12);
+      window.scrollTo({ top, behavior: 'smooth' });
       el.scrollIntoView({ behavior: 'smooth', block: 'start' });
       return true;
     };
 
-    if (scrollToPricing()) return;
+    // Try immediately, then retry while the section mounts/layout settles.
+    if (scrollToPricing()) {
+      window.setTimeout(scrollToPricing, 120);
+      window.setTimeout(scrollToPricing, 420);
+      return;
+    }
 
     let tries = 0;
     const timer = window.setInterval(() => {
       tries += 1;
-      if (scrollToPricing() || tries >= 24) {
+      if (scrollToPricing() || tries >= 40) {
         window.clearInterval(timer);
       }
-    }, 150);
+    }, 120);
 
-    return () => window.clearInterval(timer);
+    const onLoad = () => {
+      scrollToPricing();
+      window.setTimeout(scrollToPricing, 200);
+    };
+    window.addEventListener('load', onLoad);
+
+    return () => {
+      window.clearInterval(timer);
+      window.removeEventListener('load', onLoad);
+    };
   }, [isPaidRoute]);
 
   const [url, setUrl] = useState('');
