@@ -177,15 +177,17 @@ export default function App() {
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
-    const wantsPricing =
-      window.location.hash === '#pricing' ||
-      (params.get('scroll') || '').toLowerCase() === 'pricing';
+    const hash = (window.location.hash || '').toLowerCase();
+    const scrollParam = (params.get('scroll') || '').toLowerCase();
+    const wantsPricing = hash === '#pricing' || scrollParam === 'pricing';
+    const wantsNewsletter = hash === '#newsletter' || scrollParam === 'newsletter';
+    const targetId = wantsPricing ? 'pricing' : wantsNewsletter ? 'newsletter' : '';
 
-    if (!wantsPricing) return;
+    if (!targetId) return;
     if (isPaidRoute) setShowPricingOnPaid(true);
 
     const scrollToPricing = () => {
-      const el = document.getElementById('pricing');
+      const el = document.getElementById(targetId);
       if (!el) return false;
       const top = Math.max(0, window.scrollY + el.getBoundingClientRect().top - 12);
       window.scrollTo({ top, behavior: 'smooth' });
@@ -1854,6 +1856,7 @@ setJobDescription('');
 
       {/* NEWSLETTER */}
       <section
+        id="newsletter"
         className={`newsletter-section${
           isPaidRoute && !showPricingOnPaid ? ' newsletter-section--paid' : ''
         }`}
