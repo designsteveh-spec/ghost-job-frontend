@@ -175,6 +175,35 @@ export default function App() {
     return window.location.hash === '#pricing';
   });
 
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const wantsPricing =
+      window.location.hash === '#pricing' ||
+      (params.get('scroll') || '').toLowerCase() === 'pricing';
+
+    if (!wantsPricing) return;
+    if (isPaidRoute) setShowPricingOnPaid(true);
+
+    const scrollToPricing = () => {
+      const el = document.getElementById('pricing');
+      if (!el) return false;
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      return true;
+    };
+
+    if (scrollToPricing()) return;
+
+    let tries = 0;
+    const timer = window.setInterval(() => {
+      tries += 1;
+      if (scrollToPricing() || tries >= 24) {
+        window.clearInterval(timer);
+      }
+    }, 150);
+
+    return () => window.clearInterval(timer);
+  }, [isPaidRoute]);
+
   const [url, setUrl] = useState('');
 
 
