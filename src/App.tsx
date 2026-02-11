@@ -110,6 +110,48 @@ function expToMs(exp?: number) {
   return exp > 1e12 ? exp : exp * 1000;
 }
 
+type ExtHydratedResult = {
+  score?: number;
+  label?: string;
+  breakdown?: {
+    postingAge?: number;
+    freshness1?: number;
+    contentUniqueness?: number;
+    activityIndicators?: number;
+    freshness2?: number;
+    siteReliability?: number;
+  } | null;
+  detected?: {
+    postingAge?: string | null;
+    employerSource?: string | null;
+    canonicalJobId?: string | null;
+  } | null;
+  signals?: {
+    stale?: { result?: boolean } | null;
+    weak?: { result?: boolean } | null;
+    inactivity?: { result?: boolean } | null;
+  } | null;
+  google?: {
+    enabled?: boolean | null;
+    indexed?: boolean | null;
+    topTitle?: string | null;
+    topSnippet?: string | null;
+    topLink?: string | null;
+  } | null;
+};
+
+function decodeBase64UrlJson<T>(value: string): T | null {
+  try {
+    if (!value) return null;
+    const b64 = value.replace(/-/g, '+').replace(/_/g, '/');
+    const padded = b64 + '='.repeat((4 - (b64.length % 4)) % 4);
+    const json = atob(padded);
+    return JSON.parse(json) as T;
+  } catch {
+    return null;
+  }
+}
+
 export default function App() {
   useEffect(() => {
   // Warm up API (Render may cold-start after inactivity)
@@ -476,6 +518,74 @@ useEffect(() => {
   if (next) {
     setAccessCode(next);
     localStorage.setItem('gj_access_code', next);
+  }
+
+  // Extension hydration flow:
+  // If extension passes a precomputed result, render full "complete" analysis immediately.
+  const extSource = (params.get('ext_source') || '').trim().toLowerCase();
+  const extPayloadRaw = (params.get('ext_result') || '').trim();
+  const extScoreRaw = (params.get('ext_score') || '').trim();
+  const extTsRaw = (params.get('ext_ts') || '').trim();
+  const extUrl = (params.get('url') || '').trim();
+
+  const extPayload = decodeBase64UrlJson<ExtHydratedResult>(extPayloadRaw);
+  const extScoreParsed = Number(extScoreRaw);
+  const extScoreFromPayload = Number(extPayload?.score);
+  const extScore = Number.isFinite(extScoreParsed)
+    ? extScoreParsed
+    : (Number.isFinite(extScoreFromPayload) ? extScoreFromPayload : NaN);
+
+  if (extSource === 'extension' && Number.isFinite(extScore)) {
+    clearAllTimeouts();
+    stopGaugeFlutter();
+    stopRollingText();
+
+    if (extUrl) {
+      setUrl(extUrl);
+      setLastAnalyzedUrl(extUrl);
+    }
+
+    setFormError(null);
+    setOpenAnalysis(true);
+    resetAnalysisSteps();
+    completeAllAnalysisSteps();
+
+    setSignals({
+      stale: 'complete',
+      weak: 'complete',
+      inactivity: 'complete',
+    });
+
+    const finalScore = Math.max(0, Math.min(100, Math.round(extScore)));
+    setScore(finalScore);
+    setGaugeTarget(finalScore);
+    setGaugeDurationMs(500);
+    gaugeDurationRef.current = 500;
+    setGaugeRunId((n) => n + 1);
+    setStatus('complete');
+
+    setScoreBreakdown(extPayload?.breakdown ?? null);
+
+    setDetectedPostingAgeValue(extPayload?.detected?.postingAge ?? null);
+    setDetectedEmployerSourceValue(extPayload?.detected?.employerSource ?? null);
+    setDetectedCanonicalJobIdValue(extPayload?.detected?.canonicalJobId ?? null);
+
+    const g = extPayload?.google;
+    if (!g || g.enabled === false) {
+      setDetectedGoogleIndexedValue('Not enabled');
+      setDetectedGoogleTopResultValue('—');
+      setDetectedGoogleSnippetValue('—');
+      setDetectedGoogleTopLinkValue(null);
+    } else {
+      setDetectedGoogleIndexedValue(g.indexed === true ? 'Indexed' : g.indexed === false ? 'Not found' : null);
+      setDetectedGoogleTopResultValue(g.topTitle ?? null);
+      setDetectedGoogleSnippetValue(g.topSnippet ?? null);
+      setDetectedGoogleTopLinkValue(g.topLink ?? null);
+    }
+
+    const ts = Number(extTsRaw);
+    const when = Number.isFinite(ts) && ts > 0 ? new Date(ts) : new Date();
+    setLastUpdatedAt(when.toLocaleString());
   }
 
   // ✅ Stripe return clarity: show "Pass Unlocked" modal once, then clean URL
