@@ -314,6 +314,7 @@ const canAnalyzeNow =
   }
 
 
+
   // "What we detected" values (UI only)
   const [detectedPostingAgeValue, setDetectedPostingAgeValue] = useState<string | null>(null);
   // (removed) detectedPostingAgeStatusValue — unused (TS6133)
@@ -329,6 +330,7 @@ const canAnalyzeNow =
   const [detectedGoogleTopLinkValue, setDetectedGoogleTopLinkValue] = useState<string | null>(null);
 
 const [lastUpdatedAt, setLastUpdatedAt] = useState<string | null>(null);
+  const [isExtensionHydratedResult, setIsExtensionHydratedResult] = useState<boolean>(false);
 
 
 
@@ -607,6 +609,7 @@ useEffect(() => {
     : (Number.isFinite(extScoreFromPayload) ? extScoreFromPayload : NaN);
 
   if (extSource === 'extension' && Number.isFinite(extScore)) {
+    setIsExtensionHydratedResult(true);
     clearAllTimeouts();
     stopGaugeFlutter();
     stopRollingText();
@@ -851,6 +854,7 @@ const postingAgeLabel = (rangeKey: string): string => {
 
 
   const handleAnalyze = async (override?: { url?: string; jobDescription?: string; postingDate?: string }) => {
+    setIsExtensionHydratedResult(false);
     setFormError(null);
 
     const urlValue = (override?.url ?? url).trim();
@@ -1633,6 +1637,29 @@ setJobDescription('');
                         <div className="analysis-tag-text">
                           <div className="analysis-tag-title">Email Listed</div>
                           <div className="analysis-tag-value">{detectedEmailListedValue ?? '—'}</div>
+                        </div>
+                      </div>
+                    )}
+
+                    {!isExtensionHydratedResult && status === 'complete' && (
+                      <div
+                        className="analysis-tag analysis-tag-highlight"
+                        style={{ background: '#0B57D0', borderColor: '#0B57D0', color: '#fff' }}
+                        data-tip="Use the Chrome extension for deeper page-visible extraction."
+                      >
+                        <img src={checkComplete} alt="" className="analysis-tag-icon" />
+                        <div className="analysis-tag-text">
+                          <div className="analysis-tag-title" style={{ color: '#fff' }}>Get Deeper Analysis</div>
+                          <div className="analysis-tag-value">
+                            <a
+                              href="https://chromewebstore.google.com/"
+                              target="_blank"
+                              rel="noreferrer"
+                              style={{ color: '#fff', textDecoration: 'underline' }}
+                            >
+                              with Chrome Extension
+                            </a>
+                          </div>
                         </div>
                       </div>
                     )}
