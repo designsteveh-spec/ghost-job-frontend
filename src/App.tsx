@@ -1603,7 +1603,12 @@ setJobDescription('');
                         style={{ background: '#0B57D0', borderColor: '#0B57D0', color: '#fff' }}
                         data-tip="Use the Chrome extension for deeper page-visible extraction."
                       >
-                        <img src={checkOn} alt="" className="analysis-tag-icon" />
+                        <img
+                          src={checkComplete}
+                          alt=""
+                          className="analysis-tag-icon"
+                          style={{ filter: 'brightness(0) invert(1)' }}
+                        />
                         <div className="analysis-tag-text">
                           <div className="analysis-tag-title" style={{ color: '#fff' }}>Get Deeper Analysis</div>
                           <div className="analysis-tag-value">
