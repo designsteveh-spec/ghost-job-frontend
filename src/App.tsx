@@ -1582,6 +1582,29 @@ setJobDescription('');
 
                     <div className="analysis-card-title">WHAT WE DETECTED</div>
 
+                    {!isExtensionHydratedResult && status === 'complete' && (
+                      <div
+                        className="analysis-tag analysis-tag-highlight"
+                        style={{ background: '#0B57D0', borderColor: '#0B57D0', color: '#fff' }}
+                        data-tip="Use the Chrome extension for deeper page-visible extraction."
+                      >
+                        <img src={checkOn} alt="" className="analysis-tag-icon" />
+                        <div className="analysis-tag-text">
+                          <div className="analysis-tag-title" style={{ color: '#fff' }}>Get Deeper Analysis</div>
+                          <div className="analysis-tag-value">
+                            <a
+                              href="https://chromewebstore.google.com/"
+                              target="_blank"
+                              rel="noreferrer"
+                              style={{ color: '#fff', textDecoration: 'underline' }}
+                            >
+                              with Chrome Extension
+                            </a>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
                                         {analysisSteps.detectedPostingAge === 'complete' && (
                       <div className="analysis-tag" data-tip="Posting age used for scoring (from your selection when required).">
                         <img src={checkComplete} alt="" className="analysis-tag-icon" />
@@ -1637,29 +1660,6 @@ setJobDescription('');
                         <div className="analysis-tag-text">
                           <div className="analysis-tag-title">Email Listed</div>
                           <div className="analysis-tag-value">{detectedEmailListedValue ?? '—'}</div>
-                        </div>
-                      </div>
-                    )}
-
-                    {!isExtensionHydratedResult && status === 'complete' && (
-                      <div
-                        className="analysis-tag analysis-tag-highlight"
-                        style={{ background: '#0B57D0', borderColor: '#0B57D0', color: '#fff' }}
-                        data-tip="Use the Chrome extension for deeper page-visible extraction."
-                      >
-                        <img src={checkComplete} alt="" className="analysis-tag-icon" />
-                        <div className="analysis-tag-text">
-                          <div className="analysis-tag-title" style={{ color: '#fff' }}>Get Deeper Analysis</div>
-                          <div className="analysis-tag-value">
-                            <a
-                              href="https://chromewebstore.google.com/"
-                              target="_blank"
-                              rel="noreferrer"
-                              style={{ color: '#fff', textDecoration: 'underline' }}
-                            >
-                              with Chrome Extension
-                            </a>
-                          </div>
                         </div>
                       </div>
                     )}
