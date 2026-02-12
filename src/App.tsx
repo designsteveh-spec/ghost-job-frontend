@@ -123,6 +123,7 @@ type ExtHydratedResult = {
   } | null;
   detected?: {
     postingAge?: string | null;
+    postingAgeNote?: string | null;
     employerSource?: string | null;
     canonicalJobId?: string | null;
   } | null;
@@ -628,7 +629,7 @@ useEffect(() => {
 
     setScoreBreakdown(extPayload?.breakdown ?? null);
 
-    setDetectedPostingAgeValue(extPayload?.detected?.postingAge ?? null);
+    setDetectedPostingAgeValue(extPayload?.detected?.postingAge ?? extPayload?.detected?.postingAgeNote ?? null);
     setDetectedEmployerSourceValue(extPayload?.detected?.employerSource ?? null);
     setDetectedCanonicalJobIdValue(extPayload?.detected?.canonicalJobId ?? null);
 
@@ -1061,7 +1062,7 @@ setLastUpdatedAt(new Date().toLocaleString());
         }
       } catch {}
 
-      setDetectedPostingAgeValue(data?.detected?.postingAge ?? null);
+      setDetectedPostingAgeValue(data?.detected?.postingAge ?? data?.detected?.postingAgeNote ?? null);
      // (removed) detectedPostingAgeStatusValue — unused
 
       setDetectedEmployerSourceValue(data?.detected?.employerSource ?? fallbackHost ?? null);
