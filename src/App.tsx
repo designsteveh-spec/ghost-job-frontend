@@ -126,6 +126,7 @@ type ExtHydratedResult = {
     postingAgeNote?: string | null;
     employerSource?: string | null;
     canonicalJobId?: string | null;
+    hiringContact?: string | null;
   } | null;
   signals?: {
     stale?: { result?: boolean } | null;
@@ -317,6 +318,7 @@ const canAnalyzeNow =
   // (removed) detectedPostingAgeStatusValue — unused (TS6133)
   const [detectedEmployerSourceValue, setDetectedEmployerSourceValue] = useState<string | null>(null);
   const [detectedCanonicalJobIdValue, setDetectedCanonicalJobIdValue] = useState<string | null>(null);
+  const [detectedHiringContactValue, setDetectedHiringContactValue] = useState<string | null>(null);
 
   // Google snippet “What we detected”
   const [detectedGoogleIndexedValue, setDetectedGoogleIndexedValue] = useState<string | null>(null);
@@ -366,6 +368,7 @@ const [gaugeRunId, setGaugeRunId] = useState<number>(0);
     | 'detectedPostingAge'
     | 'detectedEmployerSource'
     | 'detectedCanonicalJobId'
+    | 'detectedHiringContact'
     | 'detectedActivityScan'
     | 'detectedLastUpdated'
     | 'detectedApplyLinkBehavior'
@@ -393,6 +396,7 @@ const [gaugeRunId, setGaugeRunId] = useState<number>(0);
     detectedPostingAge: 'pending',
     detectedEmployerSource: 'pending',
     detectedCanonicalJobId: 'pending',
+    detectedHiringContact: 'pending',
     detectedActivityScan: 'pending',
     detectedLastUpdated: 'pending',
     detectedApplyLinkBehavior: 'pending',
@@ -632,6 +636,7 @@ useEffect(() => {
     setDetectedPostingAgeValue(extPayload?.detected?.postingAge ?? extPayload?.detected?.postingAgeNote ?? null);
     setDetectedEmployerSourceValue(extPayload?.detected?.employerSource ?? null);
     setDetectedCanonicalJobIdValue(extPayload?.detected?.canonicalJobId ?? null);
+    setDetectedHiringContactValue(extPayload?.detected?.hiringContact ?? null);
 
     const g = extPayload?.google;
     if (!g || g.enabled === false) {
@@ -731,6 +736,7 @@ setDetectedPostingAgeValue(null);
 
 setDetectedEmployerSourceValue(null);
 setDetectedCanonicalJobIdValue(null);
+setDetectedHiringContactValue(null);
 
 setDetectedGoogleIndexedValue(null);
 setDetectedGoogleTopResultValue(null);
@@ -903,6 +909,7 @@ setDetectedPostingAgeValue(null);
 
 setDetectedEmployerSourceValue(null);
 setDetectedCanonicalJobIdValue(null);
+setDetectedHiringContactValue(null);
 setDetectedGoogleIndexedValue(null);
 setDetectedGoogleTopResultValue(null);
 setDetectedGoogleSnippetValue(null);
@@ -939,6 +946,7 @@ scheduleStep('activityIndicatorsScan', 2000);
 scheduleStep('detectedPostingAge', 560);
 scheduleStep('detectedEmployerSource', 900);
 scheduleStep('detectedCanonicalJobId', 1240);
+scheduleStep('detectedHiringContact', 1440);
 scheduleStep('detectedActivityScan', 1680);
 scheduleStep('detectedLastUpdated', 2080);
 scheduleStep('detectedApplyLinkBehavior', 2400);
@@ -1067,6 +1075,7 @@ setLastUpdatedAt(new Date().toLocaleString());
 
       setDetectedEmployerSourceValue(data?.detected?.employerSource ?? fallbackHost ?? null);
       setDetectedCanonicalJobIdValue(data?.detected?.canonicalJobId ?? fallbackJobId ?? null);
+      setDetectedHiringContactValue(data?.detected?.hiringContact ?? null);
 
 
             // Google snippet values (from API if available)
@@ -1595,6 +1604,16 @@ setJobDescription('');
                         <div className="analysis-tag-text">
                           <div className="analysis-tag-title">Canonical Job ID</div>
                           <div className="analysis-tag-value">{detectedCanonicalJobIdValue ?? '—'}</div>
+                        </div>
+                      </div>
+                    )}
+
+                    {analysisSteps.detectedHiringContact === 'complete' && (
+                      <div className="analysis-tag" data-tip="Hiring contact detected from visible page content.">
+                        <img src={checkComplete} alt="" className="analysis-tag-icon" />
+                        <div className="analysis-tag-text">
+                          <div className="analysis-tag-title">Hiring Contact</div>
+                          <div className="analysis-tag-value">{detectedHiringContactValue ?? '—'}</div>
                         </div>
                       </div>
                     )}
