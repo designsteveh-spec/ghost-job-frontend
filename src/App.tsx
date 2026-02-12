@@ -313,6 +313,21 @@ const canAnalyzeNow =
     return maskedZeroDisplayRef.current[key];
   }
 
+  function hasMeaningfulDetectedValue(value: string | null | undefined) {
+    const v = String(value ?? '').trim();
+    if (!v) return false;
+    const low = v.toLowerCase();
+    return !(
+      low === '-' ||
+      low === '—' ||
+      low === 'â€”' ||
+      low === 'not found' ||
+      low === 'not listed' ||
+      low === 'null' ||
+      low === 'undefined'
+    );
+  }
+
 
 
   // "What we detected" values (UI only)
@@ -1644,41 +1659,41 @@ setJobDescription('');
                       </div>
                     )}
 
-                    {analysisSteps.detectedHiringContact === 'complete' && (
+                    {analysisSteps.detectedHiringContact === 'complete' && hasMeaningfulDetectedValue(detectedHiringContactValue) && (
                       <div className="analysis-tag" data-tip="Hiring contact detected from visible page content.">
                         <img src={checkComplete} alt="" className="analysis-tag-icon" />
                         <div className="analysis-tag-text">
                           <div className="analysis-tag-title">Hiring Contact</div>
-                          <div className="analysis-tag-value">{detectedHiringContactValue ?? '—'}</div>
+                          <div className="analysis-tag-value">{detectedHiringContactValue}</div>
                         </div>
                       </div>
                     )}
 
-                    {analysisSteps.detectedEmailListed === 'complete' && (
+                    {analysisSteps.detectedEmailListed === 'complete' && hasMeaningfulDetectedValue(detectedEmailListedValue) && (
                       <div className="analysis-tag" data-tip="First email address detected from visible job content.">
                         <img src={checkComplete} alt="" className="analysis-tag-icon" />
                         <div className="analysis-tag-text">
                           <div className="analysis-tag-title">Email Listed</div>
-                          <div className="analysis-tag-value">{detectedEmailListedValue ?? '—'}</div>
+                          <div className="analysis-tag-value">{detectedEmailListedValue}</div>
                         </div>
                       </div>
                     )}
 
-                                        {analysisSteps.detectedGoogleIndexed === 'complete' && (
+                                        {analysisSteps.detectedGoogleIndexed === 'complete' && hasMeaningfulDetectedValue(detectedGoogleIndexedValue) && (
                       <div className="analysis-tag" data-tip="Checks whether Google currently returns results for this job/source.">
                         <img src={checkComplete} alt="" className="analysis-tag-icon" />
                         <div className="analysis-tag-text">
                           <div className="analysis-tag-title">Google Index</div>
-                          <div className="analysis-tag-value">{detectedGoogleIndexedValue ?? '—'}</div>
+                          <div className="analysis-tag-value">{detectedGoogleIndexedValue}</div>
                         </div>
                       </div>
                     )}
 
-                    {analysisSteps.detectedGoogleTopResult === 'complete' && (
-                      detectedGoogleTopLinkValue ? (
+                    {analysisSteps.detectedGoogleTopResult === 'complete' && hasMeaningfulDetectedValue(detectedGoogleTopResultValue) && (
+                      hasMeaningfulDetectedValue(detectedGoogleTopLinkValue) ? (
                         <a
                           className="analysis-tag analysis-tag-link"
-                          href={detectedGoogleTopLinkValue}
+                          href={detectedGoogleTopLinkValue || undefined}
                           target="_blank"
                           rel="noreferrer"
                           data-tip="Opens the top Google result in a new tab."
@@ -1687,7 +1702,7 @@ setJobDescription('');
                           <div className="analysis-tag-text">
                             <div className="analysis-tag-title">Google Top Result</div>
                             <div className="analysis-tag-value analysis-tag-value-link">
-                              {detectedGoogleTopResultValue ?? '—'}
+                              {detectedGoogleTopResultValue}
                             </div>
                           </div>
                         </a>
@@ -1696,18 +1711,18 @@ setJobDescription('');
                           <img src={checkComplete} alt="" className="analysis-tag-icon" />
                           <div className="analysis-tag-text">
                             <div className="analysis-tag-title">Google Top Result</div>
-                            <div className="analysis-tag-value">{detectedGoogleTopResultValue ?? '—'}</div>
+                            <div className="analysis-tag-value">{detectedGoogleTopResultValue}</div>
                           </div>
                         </div>
                       )
                     )}
 
-                    {analysisSteps.detectedGoogleSnippet === 'complete' && (
+                    {analysisSteps.detectedGoogleSnippet === 'complete' && hasMeaningfulDetectedValue(detectedGoogleSnippetValue) && (
                       <div className="analysis-tag" data-tip="Snippet text Google shows for this result (may include age cues).">
                         <img src={checkComplete} alt="" className="analysis-tag-icon" />
                         <div className="analysis-tag-text">
                           <div className="analysis-tag-title">Google Snippet</div>
-                          <div className="analysis-tag-value">{detectedGoogleSnippetValue ?? '—'}</div>
+                          <div className="analysis-tag-value">{detectedGoogleSnippetValue}</div>
                         </div>
                       </div>
                     )}
