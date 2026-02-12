@@ -126,10 +126,6 @@ type ExtHydratedResult = {
     postingAgeNote?: string | null;
     employerSource?: string | null;
     canonicalJobId?: string | null;
-    hiringContactEmail?: string | null;
-    hiringContactName?: string | null;
-    hiringContactSource?: string | null;
-    hiringContactConfidence?: string | null;
   } | null;
   signals?: {
     stale?: { result?: boolean } | null;
@@ -321,8 +317,6 @@ const canAnalyzeNow =
   // (removed) detectedPostingAgeStatusValue — unused (TS6133)
   const [detectedEmployerSourceValue, setDetectedEmployerSourceValue] = useState<string | null>(null);
   const [detectedCanonicalJobIdValue, setDetectedCanonicalJobIdValue] = useState<string | null>(null);
-  const [detectedHiringContactEmailValue, setDetectedHiringContactEmailValue] = useState<string | null>(null);
-  const [detectedHiringContactNameValue, setDetectedHiringContactNameValue] = useState<string | null>(null);
 
   // Google snippet “What we detected”
   const [detectedGoogleIndexedValue, setDetectedGoogleIndexedValue] = useState<string | null>(null);
@@ -372,8 +366,6 @@ const [gaugeRunId, setGaugeRunId] = useState<number>(0);
     | 'detectedPostingAge'
     | 'detectedEmployerSource'
     | 'detectedCanonicalJobId'
-    | 'detectedHiringContactEmail'
-    | 'detectedHiringContactName'
     | 'detectedActivityScan'
     | 'detectedLastUpdated'
     | 'detectedApplyLinkBehavior'
@@ -401,8 +393,6 @@ const [gaugeRunId, setGaugeRunId] = useState<number>(0);
     detectedPostingAge: 'pending',
     detectedEmployerSource: 'pending',
     detectedCanonicalJobId: 'pending',
-    detectedHiringContactEmail: 'pending',
-    detectedHiringContactName: 'pending',
     detectedActivityScan: 'pending',
     detectedLastUpdated: 'pending',
     detectedApplyLinkBehavior: 'pending',
@@ -642,8 +632,6 @@ useEffect(() => {
     setDetectedPostingAgeValue(extPayload?.detected?.postingAge ?? extPayload?.detected?.postingAgeNote ?? null);
     setDetectedEmployerSourceValue(extPayload?.detected?.employerSource ?? null);
     setDetectedCanonicalJobIdValue(extPayload?.detected?.canonicalJobId ?? null);
-    setDetectedHiringContactEmailValue(extPayload?.detected?.hiringContactEmail ?? null);
-    setDetectedHiringContactNameValue(extPayload?.detected?.hiringContactName ?? null);
 
     const g = extPayload?.google;
     if (!g || g.enabled === false) {
@@ -743,8 +731,6 @@ setDetectedPostingAgeValue(null);
 
 setDetectedEmployerSourceValue(null);
 setDetectedCanonicalJobIdValue(null);
-setDetectedHiringContactEmailValue(null);
-setDetectedHiringContactNameValue(null);
 
 setDetectedGoogleIndexedValue(null);
 setDetectedGoogleTopResultValue(null);
@@ -917,8 +903,6 @@ setDetectedPostingAgeValue(null);
 
 setDetectedEmployerSourceValue(null);
 setDetectedCanonicalJobIdValue(null);
-setDetectedHiringContactEmailValue(null);
-setDetectedHiringContactNameValue(null);
 setDetectedGoogleIndexedValue(null);
 setDetectedGoogleTopResultValue(null);
 setDetectedGoogleSnippetValue(null);
@@ -955,8 +939,6 @@ scheduleStep('activityIndicatorsScan', 2000);
 scheduleStep('detectedPostingAge', 560);
 scheduleStep('detectedEmployerSource', 900);
 scheduleStep('detectedCanonicalJobId', 1240);
-scheduleStep('detectedHiringContactEmail', 1360);
-scheduleStep('detectedHiringContactName', 1480);
 scheduleStep('detectedActivityScan', 1680);
 scheduleStep('detectedLastUpdated', 2080);
 scheduleStep('detectedApplyLinkBehavior', 2400);
@@ -1085,8 +1067,6 @@ setLastUpdatedAt(new Date().toLocaleString());
 
       setDetectedEmployerSourceValue(data?.detected?.employerSource ?? fallbackHost ?? null);
       setDetectedCanonicalJobIdValue(data?.detected?.canonicalJobId ?? fallbackJobId ?? null);
-      setDetectedHiringContactEmailValue(data?.detected?.hiringContactEmail ?? null);
-      setDetectedHiringContactNameValue(data?.detected?.hiringContactName ?? null);
 
 
             // Google snippet values (from API if available)
@@ -1615,30 +1595,6 @@ setJobDescription('');
                         <div className="analysis-tag-text">
                           <div className="analysis-tag-title">Canonical Job ID</div>
                           <div className="analysis-tag-value">{detectedCanonicalJobIdValue ?? '—'}</div>
-                        </div>
-                      </div>
-                    )}
-
-                    {analysisSteps.detectedHiringContactEmail === 'complete' && (
-                      <div className="analysis-tag" data-tip="Detected hiring contact email when exposed on the page.">
-                        <img src={checkComplete} alt="" className="analysis-tag-icon" />
-                        <div className="analysis-tag-text">
-                          <div className="analysis-tag-title">Email Detected</div>
-                          <div className="analysis-tag-value">
-                            {detectedHiringContactEmailValue ?? 'Not listed / webpage potentially blocked'}
-                          </div>
-                        </div>
-                      </div>
-                    )}
-
-                    {analysisSteps.detectedHiringContactName === 'complete' && (
-                      <div className="analysis-tag" data-tip="Detected hiring manager/contact name when exposed on the page.">
-                        <img src={checkComplete} alt="" className="analysis-tag-icon" />
-                        <div className="analysis-tag-text">
-                          <div className="analysis-tag-title">Hiring Manager</div>
-                          <div className="analysis-tag-value">
-                            {detectedHiringContactNameValue ?? 'Not listed / webpage potentially blocked'}
-                          </div>
                         </div>
                       </div>
                     )}
