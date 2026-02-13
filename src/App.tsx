@@ -16,6 +16,7 @@ import ActivityGauge from './components/ActivityGauge';
 import educationImage from './assets/ghostPic-1.png';
 import ghostPhoneAppLeft from './assets/ghostPhoneAppLeft.png';
 import ghostPhoneAppRight from './assets/ghostPhoneAppRight.png';
+import chevronDownIcon from './assets/chevron-down.svg';
 
 
 
@@ -33,6 +34,7 @@ import twitterIcon from './assets/socialTwitter.svg';
 import tiktokIcon from './assets/socialTikTok.svg';
 
 const API_BASE = (import.meta.env.VITE_API_BASE || '').trim();
+const CHROME_EXTENSION_URL = 'https://chromewebstore.google.com/';
 console.log('[API_BASE]', API_BASE);
 
 const WARMUP_TOTAL_MS = 45000;      // total time we’re willing to wait for Render to wake
@@ -163,6 +165,8 @@ export default function App() {
 
 
   const path = window.location.pathname || '/';
+  const searchParams = new URLSearchParams(window.location.search);
+  const isExtensionEntry = (searchParams.get('ext_source') || '').trim().toLowerCase() === 'extension';
   const isCasualRoute = path === '/casual';
   const isActiveRoute = path === '/active';
   const isDayRoute = path === '/day';
@@ -1221,6 +1225,45 @@ timeoutsRef.current.push(t4);
 
 
 
+      {!isExtensionEntry && (
+        <section className="top-promo" aria-label="Get the app">
+          <div className="top-promo-inner">
+            <div className="top-promo-main">
+              <div className="top-promo-title-row">
+                <h2 className="top-promo-title">
+                  <span className="top-promo-title-accent">Get the Job Checker App.</span>{' '}
+                  <span>Check the quality of jobs before applying.</span>
+                </h2>
+              </div>
+              <p className="top-promo-subtitle">
+                Don&apos;t miss out on using the best AI built algorithms to check jobs.
+              </p>
+            </div>
+
+            <a
+              href={CHROME_EXTENSION_URL}
+              target="_blank"
+              rel="noreferrer"
+              className="top-promo-cta"
+            >
+              Add to Chrome
+            </a>
+          </div>
+
+          <button
+            type="button"
+            className="top-promo-chevron-btn"
+            aria-label="Scroll to job checker section"
+            onClick={() => {
+              const hero = document.getElementById('hero');
+              if (hero) hero.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }}
+          >
+            <img src={chevronDownIcon} alt="" aria-hidden="true" className="top-promo-chevron" />
+          </button>
+        </section>
+      )}
+
       {showPassUnlocked && (
         <div
           className="pass-unlocked-overlay"
@@ -1288,12 +1331,15 @@ timeoutsRef.current.push(t4);
 </h1>
 
                 <p className="hero-qualifier">
-                  Using the best <span className="hero-qualifier-accent">AI built</span> algorithms to check jobs.
+                  Try it here now, or use the extension while browsing job ads for <span className="hero-qualifier-accent">advanced analysis</span>.
                 </p>
 
-                <p className="subtitle">
+<p className="subtitle">
   Paste any public job posting link to receive a probability-based assessment using observable signals.
-  This tool provides insight — not accusations — to help you decide where to focus your time.
+  More features and deeper analysis are available with the{' '}
+  <a href={CHROME_EXTENSION_URL} target="_blank" rel="noreferrer">
+    Job Checker Chrome Extension
+  </a>.
 </p>
 
 <div className="unified-form">
@@ -1613,7 +1659,7 @@ setJobDescription('');
                           <div className="analysis-tag-title" style={{ color: '#fff' }}>Get Deeper Analysis</div>
                           <div className="analysis-tag-value">
                             <a
-                              href="https://chromewebstore.google.com/"
+                              href={CHROME_EXTENSION_URL}
                               target="_blank"
                               rel="noreferrer"
                               style={{ color: '#fff', textDecoration: 'underline' }}
