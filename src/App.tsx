@@ -122,6 +122,7 @@ type ExtHydratedResult = {
     activityIndicators?: number;
     freshness2?: number;
     siteReliability?: number;
+    recruiterContactQuality?: number;
   } | null;
   detected?: {
     postingAge?: string | null;
@@ -129,6 +130,9 @@ type ExtHydratedResult = {
     employerSource?: string | null;
     canonicalJobId?: string | null;
     hiringContact?: string | null;
+    recruiterContactQuality?: string | null;
+    recruiterContactQualityReason?: string | null;
+    recruiterContactType?: string | null;
     emailListed?: string | null;
   } | null;
   signals?: {
@@ -300,21 +304,24 @@ const canAnalyzeNow =
   activityIndicators?: number;
   freshness2?: number;
   siteReliability?: number;
+  recruiterContactQuality?: number;
   } | null>(null);
-  const maskedZeroDisplayRef = useRef<Record<string, number>>({});
-
-  useEffect(() => {
-    maskedZeroDisplayRef.current = {};
-  }, [scoreBreakdown]);
-
-  function renderScoreSummaryValue(raw: number | null | undefined, key: string) {
+  function scoreSummaryLabel(raw: number | null | undefined): string {
     const n = Number(raw ?? 0);
-    if (!Number.isFinite(n)) return 0;
-    if (n !== 0) return n;
-    if (!maskedZeroDisplayRef.current[key]) {
-      maskedZeroDisplayRef.current[key] = Math.random() < 0.5 ? 1 : 2;
-    }
-    return maskedZeroDisplayRef.current[key];
+    if (!Number.isFinite(n)) return 'Unknown';
+    if (n < 0) return 'Risk';
+    if (n <= 1) return 'Very Low';
+    if (n <= 4) return 'Low';
+    if (n <= 7) return 'Medium';
+    return 'High';
+  }
+
+  function renderScoreSummaryValue(raw: number | null | undefined, _key: string) {
+    const n = Number(raw ?? 0);
+    const label = scoreSummaryLabel(n);
+    if (!Number.isFinite(n)) return label;
+    const signed = n > 0 ? `+${n}` : `${n}`;
+    return `${label} (${signed})`;
   }
 
   function hasMeaningfulDetectedValue(value: string | null | undefined) {
@@ -340,6 +347,8 @@ const canAnalyzeNow =
   const [detectedEmployerSourceValue, setDetectedEmployerSourceValue] = useState<string | null>(null);
   const [detectedCanonicalJobIdValue, setDetectedCanonicalJobIdValue] = useState<string | null>(null);
   const [detectedHiringContactValue, setDetectedHiringContactValue] = useState<string | null>(null);
+  const [detectedRecruiterContactQualityValue, setDetectedRecruiterContactQualityValue] = useState<string | null>(null);
+  const [detectedRecruiterContactQualityReasonValue, setDetectedRecruiterContactQualityReasonValue] = useState<string | null>(null);
   const [detectedEmailListedValue, setDetectedEmailListedValue] = useState<string | null>(null);
 
   // Google snippet “What we detected”
@@ -403,6 +412,7 @@ const [gaugeRunId, setGaugeRunId] = useState<number>(0);
     | 'scoreActivityIndicators'
     | 'scoreFreshness2'
     | 'scoreSiteReliability'
+    | 'scoreRecruiterContactQuality'
     | 'detectedGoogleIndexed'
     | 'detectedGoogleTopResult'
     | 'detectedGoogleSnippet';
@@ -434,6 +444,7 @@ const [gaugeRunId, setGaugeRunId] = useState<number>(0);
     scoreActivityIndicators: 'pending',
     scoreFreshness2: 'pending',
     scoreSiteReliability: 'pending',
+    scoreRecruiterContactQuality: 'pending',
 
     detectedGoogleIndexed: 'pending',
     detectedGoogleTopResult: 'pending',
@@ -663,6 +674,8 @@ useEffect(() => {
     setDetectedEmployerSourceValue(extPayload?.detected?.employerSource ?? null);
     setDetectedCanonicalJobIdValue(extPayload?.detected?.canonicalJobId ?? null);
     setDetectedHiringContactValue(extPayload?.detected?.hiringContact ?? null);
+    setDetectedRecruiterContactQualityValue(extPayload?.detected?.recruiterContactQuality ?? null);
+    setDetectedRecruiterContactQualityReasonValue(extPayload?.detected?.recruiterContactQualityReason ?? null);
     setDetectedEmailListedValue(extPayload?.detected?.emailListed ?? null);
 
     const g = extPayload?.google;
@@ -764,6 +777,8 @@ setDetectedPostingAgeValue(null);
 setDetectedEmployerSourceValue(null);
 setDetectedCanonicalJobIdValue(null);
 setDetectedHiringContactValue(null);
+setDetectedRecruiterContactQualityValue(null);
+setDetectedRecruiterContactQualityReasonValue(null);
 setDetectedEmailListedValue(null);
 
 setDetectedGoogleIndexedValue(null);
@@ -939,6 +954,8 @@ setDetectedPostingAgeValue(null);
 setDetectedEmployerSourceValue(null);
 setDetectedCanonicalJobIdValue(null);
 setDetectedHiringContactValue(null);
+setDetectedRecruiterContactQualityValue(null);
+setDetectedRecruiterContactQualityReasonValue(null);
 setDetectedEmailListedValue(null);
 setDetectedGoogleIndexedValue(null);
 setDetectedGoogleTopResultValue(null);
@@ -990,6 +1007,7 @@ scheduleStep('scoreContentUniqueness', 1640);
 scheduleStep('scoreActivityIndicators', 1960);
 scheduleStep('scoreFreshness2', 2280);
 scheduleStep('scoreSiteReliability', 2600);
+scheduleStep('scoreRecruiterContactQuality', 2760);
 
 scheduleStep('detectedGoogleIndexed', 1100);
 scheduleStep('detectedGoogleTopResult', 1500);
@@ -1107,6 +1125,8 @@ setLastUpdatedAt(new Date().toLocaleString());
       setDetectedEmployerSourceValue(data?.detected?.employerSource ?? fallbackHost ?? null);
       setDetectedCanonicalJobIdValue(data?.detected?.canonicalJobId ?? fallbackJobId ?? null);
       setDetectedHiringContactValue(data?.detected?.hiringContact ?? null);
+      setDetectedRecruiterContactQualityValue(data?.detected?.recruiterContactQuality ?? null);
+      setDetectedRecruiterContactQualityReasonValue(data?.detected?.recruiterContactQualityReason ?? null);
       setDetectedEmailListedValue(data?.detected?.emailListed ?? null);
 
 
@@ -1918,6 +1938,30 @@ setJobDescription('');
   {renderScoreSummaryValue(scoreBreakdown?.siteReliability, 'siteReliability')}
 </div>
 
+                        </div>
+                      </div>
+                    )}
+
+                    {analysisSteps.scoreRecruiterContactQuality === 'complete' && (
+                      <div
+                        className="analysis-tag"
+                        data-tip={
+                          detectedRecruiterContactQualityReasonValue
+                            ? `Quality of hiring contact extraction. ${detectedRecruiterContactQualityReasonValue}`
+                            : 'Quality of hiring contact extraction (person/company/missing).'
+                        }
+                      >
+                        <img src={checkComplete} alt="" className="analysis-tag-icon" />
+                        <div className="analysis-tag-text">
+                          <div className="analysis-tag-title">Recruiter/Contact Quality</div>
+                          <div className="analysis-tag-value">
+                            {detectedRecruiterContactQualityValue || renderScoreSummaryValue(scoreBreakdown?.recruiterContactQuality, 'recruiterContactQuality')}
+                          </div>
+                          {detectedRecruiterContactQualityReasonValue && (
+                            <div className="analysis-tag-value" style={{ opacity: 0.85 }}>
+                              {detectedRecruiterContactQualityReasonValue}
+                            </div>
+                          )}
                         </div>
                       </div>
                     )}
