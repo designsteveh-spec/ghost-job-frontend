@@ -2107,6 +2107,25 @@ select.postingage-cta-input {
   background: #FFCD2E;
 }
 
+.analysis-tag-primary-cue {
+  background: #32E553;
+  border-color: #4040FF;
+}
+
+.analysis-tag-primary-cue .analysis-tag-title,
+.analysis-tag-primary-cue .analysis-tag-value {
+  color: #4040FF;
+}
+
+.analysis-tag-check {
+  color: #4040FF;
+  font-weight: 800;
+  font-size: 18px;
+  line-height: 1;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
 /* simple CSS tooltip */
 .analysis-tag[data-tip]::after {
   content: attr(data-tip);

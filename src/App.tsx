@@ -130,6 +130,11 @@ type ExtHydratedResult = {
     employerSource?: string | null;
     canonicalJobId?: string | null;
     hiringContact?: string | null;
+    linkedinAppliesCount?: number | null;
+    linkedinCompetitionScore?: number | null;
+    linkedinJobCompetition?: string | null;
+    linkedinCrowdIndicators?: string | null;
+    linkedinCrowdIndicatorsValue?: string | null;
     recruiterContactQuality?: string | null;
     recruiterContactQualityReason?: string | null;
     recruiterContactType?: string | null;
@@ -348,6 +353,8 @@ const canAnalyzeNow =
   const [detectedEmployerSourceValue, setDetectedEmployerSourceValue] = useState<string | null>(null);
   const [detectedCanonicalJobIdValue, setDetectedCanonicalJobIdValue] = useState<string | null>(null);
   const [detectedHiringContactValue, setDetectedHiringContactValue] = useState<string | null>(null);
+  const [detectedLinkedinJobCompetitionValue, setDetectedLinkedinJobCompetitionValue] = useState<string | null>(null);
+  const [detectedLinkedinCrowdIndicatorsValue, setDetectedLinkedinCrowdIndicatorsValue] = useState<string | null>(null);
   const [detectedRecruiterContactQualityValue, setDetectedRecruiterContactQualityValue] = useState<string | null>(null);
   const [detectedRecruiterContactQualityReasonValue, setDetectedRecruiterContactQualityReasonValue] = useState<string | null>(null);
   const [detectedEmailListedValue, setDetectedEmailListedValue] = useState<string | null>(null);
@@ -675,6 +682,12 @@ useEffect(() => {
     setDetectedEmployerSourceValue(extPayload?.detected?.employerSource ?? null);
     setDetectedCanonicalJobIdValue(extPayload?.detected?.canonicalJobId ?? null);
     setDetectedHiringContactValue(extPayload?.detected?.hiringContact ?? null);
+    setDetectedLinkedinJobCompetitionValue(extPayload?.detected?.linkedinJobCompetition ?? null);
+    setDetectedLinkedinCrowdIndicatorsValue(
+      extPayload?.detected?.linkedinCrowdIndicatorsValue ??
+      extPayload?.detected?.linkedinCrowdIndicators ??
+      null
+    );
     setDetectedRecruiterContactQualityValue(extPayload?.detected?.recruiterContactQuality ?? null);
     setDetectedRecruiterContactQualityReasonValue(extPayload?.detected?.recruiterContactQualityReason ?? null);
     setDetectedEmailListedValue(extPayload?.detected?.emailListed ?? null);
@@ -778,6 +791,8 @@ setDetectedPostingAgeValue(null);
 setDetectedEmployerSourceValue(null);
 setDetectedCanonicalJobIdValue(null);
 setDetectedHiringContactValue(null);
+setDetectedLinkedinJobCompetitionValue(null);
+setDetectedLinkedinCrowdIndicatorsValue(null);
 setDetectedRecruiterContactQualityValue(null);
 setDetectedRecruiterContactQualityReasonValue(null);
 setDetectedEmailListedValue(null);
@@ -955,6 +970,8 @@ setDetectedPostingAgeValue(null);
 setDetectedEmployerSourceValue(null);
 setDetectedCanonicalJobIdValue(null);
 setDetectedHiringContactValue(null);
+setDetectedLinkedinJobCompetitionValue(null);
+setDetectedLinkedinCrowdIndicatorsValue(null);
 setDetectedRecruiterContactQualityValue(null);
 setDetectedRecruiterContactQualityReasonValue(null);
 setDetectedEmailListedValue(null);
@@ -1126,6 +1143,12 @@ setLastUpdatedAt(new Date().toLocaleString());
       setDetectedEmployerSourceValue(data?.detected?.employerSource ?? fallbackHost ?? null);
       setDetectedCanonicalJobIdValue(data?.detected?.canonicalJobId ?? fallbackJobId ?? null);
       setDetectedHiringContactValue(data?.detected?.hiringContact ?? null);
+      setDetectedLinkedinJobCompetitionValue(data?.detected?.linkedinJobCompetition ?? null);
+      setDetectedLinkedinCrowdIndicatorsValue(
+        data?.detected?.linkedinCrowdIndicatorsValue ??
+        data?.detected?.linkedinCrowdIndicators ??
+        null
+      );
       setDetectedRecruiterContactQualityValue(data?.detected?.recruiterContactQuality ?? null);
       setDetectedRecruiterContactQualityReasonValue(data?.detected?.recruiterContactQualityReason ?? null);
       setDetectedEmailListedValue(data?.detected?.emailListed ?? null);
@@ -1848,18 +1871,38 @@ setJobDescription('');
                     )}
                   </div>
 
-                  {/* 3) CONFIDENCE */}
+                  {/* 3) PRIMARY CUES */}
                   <div className="analysis-card">
-                    <div className="analysis-card-title">CONFIDENCE</div>
+                    <div className="analysis-card-title">PRIMARY CUES</div>
 
                     {analysisSteps.confidenceDataQuality === 'complete' && (
-                      <div className="analysis-tag analysis-tag-highlight" data-tip="Confidence reflects input quality and page accessibility.">
-                        <img src={checkComplete} alt="" className="analysis-tag-icon" />
-                        <div className="analysis-tag-text">
-                          <div className="analysis-tag-title">Data Quality</div>
-                          <div className="analysis-tag-value">Medium</div>
+                      hasMeaningfulDetectedValue(detectedLinkedinJobCompetitionValue) &&
+                      hasMeaningfulDetectedValue(detectedLinkedinCrowdIndicatorsValue) ? (
+                        <>
+                          <div className="analysis-tag analysis-tag-primary-cue" data-tip="LinkedIn competition score based on applies volume and posting recency.">
+                            <span className="analysis-tag-check" aria-hidden="true">✓</span>
+                            <div className="analysis-tag-text">
+                              <div className="analysis-tag-title">Job Competition</div>
+                              <div className="analysis-tag-value">{detectedLinkedinJobCompetitionValue}</div>
+                            </div>
+                          </div>
+                          <div className="analysis-tag analysis-tag-primary-cue" data-tip="LinkedIn crowd momentum from applies count and recent activity.">
+                            <span className="analysis-tag-check" aria-hidden="true">✓</span>
+                            <div className="analysis-tag-text">
+                              <div className="analysis-tag-title">Crowd Indicators</div>
+                              <div className="analysis-tag-value">{detectedLinkedinCrowdIndicatorsValue}</div>
+                            </div>
+                          </div>
+                        </>
+                      ) : (
+                        <div className="analysis-tag analysis-tag-highlight" data-tip="Confidence reflects input quality and page accessibility.">
+                          <img src={checkComplete} alt="" className="analysis-tag-icon" />
+                          <div className="analysis-tag-text">
+                            <div className="analysis-tag-title">Data Quality</div>
+                            <div className="analysis-tag-value">Medium</div>
+                          </div>
                         </div>
-                      </div>
+                      )
                     )}
                   </div>
 
