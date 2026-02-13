@@ -192,7 +192,8 @@ export default function App() {
     const scrollParam = (params.get('scroll') || '').toLowerCase();
     const wantsPricing = hash === '#pricing' || scrollParam === 'pricing';
     const wantsNewsletter = hash === '#newsletter' || scrollParam === 'newsletter';
-    const targetId = wantsPricing ? 'pricing' : wantsNewsletter ? 'newsletter' : '';
+    const wantsAnalysis = hash === '#analysis' || scrollParam === 'analysis';
+    const targetId = wantsPricing ? 'pricing' : wantsNewsletter ? 'newsletter' : wantsAnalysis ? 'analysis' : '';
 
     if (!targetId) return;
     if (isPaidRoute) setShowPricingOnPaid(true);
