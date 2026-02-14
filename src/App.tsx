@@ -138,6 +138,7 @@ type ExtHydratedResult = {
     linkedinWorkingArrangement?: string | null;
     indeedJobType?: string | null;
     indeedCompanyRating?: string | null;
+    indeedPay?: string | null;
     recruiterContactQuality?: string | null;
     recruiterContactQualityReason?: string | null;
     recruiterContactType?: string | null;
@@ -361,6 +362,7 @@ const canAnalyzeNow =
   const [detectedLinkedinWorkingArrangementValue, setDetectedLinkedinWorkingArrangementValue] = useState<string | null>(null);
   const [detectedIndeedJobTypeValue, setDetectedIndeedJobTypeValue] = useState<string | null>(null);
   const [detectedIndeedCompanyRatingValue, setDetectedIndeedCompanyRatingValue] = useState<string | null>(null);
+  const [detectedIndeedPayValue, setDetectedIndeedPayValue] = useState<string | null>(null);
   const [detectedRecruiterContactQualityValue, setDetectedRecruiterContactQualityValue] = useState<string | null>(null);
   const [detectedRecruiterContactQualityReasonValue, setDetectedRecruiterContactQualityReasonValue] = useState<string | null>(null);
   const [detectedEmailListedValue, setDetectedEmailListedValue] = useState<string | null>(null);
@@ -697,6 +699,7 @@ useEffect(() => {
     setDetectedLinkedinWorkingArrangementValue(extPayload?.detected?.linkedinWorkingArrangement ?? null);
     setDetectedIndeedJobTypeValue(extPayload?.detected?.indeedJobType ?? null);
     setDetectedIndeedCompanyRatingValue(extPayload?.detected?.indeedCompanyRating ?? null);
+    setDetectedIndeedPayValue(extPayload?.detected?.indeedPay ?? null);
     setDetectedRecruiterContactQualityValue(extPayload?.detected?.recruiterContactQuality ?? null);
     setDetectedRecruiterContactQualityReasonValue(extPayload?.detected?.recruiterContactQualityReason ?? null);
     setDetectedEmailListedValue(extPayload?.detected?.emailListed ?? null);
@@ -805,6 +808,7 @@ setDetectedLinkedinCrowdIndicatorsValue(null);
 setDetectedLinkedinWorkingArrangementValue(null);
 setDetectedIndeedJobTypeValue(null);
 setDetectedIndeedCompanyRatingValue(null);
+setDetectedIndeedPayValue(null);
 setDetectedRecruiterContactQualityValue(null);
 setDetectedRecruiterContactQualityReasonValue(null);
 setDetectedEmailListedValue(null);
@@ -987,6 +991,7 @@ setDetectedLinkedinCrowdIndicatorsValue(null);
 setDetectedLinkedinWorkingArrangementValue(null);
 setDetectedIndeedJobTypeValue(null);
 setDetectedIndeedCompanyRatingValue(null);
+setDetectedIndeedPayValue(null);
 setDetectedRecruiterContactQualityValue(null);
 setDetectedRecruiterContactQualityReasonValue(null);
 setDetectedEmailListedValue(null);
@@ -1167,6 +1172,7 @@ setLastUpdatedAt(new Date().toLocaleString());
       setDetectedLinkedinWorkingArrangementValue(data?.detected?.linkedinWorkingArrangement ?? null);
       setDetectedIndeedJobTypeValue(data?.detected?.indeedJobType ?? null);
       setDetectedIndeedCompanyRatingValue(data?.detected?.indeedCompanyRating ?? null);
+      setDetectedIndeedPayValue(data?.detected?.indeedPay ?? null);
       setDetectedRecruiterContactQualityValue(data?.detected?.recruiterContactQuality ?? null);
       setDetectedRecruiterContactQualityReasonValue(data?.detected?.recruiterContactQualityReason ?? null);
       setDetectedEmailListedValue(data?.detected?.emailListed ?? null);
@@ -1945,6 +1951,15 @@ setJobDescription('');
                             <div className="analysis-tag-text">
                               <div className="analysis-tag-title">COMPANY RATING</div>
                               <div className="analysis-tag-value">{detectedIndeedCompanyRatingValue}</div>
+                            </div>
+                          </div>
+                        )}
+                        {hasMeaningfulDetectedValue(detectedIndeedPayValue) && (
+                          <div className="analysis-tag analysis-tag-primary-cue" data-tip="Indeed pay extracted from visible job pay details.">
+                            <span className="analysis-tag-check" aria-hidden="true">✓</span>
+                            <div className="analysis-tag-text">
+                              <div className="analysis-tag-title">PAY</div>
+                              <div className="analysis-tag-value">{detectedIndeedPayValue}</div>
                             </div>
                           </div>
                         )}
