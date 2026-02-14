@@ -1876,13 +1876,21 @@ setJobDescription('');
                     <div className="analysis-card-title">PRIMARY CUES</div>
 
                     {analysisSteps.confidenceDataQuality === 'complete' && (
-                      hasMeaningfulDetectedValue(detectedLinkedinJobCompetitionValue) &&
-                      hasMeaningfulDetectedValue(detectedLinkedinCrowdIndicatorsValue) ? (
-                        <>
-                          <div className="analysis-tag analysis-tag-primary-cue" data-tip="LinkedIn competition score based on applies volume and posting recency.">
-                            <span className="analysis-tag-check" aria-hidden="true">✓</span>
-                            <div className="analysis-tag-text">
-                              <div className="analysis-tag-title">Job Competition</div>
+                      <>
+                        <div className="analysis-tag analysis-tag-highlight" data-tip="Confidence reflects input quality and page accessibility.">
+                          <img src={checkComplete} alt="" className="analysis-tag-icon" />
+                          <div className="analysis-tag-text">
+                            <div className="analysis-tag-title">Data Quality</div>
+                            <div className="analysis-tag-value">Medium</div>
+                          </div>
+                        </div>
+                        {hasMeaningfulDetectedValue(detectedLinkedinJobCompetitionValue) &&
+                        hasMeaningfulDetectedValue(detectedLinkedinCrowdIndicatorsValue) && (
+                          <>
+                            <div className="analysis-tag analysis-tag-primary-cue" data-tip="LinkedIn competition score based on applies volume and posting recency.">
+                              <span className="analysis-tag-check" aria-hidden="true">✓</span>
+                              <div className="analysis-tag-text">
+                                <div className="analysis-tag-title">Job Competition</div>
                               <div className="analysis-tag-value">{detectedLinkedinJobCompetitionValue}</div>
                             </div>
                           </div>
@@ -1891,18 +1899,11 @@ setJobDescription('');
                             <div className="analysis-tag-text">
                               <div className="analysis-tag-title">Crowd Indicators</div>
                               <div className="analysis-tag-value">{detectedLinkedinCrowdIndicatorsValue}</div>
+                              </div>
                             </div>
-                          </div>
-                        </>
-                      ) : (
-                        <div className="analysis-tag analysis-tag-highlight" data-tip="Confidence reflects input quality and page accessibility.">
-                          <img src={checkComplete} alt="" className="analysis-tag-icon" />
-                          <div className="analysis-tag-text">
-                            <div className="analysis-tag-title">Data Quality</div>
-                            <div className="analysis-tag-value">Medium</div>
-                          </div>
-                        </div>
-                      )
+                          </>
+                        )}
+                      </>
                     )}
                   </div>
 
