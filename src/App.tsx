@@ -135,6 +135,7 @@ type ExtHydratedResult = {
     linkedinJobCompetition?: string | null;
     linkedinCrowdIndicators?: string | null;
     linkedinCrowdIndicatorsValue?: string | null;
+    linkedinWorkingArrangement?: string | null;
     recruiterContactQuality?: string | null;
     recruiterContactQualityReason?: string | null;
     recruiterContactType?: string | null;
@@ -355,6 +356,7 @@ const canAnalyzeNow =
   const [detectedHiringContactValue, setDetectedHiringContactValue] = useState<string | null>(null);
   const [detectedLinkedinJobCompetitionValue, setDetectedLinkedinJobCompetitionValue] = useState<string | null>(null);
   const [detectedLinkedinCrowdIndicatorsValue, setDetectedLinkedinCrowdIndicatorsValue] = useState<string | null>(null);
+  const [detectedLinkedinWorkingArrangementValue, setDetectedLinkedinWorkingArrangementValue] = useState<string | null>(null);
   const [detectedRecruiterContactQualityValue, setDetectedRecruiterContactQualityValue] = useState<string | null>(null);
   const [detectedRecruiterContactQualityReasonValue, setDetectedRecruiterContactQualityReasonValue] = useState<string | null>(null);
   const [detectedEmailListedValue, setDetectedEmailListedValue] = useState<string | null>(null);
@@ -688,6 +690,7 @@ useEffect(() => {
       extPayload?.detected?.linkedinCrowdIndicators ??
       null
     );
+    setDetectedLinkedinWorkingArrangementValue(extPayload?.detected?.linkedinWorkingArrangement ?? null);
     setDetectedRecruiterContactQualityValue(extPayload?.detected?.recruiterContactQuality ?? null);
     setDetectedRecruiterContactQualityReasonValue(extPayload?.detected?.recruiterContactQualityReason ?? null);
     setDetectedEmailListedValue(extPayload?.detected?.emailListed ?? null);
@@ -793,6 +796,7 @@ setDetectedCanonicalJobIdValue(null);
 setDetectedHiringContactValue(null);
 setDetectedLinkedinJobCompetitionValue(null);
 setDetectedLinkedinCrowdIndicatorsValue(null);
+setDetectedLinkedinWorkingArrangementValue(null);
 setDetectedRecruiterContactQualityValue(null);
 setDetectedRecruiterContactQualityReasonValue(null);
 setDetectedEmailListedValue(null);
@@ -972,6 +976,7 @@ setDetectedCanonicalJobIdValue(null);
 setDetectedHiringContactValue(null);
 setDetectedLinkedinJobCompetitionValue(null);
 setDetectedLinkedinCrowdIndicatorsValue(null);
+setDetectedLinkedinWorkingArrangementValue(null);
 setDetectedRecruiterContactQualityValue(null);
 setDetectedRecruiterContactQualityReasonValue(null);
 setDetectedEmailListedValue(null);
@@ -1149,6 +1154,7 @@ setLastUpdatedAt(new Date().toLocaleString());
         data?.detected?.linkedinCrowdIndicators ??
         null
       );
+      setDetectedLinkedinWorkingArrangementValue(data?.detected?.linkedinWorkingArrangement ?? null);
       setDetectedRecruiterContactQualityValue(data?.detected?.recruiterContactQuality ?? null);
       setDetectedRecruiterContactQualityReasonValue(data?.detected?.recruiterContactQualityReason ?? null);
       setDetectedEmailListedValue(data?.detected?.emailListed ?? null);
@@ -1902,6 +1908,15 @@ setJobDescription('');
                               </div>
                             </div>
                           </>
+                        )}
+                        {hasMeaningfulDetectedValue(detectedLinkedinWorkingArrangementValue) && (
+                          <div className="analysis-tag analysis-tag-primary-cue" data-tip="LinkedIn top-card work setup (Remote / On-site / Hybrid).">
+                            <span className="analysis-tag-check" aria-hidden="true">✓</span>
+                            <div className="analysis-tag-text">
+                              <div className="analysis-tag-title">Working Arrangement</div>
+                              <div className="analysis-tag-value">{detectedLinkedinWorkingArrangementValue}</div>
+                            </div>
+                          </div>
                         )}
                       </>
                     )}
