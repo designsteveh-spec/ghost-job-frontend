@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import './index.css';
 import Pricing from './components/Pricing';
 import MailerLiteForm from './components/MailerLiteForm';
+import { applySeo } from './seo';
 
 
 import Navbar from './components/Navbar';
@@ -16,6 +17,7 @@ import ActivityGauge from './components/ActivityGauge';
 import educationImage from './assets/ghostPic-1.png';
 import ghostPhoneAppLeft from './assets/ghostPhoneAppLeft.png';
 import ghostPhoneAppRight from './assets/ghostPhoneAppRight.png';
+import chevronDownIcon from './assets/chevron-down.svg';
 
 
 
@@ -33,6 +35,7 @@ import twitterIcon from './assets/socialTwitter.svg';
 import tiktokIcon from './assets/socialTikTok.svg';
 
 const API_BASE = (import.meta.env.VITE_API_BASE || '').trim();
+const CHROME_EXTENSION_URL = 'https://chromewebstore.google.com/';
 console.log('[API_BASE]', API_BASE);
 
 const WARMUP_TOTAL_MS = 45000;      // total time we’re willing to wait for Render to wake
@@ -110,14 +113,84 @@ function expToMs(exp?: number) {
   return exp > 1e12 ? exp : exp * 1000;
 }
 
+type ExtHydratedResult = {
+  score?: number;
+  label?: string;
+  breakdown?: {
+    postingAge?: number;
+    freshness1?: number;
+    contentUniqueness?: number;
+    activityIndicators?: number;
+    freshness2?: number;
+    siteReliability?: number;
+    recruiterContactQuality?: number;
+  } | null;
+  detected?: {
+    postingAge?: string | null;
+    postingAgeNote?: string | null;
+    employerSource?: string | null;
+    canonicalJobId?: string | null;
+    hiringContact?: string | null;
+    linkedinAppliesCount?: number | null;
+    linkedinCompetitionScore?: number | null;
+    linkedinJobCompetition?: string | null;
+    linkedinCrowdIndicators?: string | null;
+    linkedinCrowdIndicatorsValue?: string | null;
+    linkedinWorkingArrangement?: string | null;
+    indeedJobType?: string | null;
+    indeedCompanyRating?: string | null;
+    indeedPay?: string | null;
+    recruiterContactQuality?: string | null;
+    recruiterContactQualityReason?: string | null;
+    recruiterContactType?: string | null;
+    emailListed?: string | null;
+  } | null;
+  signals?: {
+    stale?: { result?: boolean } | null;
+    weak?: { result?: boolean } | null;
+    inactivity?: { result?: boolean } | null;
+  } | null;
+  google?: {
+    enabled?: boolean | null;
+    indexed?: boolean | null;
+    topTitle?: string | null;
+    topSnippet?: string | null;
+    topLink?: string | null;
+  } | null;
+};
+
+function decodeBase64UrlJson<T>(value: string): T | null {
+  try {
+    if (!value) return null;
+    const b64 = value.replace(/-/g, '+').replace(/_/g, '/');
+    const padded = b64 + '='.repeat((4 - (b64.length % 4)) % 4);
+    const json = atob(padded);
+    return JSON.parse(json) as T;
+  } catch {
+    return null;
+  }
+}
+
 export default function App() {
+  const pathname = window.location.pathname || '/';
+
+  useEffect(() => {
+    applySeo({
+      title: 'Ghost Job Checker',
+      description:
+        'Check job postings for ghost job signals using recency, activity, and recruiter-contact quality cues before you apply.',
+      path: pathname,
+    });
+  }, [pathname]);
+
   useEffect(() => {
   // Warm up API (Render may cold-start after inactivity)
   fetch(`${API_BASE}/api/health`).catch(() => {});
 }, []);
 
-
-  const path = window.location.pathname || '/';
+  const path = pathname;
+  const searchParams = new URLSearchParams(window.location.search);
+  const isExtensionEntry = (searchParams.get('ext_source') || '').trim().toLowerCase() === 'extension';
   const isCasualRoute = path === '/casual';
   const isActiveRoute = path === '/active';
   const isDayRoute = path === '/day';
@@ -132,6 +205,54 @@ export default function App() {
     if (!isPaidRoute) return false;
     return window.location.hash === '#pricing';
   });
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const hash = (window.location.hash || '').toLowerCase();
+    const scrollParam = (params.get('scroll') || '').toLowerCase();
+    const wantsPricing = hash === '#pricing' || scrollParam === 'pricing';
+    const wantsNewsletter = hash === '#newsletter' || scrollParam === 'newsletter';
+    const wantsAnalysis = hash === '#analysis' || scrollParam === 'analysis';
+    const targetId = wantsPricing ? 'pricing' : wantsNewsletter ? 'newsletter' : wantsAnalysis ? 'analysis' : '';
+
+    if (!targetId) return;
+    if (isPaidRoute) setShowPricingOnPaid(true);
+
+    const scrollToPricing = () => {
+      const el = document.getElementById(targetId);
+      if (!el) return false;
+      const top = Math.max(0, window.scrollY + el.getBoundingClientRect().top - 12);
+      window.scrollTo({ top, behavior: 'smooth' });
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      return true;
+    };
+
+    // Try immediately, then retry while the section mounts/layout settles.
+    if (scrollToPricing()) {
+      window.setTimeout(scrollToPricing, 120);
+      window.setTimeout(scrollToPricing, 420);
+      return;
+    }
+
+    let tries = 0;
+    const timer = window.setInterval(() => {
+      tries += 1;
+      if (scrollToPricing() || tries >= 40) {
+        window.clearInterval(timer);
+      }
+    }, 120);
+
+    const onLoad = () => {
+      scrollToPricing();
+      window.setTimeout(scrollToPricing, 200);
+    };
+    window.addEventListener('load', onLoad);
+
+    return () => {
+      window.clearInterval(timer);
+      window.removeEventListener('load', onLoad);
+    };
+  }, [isPaidRoute]);
 
   const [url, setUrl] = useState('');
 
@@ -197,14 +318,48 @@ const canAnalyzeNow =
     const [score, setScore] = useState<number | null>(null);
 
 // Score Breakdown (from backend)
-const [scoreBreakdown, setScoreBreakdown] = useState<{
+  const [scoreBreakdown, setScoreBreakdown] = useState<{
   postingAge?: number;
   freshness1?: number;
   contentUniqueness?: number;
   activityIndicators?: number;
   freshness2?: number;
   siteReliability?: number;
-} | null>(null);
+  recruiterContactQuality?: number;
+  } | null>(null);
+  function scoreSummaryLabel(raw: number | null | undefined): string {
+    const n = Number(raw ?? 0);
+    if (!Number.isFinite(n)) return 'Unknown';
+    if (n < 0) return 'Risk';
+    if (n <= 1) return 'Very Low';
+    if (n <= 4) return 'Low';
+    if (n <= 7) return 'Medium';
+    return 'High';
+  }
+
+  function renderScoreSummaryValue(raw: number | null | undefined, _key: string) {
+    const n = Number(raw ?? 0);
+    const label = scoreSummaryLabel(n);
+    if (!Number.isFinite(n)) return label;
+    const signed = n > 0 ? `+${n}` : `${n}`;
+    return `${label} (${signed})`;
+  }
+
+  function hasMeaningfulDetectedValue(value: string | null | undefined) {
+    const v = String(value ?? '').trim();
+    if (!v) return false;
+    const low = v.toLowerCase();
+    return !(
+      low === '-' ||
+      low === '—' ||
+      low === 'â€”' ||
+      low === 'not found' ||
+      low === 'not listed' ||
+      low === 'null' ||
+      low === 'undefined'
+    );
+  }
+
 
 
   // "What we detected" values (UI only)
@@ -212,6 +367,16 @@ const [scoreBreakdown, setScoreBreakdown] = useState<{
   // (removed) detectedPostingAgeStatusValue — unused (TS6133)
   const [detectedEmployerSourceValue, setDetectedEmployerSourceValue] = useState<string | null>(null);
   const [detectedCanonicalJobIdValue, setDetectedCanonicalJobIdValue] = useState<string | null>(null);
+  const [detectedHiringContactValue, setDetectedHiringContactValue] = useState<string | null>(null);
+  const [detectedLinkedinJobCompetitionValue, setDetectedLinkedinJobCompetitionValue] = useState<string | null>(null);
+  const [detectedLinkedinCrowdIndicatorsValue, setDetectedLinkedinCrowdIndicatorsValue] = useState<string | null>(null);
+  const [detectedLinkedinWorkingArrangementValue, setDetectedLinkedinWorkingArrangementValue] = useState<string | null>(null);
+  const [detectedIndeedJobTypeValue, setDetectedIndeedJobTypeValue] = useState<string | null>(null);
+  const [detectedIndeedCompanyRatingValue, setDetectedIndeedCompanyRatingValue] = useState<string | null>(null);
+  const [detectedIndeedPayValue, setDetectedIndeedPayValue] = useState<string | null>(null);
+  const [detectedRecruiterContactQualityValue, setDetectedRecruiterContactQualityValue] = useState<string | null>(null);
+  const [detectedRecruiterContactQualityReasonValue, setDetectedRecruiterContactQualityReasonValue] = useState<string | null>(null);
+  const [detectedEmailListedValue, setDetectedEmailListedValue] = useState<string | null>(null);
 
   // Google snippet “What we detected”
   const [detectedGoogleIndexedValue, setDetectedGoogleIndexedValue] = useState<string | null>(null);
@@ -220,6 +385,7 @@ const [scoreBreakdown, setScoreBreakdown] = useState<{
   const [detectedGoogleTopLinkValue, setDetectedGoogleTopLinkValue] = useState<string | null>(null);
 
 const [lastUpdatedAt, setLastUpdatedAt] = useState<string | null>(null);
+  const [isExtensionHydratedResult, setIsExtensionHydratedResult] = useState<boolean>(false);
 
 
 
@@ -261,6 +427,8 @@ const [gaugeRunId, setGaugeRunId] = useState<number>(0);
     | 'detectedPostingAge'
     | 'detectedEmployerSource'
     | 'detectedCanonicalJobId'
+    | 'detectedHiringContact'
+    | 'detectedEmailListed'
     | 'detectedActivityScan'
     | 'detectedLastUpdated'
     | 'detectedApplyLinkBehavior'
@@ -271,6 +439,7 @@ const [gaugeRunId, setGaugeRunId] = useState<number>(0);
     | 'scoreActivityIndicators'
     | 'scoreFreshness2'
     | 'scoreSiteReliability'
+    | 'scoreRecruiterContactQuality'
     | 'detectedGoogleIndexed'
     | 'detectedGoogleTopResult'
     | 'detectedGoogleSnippet';
@@ -288,6 +457,8 @@ const [gaugeRunId, setGaugeRunId] = useState<number>(0);
     detectedPostingAge: 'pending',
     detectedEmployerSource: 'pending',
     detectedCanonicalJobId: 'pending',
+    detectedHiringContact: 'pending',
+    detectedEmailListed: 'pending',
     detectedActivityScan: 'pending',
     detectedLastUpdated: 'pending',
     detectedApplyLinkBehavior: 'pending',
@@ -300,6 +471,7 @@ const [gaugeRunId, setGaugeRunId] = useState<number>(0);
     scoreActivityIndicators: 'pending',
     scoreFreshness2: 'pending',
     scoreSiteReliability: 'pending',
+    scoreRecruiterContactQuality: 'pending',
 
     detectedGoogleIndexed: 'pending',
     detectedGoogleTopResult: 'pending',
@@ -478,6 +650,89 @@ useEffect(() => {
     localStorage.setItem('gj_access_code', next);
   }
 
+  // Extension hydration flow:
+  // If extension passes a precomputed result, render full "complete" analysis immediately.
+  const extSource = (params.get('ext_source') || '').trim().toLowerCase();
+  const extPayloadRaw = (params.get('ext_result') || '').trim();
+  const extScoreRaw = (params.get('ext_score') || '').trim();
+  const extTsRaw = (params.get('ext_ts') || '').trim();
+  const extUrl = (params.get('url') || '').trim();
+
+  const extPayload = decodeBase64UrlJson<ExtHydratedResult>(extPayloadRaw);
+  const extScoreParsed = Number(extScoreRaw);
+  const extScoreFromPayload = Number(extPayload?.score);
+  const extScore = Number.isFinite(extScoreParsed)
+    ? extScoreParsed
+    : (Number.isFinite(extScoreFromPayload) ? extScoreFromPayload : NaN);
+
+  if (extSource === 'extension' && Number.isFinite(extScore)) {
+    setIsExtensionHydratedResult(true);
+    clearAllTimeouts();
+    stopGaugeFlutter();
+    stopRollingText();
+
+    if (extUrl) {
+      setUrl(extUrl);
+      setLastAnalyzedUrl(extUrl);
+    }
+
+    setFormError(null);
+    setOpenAnalysis(true);
+    resetAnalysisSteps();
+    completeAllAnalysisSteps();
+
+    setSignals({
+      stale: 'complete',
+      weak: 'complete',
+      inactivity: 'complete',
+    });
+
+    const finalScore = Math.max(0, Math.min(100, Math.round(extScore)));
+    setScore(finalScore);
+    setGaugeTarget(finalScore);
+    setGaugeDurationMs(500);
+    gaugeDurationRef.current = 500;
+    setGaugeRunId((n) => n + 1);
+    setStatus('complete');
+
+    setScoreBreakdown(extPayload?.breakdown ?? null);
+
+    setDetectedPostingAgeValue(extPayload?.detected?.postingAge ?? extPayload?.detected?.postingAgeNote ?? null);
+    setDetectedEmployerSourceValue(extPayload?.detected?.employerSource ?? null);
+    setDetectedCanonicalJobIdValue(extPayload?.detected?.canonicalJobId ?? null);
+    setDetectedHiringContactValue(extPayload?.detected?.hiringContact ?? null);
+    setDetectedLinkedinJobCompetitionValue(extPayload?.detected?.linkedinJobCompetition ?? null);
+    setDetectedLinkedinCrowdIndicatorsValue(
+      extPayload?.detected?.linkedinCrowdIndicatorsValue ??
+      extPayload?.detected?.linkedinCrowdIndicators ??
+      null
+    );
+    setDetectedLinkedinWorkingArrangementValue(extPayload?.detected?.linkedinWorkingArrangement ?? null);
+    setDetectedIndeedJobTypeValue(extPayload?.detected?.indeedJobType ?? null);
+    setDetectedIndeedCompanyRatingValue(extPayload?.detected?.indeedCompanyRating ?? null);
+    setDetectedIndeedPayValue(extPayload?.detected?.indeedPay ?? null);
+    setDetectedRecruiterContactQualityValue(extPayload?.detected?.recruiterContactQuality ?? null);
+    setDetectedRecruiterContactQualityReasonValue(extPayload?.detected?.recruiterContactQualityReason ?? null);
+    setDetectedEmailListedValue(extPayload?.detected?.emailListed ?? null);
+
+    const g = extPayload?.google;
+    if (!g || g.enabled === false) {
+      setDetectedGoogleIndexedValue('Not enabled');
+      setDetectedGoogleTopResultValue('—');
+      setDetectedGoogleSnippetValue('—');
+      setDetectedGoogleTopLinkValue(null);
+    } else {
+      setDetectedGoogleIndexedValue(g.indexed === true ? 'Indexed' : g.indexed === false ? 'Not found' : null);
+      setDetectedGoogleTopResultValue(g.topTitle ?? null);
+      setDetectedGoogleSnippetValue(g.topSnippet ?? null);
+      setDetectedGoogleTopLinkValue(g.topLink ?? null);
+    }
+
+    const ts = Number(extTsRaw);
+    const when = Number.isFinite(ts) && ts > 0 ? new Date(ts) : new Date();
+    setLastUpdatedAt(when.toLocaleString());
+  }
+
   // ✅ Stripe return clarity: show "Pass Unlocked" modal once, then clean URL
   const welcome = (params.get('welcome') || '').trim();
   if (welcome === '1') {
@@ -558,6 +813,16 @@ setDetectedPostingAgeValue(null);
 
 setDetectedEmployerSourceValue(null);
 setDetectedCanonicalJobIdValue(null);
+setDetectedHiringContactValue(null);
+setDetectedLinkedinJobCompetitionValue(null);
+setDetectedLinkedinCrowdIndicatorsValue(null);
+setDetectedLinkedinWorkingArrangementValue(null);
+setDetectedIndeedJobTypeValue(null);
+setDetectedIndeedCompanyRatingValue(null);
+setDetectedIndeedPayValue(null);
+setDetectedRecruiterContactQualityValue(null);
+setDetectedRecruiterContactQualityReasonValue(null);
+setDetectedEmailListedValue(null);
 
 setDetectedGoogleIndexedValue(null);
 setDetectedGoogleTopResultValue(null);
@@ -666,6 +931,7 @@ const postingAgeLabel = (rangeKey: string): string => {
 
 
   const handleAnalyze = async (override?: { url?: string; jobDescription?: string; postingDate?: string }) => {
+    setIsExtensionHydratedResult(false);
     setFormError(null);
 
     const urlValue = (override?.url ?? url).trim();
@@ -730,6 +996,16 @@ setDetectedPostingAgeValue(null);
 
 setDetectedEmployerSourceValue(null);
 setDetectedCanonicalJobIdValue(null);
+setDetectedHiringContactValue(null);
+setDetectedLinkedinJobCompetitionValue(null);
+setDetectedLinkedinCrowdIndicatorsValue(null);
+setDetectedLinkedinWorkingArrangementValue(null);
+setDetectedIndeedJobTypeValue(null);
+setDetectedIndeedCompanyRatingValue(null);
+setDetectedIndeedPayValue(null);
+setDetectedRecruiterContactQualityValue(null);
+setDetectedRecruiterContactQualityReasonValue(null);
+setDetectedEmailListedValue(null);
 setDetectedGoogleIndexedValue(null);
 setDetectedGoogleTopResultValue(null);
 setDetectedGoogleSnippetValue(null);
@@ -766,6 +1042,8 @@ scheduleStep('activityIndicatorsScan', 2000);
 scheduleStep('detectedPostingAge', 560);
 scheduleStep('detectedEmployerSource', 900);
 scheduleStep('detectedCanonicalJobId', 1240);
+scheduleStep('detectedHiringContact', 1440);
+scheduleStep('detectedEmailListed', 1560);
 scheduleStep('detectedActivityScan', 1680);
 scheduleStep('detectedLastUpdated', 2080);
 scheduleStep('detectedApplyLinkBehavior', 2400);
@@ -778,6 +1056,7 @@ scheduleStep('scoreContentUniqueness', 1640);
 scheduleStep('scoreActivityIndicators', 1960);
 scheduleStep('scoreFreshness2', 2280);
 scheduleStep('scoreSiteReliability', 2600);
+scheduleStep('scoreRecruiterContactQuality', 2760);
 
 scheduleStep('detectedGoogleIndexed', 1100);
 scheduleStep('detectedGoogleTopResult', 1500);
@@ -889,11 +1168,25 @@ setLastUpdatedAt(new Date().toLocaleString());
         }
       } catch {}
 
-      setDetectedPostingAgeValue(data?.detected?.postingAge ?? null);
+      setDetectedPostingAgeValue(data?.detected?.postingAge ?? data?.detected?.postingAgeNote ?? null);
      // (removed) detectedPostingAgeStatusValue — unused
 
       setDetectedEmployerSourceValue(data?.detected?.employerSource ?? fallbackHost ?? null);
       setDetectedCanonicalJobIdValue(data?.detected?.canonicalJobId ?? fallbackJobId ?? null);
+      setDetectedHiringContactValue(data?.detected?.hiringContact ?? null);
+      setDetectedLinkedinJobCompetitionValue(data?.detected?.linkedinJobCompetition ?? null);
+      setDetectedLinkedinCrowdIndicatorsValue(
+        data?.detected?.linkedinCrowdIndicatorsValue ??
+        data?.detected?.linkedinCrowdIndicators ??
+        null
+      );
+      setDetectedLinkedinWorkingArrangementValue(data?.detected?.linkedinWorkingArrangement ?? null);
+      setDetectedIndeedJobTypeValue(data?.detected?.indeedJobType ?? null);
+      setDetectedIndeedCompanyRatingValue(data?.detected?.indeedCompanyRating ?? null);
+      setDetectedIndeedPayValue(data?.detected?.indeedPay ?? null);
+      setDetectedRecruiterContactQualityValue(data?.detected?.recruiterContactQuality ?? null);
+      setDetectedRecruiterContactQualityReasonValue(data?.detected?.recruiterContactQualityReason ?? null);
+      setDetectedEmailListedValue(data?.detected?.emailListed ?? null);
 
 
             // Google snippet values (from API if available)
@@ -1011,6 +1304,45 @@ timeoutsRef.current.push(t4);
 
 
 
+      {!isExtensionEntry && (
+        <section className="top-promo" aria-label="Get the app">
+          <div className="top-promo-inner">
+            <div className="top-promo-main">
+              <div className="top-promo-title-row">
+                <h2 className="top-promo-title">
+                  <span className="top-promo-title-accent">Get the Job Checker App.</span>{' '}
+                  <span>Check the quality of jobs before applying.</span>
+                </h2>
+              </div>
+              <p className="top-promo-subtitle">
+                Don&apos;t miss out on using the best AI built algorithms to check jobs.
+              </p>
+            </div>
+
+            <a
+              href={CHROME_EXTENSION_URL}
+              target="_blank"
+              rel="noreferrer"
+              className="top-promo-cta"
+            >
+              Add to Chrome
+            </a>
+          </div>
+
+          <button
+            type="button"
+            className="top-promo-chevron-btn"
+            aria-label="Scroll to job checker section"
+            onClick={() => {
+              const hero = document.getElementById('hero');
+              if (hero) hero.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }}
+          >
+            <img src={chevronDownIcon} alt="" aria-hidden="true" className="top-promo-chevron" />
+          </button>
+        </section>
+      )}
+
       {showPassUnlocked && (
         <div
           className="pass-unlocked-overlay"
@@ -1078,12 +1410,15 @@ timeoutsRef.current.push(t4);
 </h1>
 
                 <p className="hero-qualifier">
-                  Using the best <span className="hero-qualifier-accent">AI built</span> algorithms to check jobs.
+                  Try it here now, or use the extension while browsing job ads for <span className="hero-qualifier-accent">advanced analysis</span>.
                 </p>
 
-                <p className="subtitle">
+<p className="subtitle">
   Paste any public job posting link to receive a probability-based assessment using observable signals.
-  This tool provides insight — not accusations — to help you decide where to focus your time.
+  More features and deeper analysis are available with the{' '}
+  <a href={CHROME_EXTENSION_URL} target="_blank" rel="noreferrer">
+    Job Checker Chrome Extension
+  </a>.
 </p>
 
 <div className="unified-form">
@@ -1387,6 +1722,34 @@ setJobDescription('');
 
                     <div className="analysis-card-title">WHAT WE DETECTED</div>
 
+                    {!isExtensionHydratedResult && status === 'complete' && (
+                      <div
+                        className="analysis-tag analysis-tag-highlight"
+                        style={{ background: '#0B57D0', borderColor: '#0B57D0', color: '#fff' }}
+                        data-tip="Use the Chrome extension for deeper page-visible extraction."
+                      >
+                        <img
+                          src={checkComplete}
+                          alt=""
+                          className="analysis-tag-icon"
+                          style={{ filter: 'brightness(0) invert(1)' }}
+                        />
+                        <div className="analysis-tag-text">
+                          <div className="analysis-tag-title" style={{ color: '#fff' }}>Get Deeper Analysis</div>
+                          <div className="analysis-tag-value">
+                            <a
+                              href={CHROME_EXTENSION_URL}
+                              target="_blank"
+                              rel="noreferrer"
+                              style={{ color: '#fff', textDecoration: 'underline' }}
+                            >
+                              with Chrome Extension
+                            </a>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
                                         {analysisSteps.detectedPostingAge === 'complete' && (
                       <div className="analysis-tag" data-tip="Posting age used for scoring (from your selection when required).">
                         <img src={checkComplete} alt="" className="analysis-tag-icon" />
@@ -1426,21 +1789,41 @@ setJobDescription('');
                       </div>
                     )}
 
-                                        {analysisSteps.detectedGoogleIndexed === 'complete' && (
-                      <div className="analysis-tag" data-tip="Checks whether Google currently returns results for this job/source.">
+                    {analysisSteps.detectedHiringContact === 'complete' && hasMeaningfulDetectedValue(detectedHiringContactValue) && (
+                      <div className="analysis-tag" data-tip="Hiring contact detected from visible page content.">
                         <img src={checkComplete} alt="" className="analysis-tag-icon" />
                         <div className="analysis-tag-text">
-                          <div className="analysis-tag-title">Google Index</div>
-                          <div className="analysis-tag-value">{detectedGoogleIndexedValue ?? '—'}</div>
+                          <div className="analysis-tag-title">Hiring Contact</div>
+                          <div className="analysis-tag-value">{detectedHiringContactValue}</div>
                         </div>
                       </div>
                     )}
 
-                    {analysisSteps.detectedGoogleTopResult === 'complete' && (
-                      detectedGoogleTopLinkValue ? (
+                    {analysisSteps.detectedEmailListed === 'complete' && hasMeaningfulDetectedValue(detectedEmailListedValue) && (
+                      <div className="analysis-tag" data-tip="First email address detected from visible job content.">
+                        <img src={checkComplete} alt="" className="analysis-tag-icon" />
+                        <div className="analysis-tag-text">
+                          <div className="analysis-tag-title">Email Listed</div>
+                          <div className="analysis-tag-value">{detectedEmailListedValue}</div>
+                        </div>
+                      </div>
+                    )}
+
+                                        {analysisSteps.detectedGoogleIndexed === 'complete' && hasMeaningfulDetectedValue(detectedGoogleIndexedValue) && (
+                      <div className="analysis-tag" data-tip="Checks whether Google currently returns results for this job/source.">
+                        <img src={checkComplete} alt="" className="analysis-tag-icon" />
+                        <div className="analysis-tag-text">
+                          <div className="analysis-tag-title">Google Index</div>
+                          <div className="analysis-tag-value">{detectedGoogleIndexedValue}</div>
+                        </div>
+                      </div>
+                    )}
+
+                    {analysisSteps.detectedGoogleTopResult === 'complete' && hasMeaningfulDetectedValue(detectedGoogleTopResultValue) && (
+                      hasMeaningfulDetectedValue(detectedGoogleTopLinkValue) ? (
                         <a
                           className="analysis-tag analysis-tag-link"
-                          href={detectedGoogleTopLinkValue}
+                          href={detectedGoogleTopLinkValue || undefined}
                           target="_blank"
                           rel="noreferrer"
                           data-tip="Opens the top Google result in a new tab."
@@ -1449,7 +1832,7 @@ setJobDescription('');
                           <div className="analysis-tag-text">
                             <div className="analysis-tag-title">Google Top Result</div>
                             <div className="analysis-tag-value analysis-tag-value-link">
-                              {detectedGoogleTopResultValue ?? '—'}
+                              {detectedGoogleTopResultValue}
                             </div>
                           </div>
                         </a>
@@ -1458,18 +1841,18 @@ setJobDescription('');
                           <img src={checkComplete} alt="" className="analysis-tag-icon" />
                           <div className="analysis-tag-text">
                             <div className="analysis-tag-title">Google Top Result</div>
-                            <div className="analysis-tag-value">{detectedGoogleTopResultValue ?? '—'}</div>
+                            <div className="analysis-tag-value">{detectedGoogleTopResultValue}</div>
                           </div>
                         </div>
                       )
                     )}
 
-                    {analysisSteps.detectedGoogleSnippet === 'complete' && (
+                    {analysisSteps.detectedGoogleSnippet === 'complete' && hasMeaningfulDetectedValue(detectedGoogleSnippetValue) && (
                       <div className="analysis-tag" data-tip="Snippet text Google shows for this result (may include age cues).">
                         <img src={checkComplete} alt="" className="analysis-tag-icon" />
                         <div className="analysis-tag-text">
                           <div className="analysis-tag-title">Google Snippet</div>
-                          <div className="analysis-tag-value">{detectedGoogleSnippetValue ?? '—'}</div>
+                          <div className="analysis-tag-value">{detectedGoogleSnippetValue}</div>
                         </div>
                       </div>
                     )}
@@ -1523,18 +1906,75 @@ setJobDescription('');
                     )}
                   </div>
 
-                  {/* 3) CONFIDENCE */}
+                  {/* 3) PRIMARY CUES */}
                   <div className="analysis-card">
-                    <div className="analysis-card-title">CONFIDENCE</div>
+                    <div className="analysis-card-title">PRIMARY CUES</div>
 
                     {analysisSteps.confidenceDataQuality === 'complete' && (
-                      <div className="analysis-tag analysis-tag-highlight" data-tip="Confidence reflects input quality and page accessibility.">
-                        <img src={checkComplete} alt="" className="analysis-tag-icon" />
-                        <div className="analysis-tag-text">
-                          <div className="analysis-tag-title">Data Quality</div>
-                          <div className="analysis-tag-value">Medium</div>
+                      <>
+                        <div className="analysis-tag analysis-tag-highlight" data-tip="Confidence reflects input quality and page accessibility.">
+                          <img src={checkComplete} alt="" className="analysis-tag-icon" />
+                          <div className="analysis-tag-text">
+                            <div className="analysis-tag-title">Data Quality</div>
+                            <div className="analysis-tag-value">Medium</div>
+                          </div>
                         </div>
-                      </div>
+                        {hasMeaningfulDetectedValue(detectedLinkedinJobCompetitionValue) &&
+                        hasMeaningfulDetectedValue(detectedLinkedinCrowdIndicatorsValue) && (
+                          <>
+                            <div className="analysis-tag analysis-tag-primary-cue" data-tip="LinkedIn competition score based on applies volume and posting recency.">
+                              <span className="analysis-tag-check" aria-hidden="true">✓</span>
+                              <div className="analysis-tag-text">
+                                <div className="analysis-tag-title">Job Competition</div>
+                              <div className="analysis-tag-value">{detectedLinkedinJobCompetitionValue}</div>
+                            </div>
+                          </div>
+                          <div className="analysis-tag analysis-tag-primary-cue" data-tip="LinkedIn crowd momentum from applies count and recent activity.">
+                            <span className="analysis-tag-check" aria-hidden="true">✓</span>
+                            <div className="analysis-tag-text">
+                              <div className="analysis-tag-title">Crowd Indicators</div>
+                              <div className="analysis-tag-value">{detectedLinkedinCrowdIndicatorsValue}</div>
+                              </div>
+                            </div>
+                          </>
+                        )}
+                        {hasMeaningfulDetectedValue(detectedLinkedinWorkingArrangementValue) && (
+                          <div className="analysis-tag analysis-tag-primary-cue" data-tip="LinkedIn top-card work setup (Remote / On-site / Hybrid).">
+                            <span className="analysis-tag-check" aria-hidden="true">✓</span>
+                            <div className="analysis-tag-text">
+                              <div className="analysis-tag-title">Working Arrangement</div>
+                              <div className="analysis-tag-value">{detectedLinkedinWorkingArrangementValue}</div>
+                            </div>
+                          </div>
+                        )}
+                        {hasMeaningfulDetectedValue(detectedIndeedJobTypeValue) && (
+                          <div className="analysis-tag analysis-tag-primary-cue" data-tip="Indeed job type extracted from the visible job details pane.">
+                            <span className="analysis-tag-check" aria-hidden="true">✓</span>
+                            <div className="analysis-tag-text">
+                              <div className="analysis-tag-title">JOB TYPE</div>
+                              <div className="analysis-tag-value">{detectedIndeedJobTypeValue}</div>
+                            </div>
+                          </div>
+                        )}
+                        {hasMeaningfulDetectedValue(detectedIndeedCompanyRatingValue) && (
+                          <div className="analysis-tag analysis-tag-primary-cue" data-tip="Indeed company rating extracted from the job header.">
+                            <span className="analysis-tag-check" aria-hidden="true">✓</span>
+                            <div className="analysis-tag-text">
+                              <div className="analysis-tag-title">COMPANY RATING</div>
+                              <div className="analysis-tag-value">{detectedIndeedCompanyRatingValue}</div>
+                            </div>
+                          </div>
+                        )}
+                        {hasMeaningfulDetectedValue(detectedIndeedPayValue) && (
+                          <div className="analysis-tag analysis-tag-primary-cue" data-tip="Indeed pay extracted from visible job pay details.">
+                            <span className="analysis-tag-check" aria-hidden="true">✓</span>
+                            <div className="analysis-tag-text">
+                              <div className="analysis-tag-title">PAY</div>
+                              <div className="analysis-tag-value">{detectedIndeedPayValue}</div>
+                            </div>
+                          </div>
+                        )}
+                      </>
                     )}
                   </div>
 
@@ -1548,7 +1988,7 @@ setJobDescription('');
                         <div className="analysis-tag-text">
                           <div className="analysis-tag-title">Posting Age</div>
                           <div className="analysis-tag-value">
-    {scoreBreakdown?.postingAge ?? 0}
+    {renderScoreSummaryValue(scoreBreakdown?.postingAge, 'postingAge')}
 
 </div>
 
@@ -1562,7 +2002,7 @@ setJobDescription('');
                         <div className="analysis-tag-text">
                           <div className="analysis-tag-title">Freshness Indicators</div>
                           <div className="analysis-tag-value">
-    {scoreBreakdown?.freshness1 ?? 0}
+    {renderScoreSummaryValue(scoreBreakdown?.freshness1, 'freshness1')}
 
 </div>
                         </div>
@@ -1575,7 +2015,7 @@ setJobDescription('');
                         <div className="analysis-tag-text">
                           <div className="analysis-tag-title">Content Uniqueness</div>
                           <div className="analysis-tag-value">
-  {scoreBreakdown?.contentUniqueness ?? 0}
+  {renderScoreSummaryValue(scoreBreakdown?.contentUniqueness, 'contentUniqueness')}
 </div>
                         </div>
                       </div>
@@ -1587,7 +2027,7 @@ setJobDescription('');
                         <div className="analysis-tag-text">
                           <div className="analysis-tag-title">Activity Indicators</div>
                           <div className="analysis-tag-value">
-  {scoreBreakdown?.activityIndicators ?? 0}
+  {renderScoreSummaryValue(scoreBreakdown?.activityIndicators, 'activityIndicators')}
 </div>
                         </div>
                       </div>
@@ -1599,7 +2039,7 @@ setJobDescription('');
                         <div className="analysis-tag-text">
                           <div className="analysis-tag-title">Freshness Indicators</div>
                           <div className="analysis-tag-value">
-  {scoreBreakdown?.freshness2 ?? 0}
+  {renderScoreSummaryValue(scoreBreakdown?.freshness2, 'freshness2')}
 </div>
                         </div>
                       </div>
@@ -1611,9 +2051,33 @@ setJobDescription('');
                         <div className="analysis-tag-text">
                             <div className="analysis-tag-title">Site Reliability Indicators</div>
                             <div className="analysis-tag-value">
-  {scoreBreakdown?.siteReliability ?? 0}
+  {renderScoreSummaryValue(scoreBreakdown?.siteReliability, 'siteReliability')}
 </div>
 
+                        </div>
+                      </div>
+                    )}
+
+                    {analysisSteps.scoreRecruiterContactQuality === 'complete' && (
+                      <div
+                        className="analysis-tag"
+                        data-tip={
+                          detectedRecruiterContactQualityReasonValue
+                            ? `Quality of hiring contact extraction. ${detectedRecruiterContactQualityReasonValue}`
+                            : 'Quality of hiring contact extraction (person/company/missing).'
+                        }
+                      >
+                        <img src={checkComplete} alt="" className="analysis-tag-icon" />
+                        <div className="analysis-tag-text">
+                          <div className="analysis-tag-title">Recruiter/Contact Quality</div>
+                          <div className="analysis-tag-value">
+                            {detectedRecruiterContactQualityValue || renderScoreSummaryValue(scoreBreakdown?.recruiterContactQuality, 'recruiterContactQuality')}
+                          </div>
+                          {detectedRecruiterContactQualityReasonValue && (
+                            <div className="analysis-tag-value" style={{ opacity: 0.85 }}>
+                              {detectedRecruiterContactQualityReasonValue}
+                            </div>
+                          )}
                         </div>
                       </div>
                     )}
@@ -1699,6 +2163,7 @@ setJobDescription('');
 
       {/* NEWSLETTER */}
       <section
+        id="newsletter"
         className={`newsletter-section${
           isPaidRoute && !showPricingOnPaid ? ' newsletter-section--paid' : ''
         }`}
@@ -1856,6 +2321,7 @@ setJobDescription('');
 
           <div className="footer-col">
             <a href="#hero">Home</a>
+            <a href="/blog">Blog</a>
             <a href="#hero">Run Free Check Now</a>
             <a href="#pricing">Upgrade to Plus</a>
             <a href="#pricing">Upgrade to Pro</a>
