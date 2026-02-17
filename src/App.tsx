@@ -1275,9 +1275,38 @@ timeoutsRef.current.push(t4);
     setAccessCode(next);
     localStorage.setItem('gj_access_code', next);
   }}
-  onAccessCodeSubmit={(raw: string) => {
+  onAccessCodeSubmit={async (raw: string) => {
     const code = (raw || '').trim();
     if (!code) return;
+
+    if (/^coupon_/i.test(code)) {
+      const promoCode = code.replace(/^coupon_/i, '').trim();
+      if (!promoCode) {
+        setFormError('Promo code format is invalid.');
+        return;
+      }
+      try {
+        const r = await fetch(`${API_BASE}/api/promo/redeem`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ code: promoCode }),
+        });
+        const data = await r.json().catch(() => null);
+        if (!r.ok || !data?.code || !data?.plan) {
+          setFormError(data?.error || 'Promo code could not be redeemed.');
+          return;
+        }
+        const redeemedCode = String(data.code).trim();
+        setAccessCode(redeemedCode);
+        localStorage.setItem('gj_access_code', redeemedCode);
+        const planPath = planPathFrom(String(data.plan) as 'day' | 'casual' | 'active');
+        window.location.assign(`${planPath}?code=${encodeURIComponent(redeemedCode)}`);
+        return;
+      } catch {
+        setFormError('Network error while redeeming promo code.');
+        return;
+      }
+    }
 
     // Persist
     setAccessCode(code);
