@@ -17,24 +17,24 @@ export default function Navbar({
   isHomePage?: boolean;
   accessCode: string;
   onAccessCodeChange: (next: string) => void;
-  onAccessCodeSubmit: (code: string) => void;
+  onAccessCodeSubmit: (code: string) => void | Promise<void>;
   onPricingClick?: () => void;
 }) {
 
   const [menuOpen, setMenuOpen] = useState(false);
   const menuWrapRef = useRef<HTMLDivElement | null>(null);
 
-  const submitAccessCode = () => {
+  const submitAccessCode = async () => {
     const code = (accessCode || '').trim();
     if (!code) return;
-    onAccessCodeSubmit(code);
+    await onAccessCodeSubmit(code);
     setMenuOpen(false);
   };
 
   const onAccessKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
       e.preventDefault();
-      submitAccessCode();
+      void submitAccessCode();
     }
   };
 
@@ -124,7 +124,9 @@ export default function Navbar({
               <button
                 type="button"
                 className="accesscode-submit"
-                onClick={submitAccessCode}
+                onClick={() => {
+                  void submitAccessCode();
+                }}
                 aria-label="Submit access code"
               >
                 <img src={enterIcon} alt="" aria-hidden="true" />
@@ -190,7 +192,7 @@ export default function Navbar({
                 className="nav-menu-access-form"
                 onSubmit={(e) => {
                   e.preventDefault();
-                  submitAccessCode();
+                  void submitAccessCode();
                 }}
               >
                 <div className="accesscode-wrap accesscode-wrap-menu">
@@ -207,7 +209,7 @@ export default function Navbar({
                     type="button"
                     className="accesscode-submit"
                     onClick={() => {
-                      submitAccessCode();
+                      void submitAccessCode();
                     }}
                     aria-label="Submit access code"
                   >

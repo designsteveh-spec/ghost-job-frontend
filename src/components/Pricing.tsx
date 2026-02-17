@@ -8,7 +8,7 @@ import xIcon from '../assets/red-checkmark.svg';
 
 export default function Pricing() {
   const API_BASE =
-    (import.meta as any).env?.VITE_API_BASE || 'https://ghost-job-api.onrender.com';
+    (import.meta as any).env?.VITE_API_BASE || 'https://ghostjobs.trusted-tools.com';
 
   async function startCheckout(plan: 'day' | 'casual' | 'active') {
     try {
@@ -30,6 +30,7 @@ export default function Pricing() {
       alert('Checkout could not be started. Please try again.');
     }
   }
+
 
   return (
     <section id="pricing" className="pricing">

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 
 const API_BASE =
-  (import.meta as any).env?.VITE_API_BASE || 'https://ghost-job-api.onrender.com';
+  (import.meta as any).env?.VITE_API_BASE || 'https://ghostjobs.trusted-tools.com';
 
 export default function ContactSection() {
   const [email, setEmail] = useState('');
