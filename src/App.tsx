@@ -68,6 +68,41 @@ async function ensureApiAwake(): Promise<boolean> {
   return false;
 }
 
+function computeJobLinkConfidence(input: { url: string; jobDescription?: string; pageTitle?: string }) {
+  const urlLower = String(input.url || '').toLowerCase();
+  const text = `${input.pageTitle || ''} ${input.jobDescription || ''}`.toLowerCase();
+  let score = 0;
+
+  const urlTerms = ['job', 'jobs', 'career', 'careers', 'position', 'opening', 'vacancy', 'apply', 'hiring'];
+  for (const term of urlTerms) {
+    if (urlLower.includes(term)) score += 1;
+  }
+
+  const strongTerms = [
+    'job description',
+    'full job description',
+    'job requirements',
+    'responsibilities',
+    'qualifications',
+    'work location',
+    'about the job',
+    'about the company',
+  ];
+  for (const term of strongTerms) {
+    if (text.includes(term)) score += 2;
+  }
+
+  const generalTerms = ['apply now', 'apply', 'join our', 'salary', 'full-time', 'part-time', 'remote', 'hybrid', 'job details'];
+  for (const term of generalTerms) {
+    if (text.includes(term)) score += 1;
+  }
+
+  if (String(input.jobDescription || '').trim().length >= 180) score += 2;
+  if (/\b(job|career|hiring|apply)\b/i.test(String(input.pageTitle || ''))) score += 2;
+
+  return score;
+}
+
 
 
 function safeDecodePlanFromAccessCode(code: string): { plan: 'day' | 'casual' | 'active'; exp?: number } | null {
@@ -197,6 +232,7 @@ export default function App() {
   const isPaidRoute = isCasualRoute || isActiveRoute || isDayRoute;
 
   const [accessCode, setAccessCode] = useState('');
+  const jobLinkBypassUntilRef = useRef<Record<string, number>>({});
   const [showPassUnlocked, setShowPassUnlocked] = useState(false);
   const [unlockedPlanLabel, setUnlockedPlanLabel] = useState<'Day' | 'Casual' | 'Active'>('Casual');
 
@@ -968,6 +1004,22 @@ if (override?.postingDate !== undefined) setPostingDateOverride(override.posting
   setFormError('Paste a job link to analyze.');
   return;
 }
+
+    const jobLinkKey = urlValue.toLowerCase();
+    const bypassUntil = Number(jobLinkBypassUntilRef.current[jobLinkKey] || 0);
+    const now = Date.now();
+    if (bypassUntil <= now) {
+      const confidence = computeJobLinkConfidence({
+        url: urlValue,
+        jobDescription: descValue,
+        pageTitle: document?.title || '',
+      });
+      if (confidence < 3) {
+        jobLinkBypassUntilRef.current[jobLinkKey] = now + 10 * 60 * 1000;
+        setFormError('Not a job link, try again.');
+        return;
+      }
+    }
 
 setLastAnalyzedUrl(urlValue);
 
