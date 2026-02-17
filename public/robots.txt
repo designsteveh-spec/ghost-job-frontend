@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://ghostjobs.trusted-tools.com/sitemap.xml

@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import './index.css';
 import Pricing from './components/Pricing';
 import MailerLiteForm from './components/MailerLiteForm';
+import { applySeo } from './seo';
 
 
 import Navbar from './components/Navbar';
@@ -171,13 +172,23 @@ function decodeBase64UrlJson<T>(value: string): T | null {
 }
 
 export default function App() {
+  const pathname = window.location.pathname || '/';
+
+  useEffect(() => {
+    applySeo({
+      title: 'Ghost Job Checker',
+      description:
+        'Check job postings for ghost job signals using recency, activity, and recruiter-contact quality cues before you apply.',
+      path: pathname,
+    });
+  }, [pathname]);
+
   useEffect(() => {
   // Warm up API (Render may cold-start after inactivity)
   fetch(`${API_BASE}/api/health`).catch(() => {});
 }, []);
 
-
-  const path = window.location.pathname || '/';
+  const path = pathname;
   const searchParams = new URLSearchParams(window.location.search);
   const isExtensionEntry = (searchParams.get('ext_source') || '').trim().toLowerCase() === 'extension';
   const isCasualRoute = path === '/casual';
@@ -2310,6 +2321,7 @@ setJobDescription('');
 
           <div className="footer-col">
             <a href="#hero">Home</a>
+            <a href="/blog">Blog</a>
             <a href="#hero">Run Free Check Now</a>
             <a href="#pricing">Upgrade to Plus</a>
             <a href="#pricing">Upgrade to Pro</a>

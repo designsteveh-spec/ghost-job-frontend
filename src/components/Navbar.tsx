@@ -7,12 +7,14 @@ import enterIcon from '../assets/input-enterIcon.svg';
 
 export default function Navbar({
   isPaidRoute,
+  isHomePage = true,
   accessCode,
   onAccessCodeChange,
   onAccessCodeSubmit,
   onPricingClick,
 }: {
   isPaidRoute: boolean;
+  isHomePage?: boolean;
   accessCode: string;
   onAccessCodeChange: (next: string) => void;
   onAccessCodeSubmit: (code: string) => void;
@@ -63,12 +65,16 @@ export default function Navbar({
   }, [menuOpen]);
 
 
+  const homeHref = isHomePage ? '#hero' : '/';
+  const pricingHref = isHomePage ? '#pricing' : '/#pricing';
+  const newsletterHref = isHomePage ? '#newsletter' : '/#newsletter';
+
   return (
     <header className="site-header">
       <div className="nav-inner">
         {/* Brand / Logo */}
         <a
-          href={isPaidRoute ? '#hero' : '#pricing'}
+          href={isPaidRoute ? homeHref : pricingHref}
           className="brand"
           onClick={() => setMenuOpen(false)}
         >
@@ -88,12 +94,12 @@ export default function Navbar({
         {/* Desktop actions */}
         <div className="nav-actions nav-actions-desktop">
           <a
-  href="#pricing"
+  href={pricingHref}
   className="nav-link-pricing"
   onClick={(e) => {
     setMenuOpen(false);
 
-    if (isPaidRoute && onPricingClick) {
+    if (isHomePage && isPaidRoute && onPricingClick) {
       e.preventDefault();
       onPricingClick();
     }
@@ -144,12 +150,21 @@ export default function Navbar({
           {menuOpen && (
             <div id="nav-menu-panel" className="nav-menu-panel">
               <a
-                href="#pricing"
+                role="menuitem"
+                href="/blog"
+                className="nav-menu-item"
+                onClick={() => setMenuOpen(false)}
+              >
+                Blog
+              </a>
+
+              <a
+                href={pricingHref}
                 className="nav-menu-item"
                 onClick={(e) => {
                   setMenuOpen(false);
 
-                  if (isPaidRoute && onPricingClick) {
+                  if (isHomePage && isPaidRoute && onPricingClick) {
                     e.preventDefault();
                     onPricingClick();
                   }
@@ -160,7 +175,7 @@ export default function Navbar({
 
               <a
                 role="menuitem"
-                href="#newsletter"
+                href={newsletterHref}
                 className="nav-menu-item"
                 onClick={() => setMenuOpen(false)}
               >
