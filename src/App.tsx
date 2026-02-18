@@ -85,8 +85,16 @@ function computeJobLinkConfidence(input: { url: string; jobDescription?: string;
     'responsibilities',
     'qualifications',
     'work location',
+    'on-site',
+    'onsite',
     'about the job',
     'about the company',
+    'company description',
+    "what we're looking for",
+    'apply now',
+    'apply to job',
+    'apply on company site',
+    'job details',
   ];
   for (const term of strongTerms) {
     if (text.includes(term)) score += 2;
@@ -232,7 +240,6 @@ export default function App() {
   const isPaidRoute = isCasualRoute || isActiveRoute || isDayRoute;
 
   const [accessCode, setAccessCode] = useState('');
-  const jobLinkBypassUntilRef = useRef<Record<string, number>>({});
   const [showPassUnlocked, setShowPassUnlocked] = useState(false);
   const [unlockedPlanLabel, setUnlockedPlanLabel] = useState<'Day' | 'Casual' | 'Active'>('Casual');
 
@@ -1005,20 +1012,13 @@ if (override?.postingDate !== undefined) setPostingDateOverride(override.posting
   return;
 }
 
-    const jobLinkKey = urlValue.toLowerCase();
-    const bypassUntil = Number(jobLinkBypassUntilRef.current[jobLinkKey] || 0);
-    const now = Date.now();
-    if (bypassUntil <= now) {
-      const confidence = computeJobLinkConfidence({
-        url: urlValue,
-        jobDescription: descValue,
-        pageTitle: document?.title || '',
-      });
-      if (confidence < 3) {
-        jobLinkBypassUntilRef.current[jobLinkKey] = now + 10 * 60 * 1000;
-        setFormError('Not a job link, try again.');
-        return;
-      }
+    const confidence = computeJobLinkConfidence({
+      url: urlValue,
+      jobDescription: descValue,
+      pageTitle: document?.title || '',
+    });
+    if (confidence < 3) {
+      setFormError('Flagged as possible non-job link. Running analysis anyway.');
     }
 
 setLastAnalyzedUrl(urlValue);
