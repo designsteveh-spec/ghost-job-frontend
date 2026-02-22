@@ -2364,13 +2364,44 @@ setJobDescription('');
               </p>
 
               <p>
-                Email addresses may be collected for optional newsletters or
-                upgrades. Personal information is not sold.
+                <strong>Chrome Extension Data Use:</strong> when you click
+                Analyze Job in the extension, we process data from the current
+                job page to generate your score and report. This can include
+                the page URL, page title, visible job-listing text/signals
+                (such as job description excerpts and related listing metadata),
+                and any access code you choose to submit.
               </p>
 
               <p>
-                Payments are processed by third-party providers such as Stripe
-                and are subject to their privacy policies.
+                Extension analysis data is sent to our service endpoint at
+                <strong> ghostjobsapi.trusted-tools.com</strong>. No extension
+                analysis request is sent until you initiate it (for example, by
+                clicking Analyze Job). We do not sell personal information.
+              </p>
+
+              <p>
+                We use submitted data to operate, secure, troubleshoot, and
+                improve the service, and to enforce usage limits. Access codes
+                may be stored locally in your browser so you do not have to
+                re-enter them each time.
+              </p>
+
+              <p>
+                Email addresses may be collected for optional newsletters or
+                upgrades. Payments are processed by third-party providers such
+                as Stripe and are subject to their privacy policies.
+              </p>
+
+              <p>
+                For privacy questions, data requests, or deletion requests,
+                contact{' '}
+                <a
+                  href="mailto:support@trusted-tools.com"
+                  style={{ color: '#2563eb', textDecoration: 'underline' }}
+                >
+                  support@trusted-tools.com
+                </a>
+                .
               </p>
             </div>
           )}
